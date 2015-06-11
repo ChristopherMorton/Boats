@@ -2,18 +2,6 @@
 
 var LOG = $( "#log" );
 
-String.prototype.width = function(font) {
-  var f = font || '12px arial',
-      o = $('<div>' + this + '</div>')
-            .css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': f})
-            .appendTo($('body')),
-      w = o.width();
-
-  o.remove();
-
-  return w;
-}
-
 /////////////////////////////////////////////////////////////////////
 // Data ---
 
@@ -35,43 +23,79 @@ var island_nav_c_img = new Image();
 var island_nav_cc_img = new Image();
 
 var bananas_img = new Image();
+var coconuts_img = new Image();
+var lemons_img = new Image();
+var limes_img = new Image();
+var apple_img = new Image();
 var peanuts_img = new Image();
+var carrots_img = new Image();
+var chickens_img = new Image();
+var turkeys_img = new Image();
+
+var burlap_img = new Image();
 var cotton_img = new Image();
 var silk_img = new Image();
+var doll_img = new Image();
 
-// Terrain
-var TER_MAX = 100;
+var copper_img = new Image();
+var tin_img = new Image();
+var bronze_img = new Image();
+var iron_img = new Image();
+var steel_img = new Image();
 
 // Cargo
 var cargo_index = {
    // Fruits
-   bananas: { name:'bananas', image:bananas_img, desc:'a strangely shaped fruit', foodvalue:2 },
+   bananas: { name:'bananas', image:bananas_img, desc:'a strangely shaped fruit', weight:2, foodvalue:4 },
+   coconuts: { name:'coconuts', image:coconuts_img, desc:'a strange fruit full of milk', weight:2, foodvalue:4 },
+   lemons: { name:'lemons', image:lemons_img, desc:'a strangely tart yellow fruit', weight:1, foodvalue:2 },
+   limes: { name:'limes', image:limes_img, desc:'a strangely sour green fruit', weight:1, foodvalue:2 },
+   apples: { name:'apples', image:apple_img, desc:'a strangely crunchy red fruit', weight:1, foodvalue:2 },
    // Vegetables
-   splitpeas: { name:'split peas', image:bananas_img, foodvalue:2 },
-   peanuts: { name:'peanuts', image:peanuts_img, foodvalue:3 },
+   splitpeas: { name:'split peas', image:bananas_img, desc:'', weight:1, foodvalue:2 },
+   carrots: { name:'carrots', image:carrots_img, desc:'a phallic root vegetable', weight:1, foodvalue:2 },
+   tomatoes: { name:'tomatoes', image:carrots_img, desc:'a squishy red vegetable, or fruit maybe', weight:1, foodvalue:2 },
+   peanuts: { name:'peanuts', image:peanuts_img, desc:'a nut that is nothing like a pea', weight:1, foodvalue:2 },
+   // Animals
+   chickens: { name:'chickens', image:chickens_img, desc:'the original white meat', weight:4, foodvalue: 9 },
+   turkeys: { name:'turkeys', image:turkeys_img, desc:'bigger weirder chickens', weight:14, foodvalue:32 },
+   // Cooked foods
    // Raw Resources
-   softwood: { name:'soft wood', image:bananas_img },
-   hardwood: { name:'hard wood', image:bananas_img },
-   burlap: { name:'burlap', image:bananas_img },
-   cotton: { name:'cotton', image:cotton_img },
-   silk: { name:'silk', image:silk_img },
-   // Intermediate Resources
-   nails: { name:'box of nails', image:bananas_img },
+   softwood: { name:'soft wood', image:bananas_img, desc:"flexible like your mother's standards", weight:1.5 },
+   hardwood: { name:'hard wood', image:bananas_img, desc:"very stiff", weight:2 },
+   burlap: { name:'burlap', image:burlap_img, desc:"not the softest, I'll admit", weight:1 },
+   cotton: { name:'cotton', image:cotton_img, desc:'this stuff is way softer than burlap', weight:1 },
+   silk: { name:'silk', image:silk_img, desc:'woven from butterfly wings and maybe rainbows', weight:1 },
+   // Stone/metal
+   stone: { name:'cut stone', image:bananas_img, desc:'I want a rock! (Rock!)', weight:6 },
+   granite: { name:'granite', image:bananas_img, desc:'level up your kitchen', weight:8 },
+   obsidian: { name:'obsidian', image:bananas_img, desc:'frozen fire, in the tongue of old Valyria', weight:4 },
+   coal: { name:'coal', image:bananas_img, desc:'I think I have the black lung', weight:4 },
+   copper: { name:'copper', image:copper_img, desc:'great for electrical wiring', weight:6 },
+   tin: { name:'tin', image:tin_img, desc:'you know, the metal', weight:6 },
+   bronze: { name:'bronze', image:bronze_img, desc:'a new age is upon us', weight:6 },
+   iron: { name:'iron', image:iron_img, desc:"the workhorse of the iron age, unsurprisingly", weight:10 },
+   steel: { name:'steel', image:steel_img, desc:"pretty much the best metal you could ask for", weight:12 },
+   // Usable Resources
+   bronzetools: { name:'bronze tools', image:bananas_img, desc:'', weight:6 },
+   irontools: { name:'iron tools', image:bananas_img, desc:'', weight:8 },
    // Crafted Items
-   dolls: { name:'dolls', image:bananas_img },
-   dresses: { name:'dresses', image:bananas_img },
-   fancydresses: { name:'fancy dresses', image:bananas_img }
+   dolls: { name:'dolls', image:doll_img, desc:"a child's plaything", weight:1 },
+   dresses: { name:'dresses', image:bananas_img, desc:'', weight:2 },
+   fancydresses: { name:'fancy dresses', image:bananas_img, desc:'', weight:2.5 },
+   // Weapons
 }
-var cargo_selected = '';
 
 // Places
 var places = [];
+var place_id_gen = 0;
+var TOWN_MAX_SIZE = 25;
 
 // Boats
 var boat_canvas = $('#boat_canvas')[0]
 boat_canvas.onselectstart = function () { return false; }
 var boat_context = boat_canvas.getContext('2d');
-var BOAT_WIDTH = 550, BOAT_HEIGHT = 409;
+var BOAT_WIDTH = 550, BOAT_HEIGHT = 429;
 var BOAT_SCROLLBAR_WIDTH = 15;
 var BOAT_HEADER_HEIGHT = 22;
 var BOAT_INNER_X = BOAT_SCROLLBAR_WIDTH + 65, BOAT_INNER_Y = BOAT_HEADER_HEIGHT + 5;
@@ -79,7 +103,7 @@ var BOAT_INNER_WIDTH = BOAT_WIDTH - (BOAT_INNER_X + 5);
 var BOAT_INNER_HEIGHT = BOAT_HEIGHT - (BOAT_INNER_Y + 5);
 var BOAT_NAV_CENTER_X = 90, BOAT_NAV_CENTER_Y = 130;
 
-var boat_menu = 1; // 1 = boats, 2 = cargo, 3 = sail, 4 = city, 5 = market
+var boat_menu = 1; // 1 = boats, 3 = cargo, 2 = sail, 5 = city, 4 = market
 var boat_scroll = 0;
 var boat_selection = 0;
 
@@ -93,20 +117,23 @@ var map_canvas = $('#map_canvas')[0]
 map_canvas.onselectstart = function () { return false; }
 var map_context = map_canvas.getContext('2d');
 var MAP_DRAW_DIM = 405, MAP_SQUARE_DIM = 45, MAP_DRAW_EDGE = 2, MAP_FULL_DIM = MAP_DRAW_DIM + (2 * MAP_DRAW_EDGE);
-var MAP_CONTROLS_WIDTH = 80;
+var MAP_CONTROLS_WIDTH = 40;
+var MAP_CONTROLS_HEIGHT = 20;
 var MAP_GRID_SIZE = 9, MAP_ZOOM_RATIO = 3;
-var MAP_HEIGHT = 1000, MAP_WIDTH = 1000;
+var MAP_HEIGHT = 400, MAP_WIDTH = 400;
 
 var map;
 var map_zoom_level = 0; // 1 tick = GRID_SIZE ^ zoom_level
-var map_center_x = 500, map_center_y = 500; 
+var map_center_x = 300, map_center_y = 300; 
 var shift_down = false;
 
 // Generation
-var GEN_NUM_ISLANDS = 600, GEN_NUM_BIG_ISLANDS = 30;
+var GEN_NUM_ISLANDS = 200, GEN_NUM_BIG_ISLANDS = 15;
 var GEN_HEIGHT_MIN = 5, GEN_WIDTH_MIN = 5;
 var GEN_HEIGHT_DIFF = 10, GEN_WIDTH_DIFF = 10;
 var GEN_MIN_ADJ = 3;
+var GEN_CITY_LAND_MIN = 30;
+var GEN_CITY_CHANCE_DENOM = 150;
  
 // Controls
 var mapDrag = false;
@@ -120,11 +147,125 @@ var shift_down = false;
 // General
 var discovery_fog_on = false;
 
+var text_box_selection = '';
+
+/////////////////////////////////////////////////////////////////////
+// Misc ---
+
+String.prototype.width = function(font) {
+  var f = font || '12px arial',
+      o = $('<div>' + this + '</div>')
+            .css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': f})
+            .appendTo($('body')),
+      w = o.width();
+
+  o.remove();
+
+  return w;
+}
+   
+function fitText( context, text, x_min, x_max, y_min, font_pt, font, centered, first_line_offset )
+{
+   var text_split = text.split(' ');
+   var text_bit = '', text_bit_temp = '';
+   var text_width = 0;
+   var y = y_min + font_pt;
+
+   context.font = font;
+
+   for (var i = 0; i < text_split.length; ++i) {
+      text_bit_temp += text_split[i];
+      text_width = text_bit_temp.width( font );
+      if (text_width + x_min > x_max) { // Can't add that bit
+         if (centered) context.fillText( text_bit, (x_min + x_max - text_bit.width( font )) / 2 , y );
+         else context.fillText( text_bit, x_min, y );
+
+         text_bit = text_bit_temp = text_split[i] + ' ';
+         y += font_pt;
+      } else {
+         text_bit_temp += ' ';
+         text_bit = text_bit_temp;
+      }
+   }
+   if (text_bit) {
+      if (centered) context.fillText( text_bit, (x_min + x_max - text_bit.width( font )) / 2 , y );
+      else context.fillText( text_bit, x_min, y );
+
+      return y;
+   }
+   return y - font_pt;
+}
+
+function textButton( context, x_mid, y_mid, text, font_pt, font, pressed )
+{
+   var width = text.width( font );
+   if (pressed) {
+      var x_min = x_mid - (width / 2) - 1;
+      var y_min = y_mid - (font_pt / 2) - 5;
+      context.fillStyle = "rgba(45,45,45,1)";
+      context.fillRect( x_min, y_min, width + 14, font_pt + 16 );
+      context.fillStyle = "white";
+      context.fillRect( x_min + 3, y_min + 3, width + 8, font_pt + 10 );
+   } else {
+      var x_min = x_mid - (width / 2);
+      var y_min = y_mid - (font_pt / 2) - 4;
+      context.fillStyle = "rgba(45,45,45,1)";
+      context.fillRect( x_min, y_min, width + 12, font_pt + 14 );
+      context.fillStyle = "white";
+      context.fillRect( x_min + 2, y_min + 2, width + 8, font_pt + 10 );
+   }
+   context.fillStyle = "black";
+   context.font = font;
+   context.fillText( text, x_min + 6, y_min + font_pt + 6 );
+}
+
+function updateTextBox( char_code )
+{
+   if (text_box_selection === 'coords E' || text_box_selection === 'coords S') {
+      var boat = boats[ my_boats[boat_selection] ];
+      var member_name = (text_box_selection === 'coords E')?'journey_x':'journey_y';
+      var cur_str = '' + boat[member_name];
+      var new_val = -1;
+      if (boat[member_name] === -1)
+         cur_str = '';
+
+      if (char_code === 46 /*delete*/ || char_code === 8 /*backspace*/) {
+         cur_str = cur_str.slice(0, -1);
+
+         if (cur_str === '')
+            new_val = -1;
+         else 
+            new_val = Number( cur_str );
+      }
+      else if (char_code >= 48 && char_code <= 57)
+      {
+         cur_str += (char_code - 48);
+         new_val = Number( cur_str );
+      } 
+      else if (char_code >= 96 && char_code <= 105)
+      {
+         cur_str += (char_code - 96);
+         new_val = Number( cur_str );
+      }
+      if (new_val < -1) new_val = -1;
+      if (new_val >= MAP_WIDTH) return;
+
+      boat[member_name] = new_val;
+   }
+
+}
+
 /////////////////////////////////////////////////////////////////////
 // Terrain ---
 
-/* first bit === 0 -> full water
- * otherwise it's land
+/* First we have bits to describe the kind of terrain.
+ * 0 -> full water
+ * 1 -> green grass
+ * 2 -> green jungle
+ * 3 -> light stone
+ * 4 -> dark stone
+ * 5 -> yellow desert
+ * 6 -> icy stone
  *
  * Then, 3 bits each for the start and end direction of the land, moving clockwise
  *
@@ -138,20 +279,60 @@ var discovery_fog_on = false;
  * 7 6 5
  */
 
-function constructTerrain( start_dir, end_dir, river_bits ) { // Goes Clockwise
-   return 1 + (start_dir << 1) + (end_dir << 4) + (river_bits << 7);
+function constructTerrain( start_dir, end_dir, river_bits, ter_type ) { // Goes Clockwise
+   var ter = ter_type || 1;
+   return ter + (start_dir << 3) + (end_dir << 6) + (river_bits << 9);
+}
+
+function terGetType( terrain ) {
+   return terrain & 7;
 }
 
 function terGetStart( terrain ) {
-   return (terrain >> 1) & 7;
+   return (terrain >> 3) & 7;
 }
 
 function terGetEnd( terrain ) {
-   return (terrain >> 4) & 7; 
+   return (terrain >> 6) & 7; 
 }
 
+/*
 function terGetRivers( terrain ) {
-   return (terrain >> 7) & 0xFF;
+   return (terrain >> 9) & 0xFF;
+}
+
+function terGetRiver( terrain, dir ) {
+   return (terrain >> (9 + dir)) & 0x1;
+}
+
+function terToggleRiver( terrain, dir ) {
+   var flipmask = 0x1 << (9 + dir);
+   terrain = terrain ^ flipmask;
+   return terrain;
+}
+*/
+
+function terSetColor( terrain, context ) {
+   switch (terGetType( terrain )) {
+      case 1:
+         context.fillStyle = "rgba(0,185,0,1)"; // green plains
+         break;
+      case 2:
+         context.fillStyle = "rgba(0,135,0,1)"; // green jungle
+         break;
+      case 3:
+         map_context.fillStyle = "rgba(155,155,155,1)"; // light stone
+         break;
+      case 4:
+         map_context.fillStyle = "rgba(115,115,115,1)"; // dark stone
+         break;
+      case 5:
+         map_context.fillStyle = "rgba(195,155,105,1)"; // sandy desert
+         break;
+      case 6:
+         map_context.fillStyle = "rgba(175,225,235,1)"; // icy desert
+         break;
+   }
 }
 
 function addDirection( x, y, dir )
@@ -172,16 +353,235 @@ function addDirection( x, y, dir )
 /////////////////////////////////////////////////////////////////////
 // Places ---
 
+/* So, let's talk about how towns work.
+ *
+ * First, they have certain natural resources, which are regularly harvested
+ * to produce raw goods.
+ *
+ * Second, they have 
+ */
+
 function Place( type, name )
 {
    this.type = type;
    if (type === "town") {
       this.name = name;
-      this.techlevel = 0;
-      this.tech = {};
-      this.stock = {};
+      this.id = place_id_gen++;
+      this.x = -1;
+      this.y = -1;
 
+      this.discovered = false;
+
+      this.color = "rgba(255,55,55,1)";
+
+      this.update_tick = 0;
+      this.upgrade_frequency = 500; // every 100 seconds
+      this.resources = {};
+      this.industries = {};
+      this.stock = {};
    }
+}
+
+function townNameGen()
+{
+   return 'Praetoria';
+}
+
+function growTown( town, inland )
+{
+   if (town.size >= TOWN_MAX_SIZE)
+      return false;
+
+   var town_center = map[town.x][town.y];
+   // Strategy: expand orthoganally or down the coast
+
+   // First find coastal expansion
+   var start_extremety = town_center, start_distance = 0;
+   var s_e_x = town.x, s_e_y = town.y;
+   while (start_extremety.place === town.id) {
+      var move = addDirection( s_e_x, s_e_y, terGetStart( start_extremety.terrain ) );
+      s_e_x = move[0];
+      s_e_y = move[1];
+      start_extremety = map[s_e_x][s_e_y];
+      start_distance++;
+      if (s_e_x === town.x && s_e_y === town.y) {
+         // Made a full circle
+         return false;
+      }
+   }
+   var end_extremety = town_center, end_distance = 0;
+   var e_e_x = town.x, e_e_y = town.y;
+   while (end_extremety.place === town.id) {
+      var move = addDirection( e_e_x, e_e_y, terGetEnd( end_extremety.terrain ) );
+      e_e_x = move[0];
+      e_e_y = move[1];
+      end_extremety = map[e_e_x][e_e_y];
+      end_distance++;
+   }
+
+   // Decide which way we're going
+   var decision_cap = (1.5 / start_distance) + (1.5 / end_distance) + 1;
+   if (inland === false)
+      decision_cap = (1.5 / start_distance) + (1.5 / end_distance);
+   var decision = Math.random() * decision_cap;
+
+   if (decision < (1.5 / start_distance) && start_extremety.place === undefined) { // Expand start-ward
+      // If start_extremety is orthogonal to last town, just do it
+      var connect_dir = terGetEnd( start_extremety.terrain );
+      if (connect_dir % 2 === 0) {
+         map[s_e_x][s_e_y].place = town.id;
+      }
+      else
+      {
+         // Otherwise, go through the orthoganal connector
+         move = addDirection( s_e_x, s_e_y, (connect_dir + 7) % 8 );
+         if (map[move[0]][move[1]].place === town.id)
+            map[s_e_x][s_e_y].place = town.id;
+         else
+            map[move[0]][move[1]].place = town.id;
+      }
+
+   } else if (decision < (1.5 / start_distance) + (1.5 / end_distance) && end_extremety.place === undefined) { // Expand end-ward
+      // If end_extremety is orthogonal to last town, just do it
+      var connect_dir = terGetStart( end_extremety.terrain );
+      if (connect_dir % 2 === 0) {
+         map[e_e_x][e_e_y].place = town.id;
+      }
+      else
+      {
+         // Otherwise, go through the orthoganal connector
+         move = addDirection( e_e_x, e_e_y, (connect_dir + 1) % 8 );
+         if (map[move[0]][move[1]].place === town.id)
+            map[e_e_x][e_e_y].place = town.id;
+         else
+            map[move[0]][move[1]].place = town.id;
+      }
+
+   } else { // expand inland
+      // Select a piece of coast to expand from
+      decision_cap = start_distance + end_distance - 1;
+      decision = Math.random() * decision_cap;
+
+      var x = town.x, y = town.y, expand_spot = town_center;
+      if (decision < start_distance - 1) {
+         // Move start-wise
+         while( decision > 0 ) {
+            move = addDirection( x, y, terGetStart( expand_spot.terrain ) );
+            x = move[0];
+            y = move[1];
+            expand_spot = map[x][y];
+            decision--;
+         }
+      } else if (decision < start_distance + end_distance - 2) {
+         // Move end-wise
+         decision -= start_distance - 1;
+         while( decision > 0 ) {
+            move = addDirection( x, y, terGetEnd( expand_spot.terrain ) );
+            x = move[0];
+            y = move[1];
+            expand_spot = map[x][y];
+            decision--;
+         }
+      }
+
+      // Select a direction to expand
+      // Choose randomly from all directions between start and end
+      // Then just go that way
+      // If it fails - start growTown over again?
+      var start = terGetStart( expand_spot.terrain ), end = terGetEnd( expand_spot.terrain ), dir = -1;
+      if ((start + 1) % 8 === end) {
+         // Too small, fail
+         dir = -1;
+      } else if ((start + 2) % 8 === end) {
+         dir = (start + 1) % 8;
+      } else {
+         // TODO: select only orthagonal directions
+         var dif = ((end - start + 8) % 8), options = 1;
+         if (start % 2 === 0) {
+            if (dif <= 4) options = 1;
+            else if (dif <= 6) options = 2;
+            else options = 3;
+            dir = (start + (2 * Math.ceil(Math.random() * options)));
+         } else {
+            if (dif <= 3) options = 1;
+            else if (dif <= 5) options = 2;
+            else options = 3;
+            dir = (start + (2 * Math.ceil(Math.random() * options)));
+         }
+         dir = (start + 1) + Math.floor(Math.random() * (((end - start + 8) % 8) - 1));
+      }
+      dir = dir % 8;
+
+      if (dir === -1) {
+         // Failure
+         return growTown( town, false );
+      }
+
+      while( expand_spot.place === town.id ) {
+         move = addDirection( x, y, dir );
+         x = move[0];
+         y = move[1];
+         expand_spot = map[x][y];
+      }
+      if (expand_spot.terrain === 0) {
+         // Fell off the island!
+         return growTown( town, false );
+      } else if (expand_spot.place !== undefined) {
+         // Something else is here
+         return growTown( town, false );
+      } else {
+         map[x][y].place = town.id;
+      }
+   }
+   // Success
+   town.size++;
+   return true;
+}
+
+function buildTown( center_x, center_y, island_resources, size )
+{
+   var new_town = new Place( 'town', townNameGen() );
+
+   for (var i = 0; i < island_resources.length; ++i)
+      new_town.resources[island_resources[i]] = 1;
+
+   // Add it to the map
+   map[center_x][center_y].place = new_town.id;
+   new_town.x = center_x;
+   new_town.y = center_y;
+   new_town.size = 1;
+
+   for (var i = 1; i < size; ++i)
+      growTown( new_town, true );
+
+   places.push( new_town );
+}
+
+Place.prototype.upgrade = function() {
+   // Strategy:
+   // 1- Gather resources
+   // 2- Attempt to upgrade industries
+   // 3- Attempt to grow the town
+
+   for(var res in this.resources) {
+      var cur = this.stock[res] | 0;
+      var income = this.resources[res];
+
+      cur += income;
+      this.stock[res] = cur;
+   }
+}
+
+Place.prototype.update = function() {
+   this.update_tick++;
+   if (this.update_tick >= this.upgrade_frequency) 
+      this.upgrade();
+}
+
+function updatePlaces()
+{
+   for( var i = 0; i < places.length; ++i)
+      places[i].update();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -212,6 +612,13 @@ function Boat( type )
          this.speed = 42;
          break;
       case 3:
+         this.maxcargo = 15;
+         this.name = genBoatName();
+         this.typename = "Canoe";
+         this.maxhealth = 50;
+         this.speed = 24;
+         break;
+      case 4:
          this.maxcargo = 120;
          this.name = genBoatName();
          this.typename = "Sailboat";
@@ -222,9 +629,11 @@ function Boat( type )
 
    this.id = boat_id_gen++;
    this.alive = true;
+   this.mine = false;
 
    this.cargo = {};
-   this.cargocnt = 0;
+   this.cargoweight = 0;
+   this.cargo_selected = '';
    this.health = this.maxhealth;
    this.x = 0;
    this.y = 0;
@@ -232,11 +641,13 @@ function Boat( type )
    // Sailing
    this.direction = -1; // for exploration; -1 = anchored
    this.sail_style = 0; // 0 = sail direction; 1 = explore island; 2 = journey
+   this.explore_mod = 0;
    this.next_direction = -1;
    this.journey_x = -1;
    this.journey_y = -1;
    this.nav_islands_clockwise = true;
    this.sailing_progress = 0;
+   this.sail_complete = 10000;
    this.blocked = false;
    this.block_x = -1;
    this.block_y = -1;
@@ -244,7 +655,9 @@ function Boat( type )
 
 Boat.prototype.decideNext = function ()
 {
-   if (this.sail_style === 0 || this.sail_style === 1) {
+   if (this.sail_style === -1)
+      this.next_direction = -1;
+   else if (this.sail_style === 0 || this.sail_style === 1) {
       if (this.direction === -1) {
          this.next_direction = -1;
          this.blocked = false;
@@ -295,7 +708,8 @@ Boat.prototype.decideNext = function ()
                   this.next_direction = end;
             }
          } else {
-            if (this.sail_style === 1) {
+            if (this.explore_mod & 1) {
+               // TODO: Make this work
                block = true;
             } else if (end > start) {
                if (this.direction > start && this.direction < end)
@@ -342,12 +756,30 @@ Boat.prototype.decideNext = function ()
 
    } else if (this.sail_style === 2) {
       this.next_direction = -1;
+      // TODO: Basic seek->direction strategy similar to explore
+      // TODO: Better, A* sort of strategy
    }
+   if (this.next_direction === -1)
+      this.sail_complete = 10000; 
+   else if (this.next_direction % 2 === 0)
+      this.sail_complete = this.speed;
+   else if (this.next_direction % 2 === 1)
+      this.sail_complete = this.speed * 1.4;
 }
 
 Boat.prototype.changeDirection = function ( dir )
 {
    this.direction = dir;
+
+   this.blocked = false;
+
+   this.sailing_progress = 0;
+   this.decideNext();
+}
+
+Boat.prototype.changeSailStyle = function ( style )
+{
+   this.sail_style = style;
 
    this.blocked = false;
 
@@ -361,6 +793,11 @@ Boat.prototype.sail = function ()
    this.x = new_loc[0];
    this.y = new_loc[1];
 
+   if (this.explore_mod & 2 && map[this.x][this.y].place !== undefined) {
+      // Found a city, so stop
+      this.sail_style = -1
+   }
+
    this.sailing_progress = 0;
    this.decideNext();
 }
@@ -371,9 +808,27 @@ Boat.prototype.update = function ()
 
    this.sailing_progress++;
 
-   if ((this.next_direction % 2 === 0 && this.sailing_progress >= this.speed)
-         || this.next_direction % 2 === 1 && this.sailing_progress >= (this.speed * 1.4))
+   if (this.sailing_progress >= this.sail_complete)
       this.sail();
+}
+
+Boat.prototype.addCargo = function ( cargo_id, count )
+{
+   var add_weight = cargo_index[cargo_id].weight * count;
+
+   if (this.cargoweight + add_weight > this.maxcargo)
+      return false;
+
+   var cur_cargo = this.cargo[cargo_id];
+   if (!cur_cargo)
+      cur_cargo = 0;
+   cur_cargo += count;
+   if (cur_cargo < 0)
+      return false;
+
+   this.cargo[cargo_id] = cur_cargo;
+   this.cargoweight += add_weight;
+   return true;
 }
 
 function updateBoats()
@@ -385,22 +840,33 @@ function updateBoats()
 function initBoats()
 {
    var b = new Boat( 1 );
-   //b.setPosition( 391, 391 );
-   b.x = 391;
-   b.y = 391;
-   b.cargo.bananas = 3;
-   b.cargo.cotton = 19;
-   b.cargo.silk = 5;
-   b.cargo.peanuts = 21;
-   b.cargocnt = 48;
+   b.mine = true;
+   b.x = 199;
+   b.y = 212;
+   b.addCargo( 'bananas', 2 );
+   b.addCargo( 'cotton', 2 );
+   b.addCargo( 'chickens', 2 );
+   b.addCargo( 'turkeys', 1 );
+   b.addCargo( 'peanuts', 2 );
+   b.addCargo( 'copper', 1 );
+   b.addCargo( 'tin', 1 );
+   b.addCargo( 'silk', 1 );
+   b.addCargo( 'carrots', 2 );
+   b.addCargo( 'iron', 1 );
+   b.addCargo( 'limes', 1 );
+   b.addCargo( 'coconuts', 2 );
    boats.push( b );
    my_boats.push( b.id );
    var b2 = new Boat( 1 );
-   //b2.setPosition( 391, 391 );
-   b2.x = 392;
-   b2.y = 392;
+   b2.mine = true;
+   b2.x = 200;
+   b2.y = 213;
+   b2.name = "Secret Test Boat";
+   b2.speed = 0.1;
+   b2.maxhealth = 9999;
+   b2.health = 9999;
    b2.maxcargo = 999;
-   b2.cargocnt = 999
+   b2.cargoweight = 999
    boats.push( b2 );
    my_boats.push( b2.id );
 }
@@ -426,7 +892,7 @@ function drawBoatContent()
 {
    var num_boats = my_boats.length;
    var grid_x = BOAT_SCROLLBAR_WIDTH, grid_y = BOAT_HEADER_HEIGHT + 10;
-   for (var i = 0; i < 5; ++i){
+   for (var i = 0; i < 5; ++i) {
       var index = i + boat_scroll;
       if (index >= num_boats) break;
 
@@ -435,7 +901,7 @@ function drawBoatContent()
       if (b.type === 1) b_img = rowboat_sz60_img;
 
       if (boat_selection === index) {
-         boat_context.fillStyle = "rgba(185,185,185,255)";
+         boat_context.fillStyle = "rgba(185,185,185,1)";
          boat_context.fillRect( grid_x, grid_y, BOAT_WIDTH - (2 * BOAT_SCROLLBAR_WIDTH), 60 );
       }
 
@@ -449,18 +915,18 @@ function drawBoatContent()
          boat_context.fillText(b.typename, grid_x + 85, grid_y + 50);
 
          boat_context.font = "14pt serif";
-         var dur_string = b.health + "\/" + b.maxhealth;
+         var dur_string = Math.ceil(b.health) + "\/" + b.maxhealth;
          var width = dur_string.width("14pt serif");
          boat_context.fillText("Dur: ", grid_x + 280, grid_y + 24);
          boat_context.fillText(dur_string, BOAT_WIDTH - (100 + width), grid_y + 24);
-         var cargo_string = b.cargocnt + "\/" + b.maxcargo;
+         var cargo_string = Math.ceil(b.cargoweight) + "\/" + b.maxcargo;
          width = cargo_string.width("14pt serif");
          boat_context.fillText("Cargo: ", grid_x + 280, grid_y + 50);
          boat_context.fillText(cargo_string, BOAT_WIDTH - (100 + width), grid_y + 50);
 
          // Goto Button
          boat_context.fillStyle = "white";
-         boat_context.strokeStyle = "rgba(85,85,85,255)";
+         boat_context.strokeStyle = "rgba(85,85,85,1)";
          boat_context.lineWidth = '3';
          boat_context.beginPath();
          boat_context.moveTo( BOAT_WIDTH - 75, grid_y + 17 );
@@ -477,28 +943,29 @@ function drawBoatContent()
    }
 
    if (boat_menu > 1) {
-      boat_context.fillStyle = "rgba(185,185,185,255)";
+      boat_context.fillStyle = "rgba(185,185,185,1)";
       boat_context.fillRect( BOAT_INNER_X, BOAT_INNER_Y, BOAT_INNER_WIDTH, BOAT_INNER_HEIGHT);
-      boat_context.fillStyle = "rgba(235,235,235,255)";
+      boat_context.fillStyle = "rgba(235,235,235,1)";
       boat_context.fillRect( BOAT_INNER_X + 5, BOAT_INNER_Y + 5, BOAT_INNER_WIDTH - 10, BOAT_INNER_HEIGHT - 10);
    }
 
    var boat = boats[ my_boats[boat_selection] ];
 
-   if (boat_menu === 2) {
+   if (boat_menu === 3) {
       // Cargo menu
-      var x = BOAT_INNER_X + 15, y = BOAT_INNER_Y + 15;
+      var x = BOAT_INNER_X + 10, y = BOAT_INNER_Y + 10;
+      var x_divider = BOAT_INNER_X + 10 + (70 * 4) + BOAT_SCROLLBAR_WIDTH;
       for (var cargo_id in boat.cargo) {
          var count = boat.cargo[cargo_id];
          if (count === 0) continue;
 
          var name = cargo_index[cargo_id].name;
 
-         if (name === cargo_selected) {
-            boat_context.fillStyle = "rgba(185,185,185,255)";
+         if (cargo_id === boat.cargo_selected) {
+            boat_context.fillStyle = "rgba(185,185,185,1)";
             boat_context.fillRect( x, y, 60, 60 );
          }
-         boat_context.strokeStyle = "rgba(85,85,85,255)";
+         boat_context.strokeStyle = "rgba(85,85,85,1)";
          boat_context.lineWidth = '2';
          boat_context.strokeRect( x, y, 60, 60 );
 
@@ -509,33 +976,77 @@ function drawBoatContent()
 
          // Draw count
          var count_str = String(count);
-         var count_width = count_str.width("14pt sans-serif");
+         var count_width = count_str.width("14pt arial");
             
          boat_context.fillStyle = 'white';
          boat_context.fillRect( x + 58 - count_width, y + 62 - 18, count_width + 4, 18 )
          boat_context.strokeRect( x + 58 - count_width, y + 62 - 18, count_width + 4, 18 )
 
          boat_context.fillStyle = 'black';
-         boat_context.font = '14pt sans-serif';
+         boat_context.font = '14pt arial';
          boat_context.fillText( count_str, x + 60 - count_width, y + 60 );
 
          x += 70;
-         if (x + 50 > BOAT_INNER_X + BOAT_INNER_WIDTH - 20) {
+         if (x + 60 > x_divider) {
             x = BOAT_INNER_X + 10;
             y += 70;
          }
       }
 
+      // Info pane
+      boat_context.fillStyle = 'rgba(185,185,185,1)';
+      boat_context.fillRect( x_divider, BOAT_INNER_Y, 5, BOAT_INNER_HEIGHT );
 
-   } else if (boat_menu === 3) {
+      if (boat.cargo_selected) {
+         var the_cargo = cargo_index[boat.cargo_selected];
+         if (the_cargo) {
+            var img = the_cargo.image;
+            if (img)
+               boat_context.drawImage( img, ((x_divider + BOAT_INNER_X + BOAT_INNER_WIDTH) / 2) - 30, BOAT_INNER_Y + 10 );
+
+            boat_context.fillStyle = 'black';
+            boat_context.font = '16pt arial';
+            var width = the_cargo.name.width('16pt arial');
+            boat_context.fillText( the_cargo.name, ((x_divider + BOAT_INNER_X + BOAT_INNER_WIDTH) / 2) - (width / 2), BOAT_INNER_Y + 90 );
+
+            var y = fitText( boat_context, the_cargo.desc, x_divider + 10, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, BOAT_INNER_Y + 100, 20, '12pt serif', true );
+            y += 10;
+
+            // Properties
+            if (the_cargo.foodvalue) {
+               boat_context.fillStyle = 'green';
+               y = fitText( boat_context, 'edible', x_divider + 10, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y, 20, 'Bold 12pt serif', true );
+            }
+            y += 10;
+            // Weigh-in
+            boat_context.fillStyle = 'rgba(85,85,85,1)';
+            var weight_str = 'Weight: ' + Math.floor(the_cargo.weight) + '.' + Math.floor((the_cargo.weight * 10) % 10) + ' lb';
+            y = fitText( boat_context, weight_str, x_divider + 10, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y, 20, '12pt serif', true );
+
+            // Display discard interface
+            boat_context.fillStyle = 'rgba(85,85,85,1)';
+            boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
+            boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
+
+            boat_context.fillStyle = 'white';
+            boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 73, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
+            boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 37, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
+
+            boat_context.fillStyle = 'black';
+            fitText( boat_context, 'Discard 1', x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 74, 22, '22px arial', true);
+            fitText( boat_context, 'Discard All', x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 38, 22, '22px arial', true);
+         }
+      }
+
+   } else if (boat_menu === 2) {
       // Sailing menu
       // Split it up first
-      boat_context.fillStyle = "rgba(185,185,185,255)";
+      boat_context.fillStyle = "rgba(185,185,185,1)";
       boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2), BOAT_INNER_Y, 5, BOAT_INNER_HEIGHT );
 
 
       // Titles
-      boat_context.font = "16pt sans-serif";
+      boat_context.font = "16pt arial";
       boat_context.fillStyle = "black";
       boat_context.fillText("Explore", BOAT_INNER_X + 80, BOAT_INNER_Y + 26);
       boat_context.fillText("Journey", BOAT_INNER_X + 80 + (BOAT_INNER_WIDTH / 2), BOAT_INNER_Y + 26);
@@ -560,25 +1071,123 @@ function drawBoatContent()
       else boat_context.drawImage( anchor_img, BOAT_INNER_X + BOAT_NAV_CENTER_X - 25, BOAT_INNER_Y + BOAT_NAV_CENTER_Y - 25 );
 
       // Island navigation style
-      boat_context.strokeStyle = "rgba(85,85,85,255)";
+      boat_context.strokeStyle = "rgba(85,85,85,1)";
       boat_context.lineWidth = '3';
       if (boat.nav_islands_clockwise === true)
          boat_context.strokeRect( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 59, BOAT_INNER_Y + 80, 50, 50 ); 
       else 
          boat_context.strokeRect( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 59, BOAT_INNER_Y + 135, 50, 50 ); 
-
       boat_context.drawImage( island_nav_c_img, BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 60, BOAT_INNER_Y + 80 );
       boat_context.drawImage( island_nav_cc_img, BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 60, BOAT_INNER_Y + 135 );
 
+      boat_context.fillStyle = 'black';
+      fitText( boat_context, 'Fully Explore Islands', 
+            BOAT_INNER_X + 15, BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 45, 
+            BOAT_INNER_Y + 240, 17, '17px arial', false );
+
+      fitText( boat_context, 'Stop at Next Town', 
+            BOAT_INNER_X + 15, BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 45, 
+            BOAT_INNER_Y + 285, 17, '17px arial', false );
+
+      boat_context.fillStyle = 'white';
+      boat_context.strokeStyle = 'black';
+      boat_context.lineWidth = '2';
+      boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35, BOAT_INNER_Y + 240, 20, 20 );
+      boat_context.strokeRect( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35, BOAT_INNER_Y + 240, 20, 20 );
+      if (boat.explore_mod & 1) {
+         boat_context.beginPath();
+         boat_context.moveTo( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35, BOAT_INNER_Y + 240 );
+         boat_context.lineTo( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 15, BOAT_INNER_Y + 260 );
+         boat_context.moveTo( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35, BOAT_INNER_Y + 260 );
+         boat_context.lineTo( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 15, BOAT_INNER_Y + 240 );
+         boat_context.stroke();
+      }
+      boat_context.fillStyle = 'white';
+      boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35, BOAT_INNER_Y + 285, 20, 20 );
+      boat_context.strokeRect( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35, BOAT_INNER_Y + 285, 20, 20 );
+      if (boat.explore_mod & 2) {
+         boat_context.beginPath();
+         boat_context.moveTo( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35, BOAT_INNER_Y + 285 );
+         boat_context.lineTo( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 15, BOAT_INNER_Y + 305 );
+         boat_context.moveTo( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35, BOAT_INNER_Y + 305 );
+         boat_context.lineTo( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 15, BOAT_INNER_Y + 285 );
+         boat_context.stroke();
+      }
+
+      var button_str = 'Go Exploring';
+      var button_pressed = false;
+      if (boat.sail_style === 0 || boat.sail_style === 1) {
+         button_str = 'Exploring...';
+         button_pressed = true;
+      }
+      textButton( boat_context, 
+            BOAT_INNER_X + (BOAT_INNER_WIDTH / 4), BOAT_INNER_Y + BOAT_INNER_HEIGHT - 40, 
+            button_str, 18, '18pt arial', button_pressed );
 
       // Journey
-      // TODO: Basic seek->direction strategy similar to explore
-      // TODO: Better, A* sort of strategy
+      // TODO: List of places
+
+
+      // Manual coordinate entry
+      // E
+      boat_context.fillStyle = "black";
+      boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 30, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 90, 60, 26 );
+      boat_context.fillStyle = "white";
+      boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 32, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 88, 56, 22 );
+      if (text_box_selection === 'coords E') {
+         boat_context.fillStyle = "red";
+         boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 32, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 88, 7, 22 );
+         boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 81, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 88, 7, 22 );
+      }
+
+      boat_context.fillStyle = "black";
+      var journey_x_str = (boat.journey_x === -1)?'?':'' + boat.journey_x;
+      fitText( boat_context, journey_x_str,
+         BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 30, BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 90, 
+         BOAT_INNER_Y + BOAT_INNER_HEIGHT - 86, 16, '16pt arial', true );
+      boat_context.fillText( "E", BOAT_INNER_X + (BOAT_INNER_WIDTH/2) + 93,
+                                  BOAT_INNER_Y + BOAT_INNER_HEIGHT - 70 );
+      // S
+      boat_context.fillStyle = "black";
+      boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 124, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 90, 60, 26 );
+      boat_context.fillStyle = "white";
+      boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 126, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 88, 56, 22 );
+      if (text_box_selection === 'coords S') {
+         boat_context.fillStyle = "red";
+         boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 126, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 88, 7, 22 );
+         boat_context.fillRect( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 175, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 88, 7, 22 );
+      }
+      boat_context.fillStyle = "black";
+      var journey_y_str = (boat.journey_y === -1)?'?':'' + boat.journey_y;
+      fitText( boat_context, journey_y_str,
+         BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 124, BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 184, 
+         BOAT_INNER_Y + BOAT_INNER_HEIGHT - 86, 16, '16pt arial', true );
+      boat_context.fillText( "S", BOAT_INNER_X + (BOAT_INNER_WIDTH/2) + 187,
+                                  BOAT_INNER_Y + BOAT_INNER_HEIGHT - 70 );
+
+      button_pressed = false;
+      button_str = 'Go Sailing';
+      if (boat.sail_style === 2) {
+         button_str = 'Sailing...';
+         button_pressed = true;
+      } else if (boat.sail_style === 3) {
+         button_str = 'Sail Where?';
+      }
+      textButton( boat_context, 
+            BOAT_INNER_X + (3 * (BOAT_INNER_WIDTH / 4)), BOAT_INNER_Y + BOAT_INNER_HEIGHT - 40, 
+            button_str, 18, '18pt arial', button_pressed );
 
 
    } else if (boat_menu === 4) {
+      // TODO: Market menu
 
-   } else if (boat_menu === 5) {
+   } else if (boat_menu >= 5) {
+      // TODO: Town menu
+      // Should be mostly information and some services
+      // Possible Services:
+      // - Buy a boat (boat_menu === 6)
+      // - Rename a boat (boat_menu === 7)
+      // - ????
 
    }
 }
@@ -598,27 +1207,27 @@ function drawBoatHeader()
       boat_context.strokeStyle = "black";
       boat_context.lineWidth = '1';
       boat_context.stroke();
-      boat_context.fillStyle = "rgba(205,205,205,255)";
+      boat_context.fillStyle = "rgba(205,205,205,1)";
       if (header_index === boat_menu)
-         boat_context.fillStyle = "rgba(235,235,235,255)";
+         boat_context.fillStyle = "rgba(235,235,235,1)";
       boat_context.fill();
       header_index++;
    }
 
    boat_context.fillStyle = "black";
-   boat_context.font = "12pt sans-serif";
+   boat_context.font = "12pt arial";
    boat_context.fillText( "1 - Boats", 10, BOAT_HEADER_HEIGHT - 4 );
-   boat_context.fillText( "2 - Cargo", 120, BOAT_HEADER_HEIGHT - 4 );
-   boat_context.fillText( "3 - Sail", 230, BOAT_HEADER_HEIGHT - 4 );
-   boat_context.fillText( "4 - Town", 340, BOAT_HEADER_HEIGHT - 4 );
-   boat_context.fillText( "5 - Market", 450, BOAT_HEADER_HEIGHT - 4 );
+   boat_context.fillText( "2 - Sail", 120, BOAT_HEADER_HEIGHT - 4 );
+   boat_context.fillText( "3 - Cargo", 230, BOAT_HEADER_HEIGHT - 4 );
+   boat_context.fillText( "4 - Market", 340, BOAT_HEADER_HEIGHT - 4 );
+   boat_context.fillText( "5 - Town", 450, BOAT_HEADER_HEIGHT - 4 );
 
 }
 
 function clearBoats()
 {
    boat_context.clearRect( 0, 0, BOAT_WIDTH, BOAT_HEIGHT );
-   boat_context.fillStyle = "rgba(235,235,235,255)";
+   boat_context.fillStyle = "rgba(235,235,235,1)";
    boat_context.fillRect( 0, 0, BOAT_WIDTH, BOAT_HEIGHT );
 }
 
@@ -634,6 +1243,8 @@ function onClickBoats( e )
 {
    var x_pix = e.pageX - boat_canvas.offsetLeft;
    var y_pix = e.pageY - boat_canvas.offsetTop;
+
+   text_box_selection = '';
 
    if (y_pix < BOAT_HEADER_HEIGHT) {
       changeBoatMenu( Math.ceil(x_pix / 110) );
@@ -657,7 +1268,50 @@ function onClickBoats( e )
          refresh();
       }
    }
-   else if (boat_menu === 3) {
+   else if (boat_menu === 3)
+   {
+      var boat = boats[ my_boats[boat_selection] ];
+      var x_divider = BOAT_INNER_X + 10 + (70 * 4) + BOAT_SCROLLBAR_WIDTH;
+      if (x_pix > x_divider + 18 && x_pix < BOAT_INNER_X + BOAT_INNER_WIDTH - 18) {
+         // In info pane
+         if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 
+          && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 + 28 ) {
+            boat.addCargo( boat.cargo_selected, -1 ); // discard 1
+            if (boat.cargo[ boat.cargo_selected ] === 0)
+               boat.cargo_selected = '';
+            refresh();
+         } else if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39 
+               && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39 + 28 ) {
+            boat.addCargo( boat.cargo_selected, -boat.cargo[boat.cargo_selected] ); // discard all
+            boat.cargo_selected = '';
+            refresh();
+         }
+      } else {
+         var x_box = Math.floor((x_pix - (BOAT_INNER_X + 5)) / 70);
+         var y_box = Math.floor((y_pix - (BOAT_INNER_Y + 5)) / 70);
+         if (x_box >= 0 && x_box < 4 && y_box >= 0 && y_box < 5) {
+            var index = x_box + (4 * y_box);
+            var i = 0;
+            for (var cargo_id in boat.cargo) {
+               if (!boat.cargo[cargo_id] || boat.cargo[cargo_id] === 0)
+                  continue;
+
+               if (i === index) {
+                  boat.cargo_selected = cargo_id;
+                  refresh();
+                  break;
+               }
+               else
+               {
+                  ++i;
+               }
+            }
+         }
+      }
+
+   }
+   else if (boat_menu === 2)
+   {
       var boat = boats[ my_boats[boat_selection] ];
       var nav_x = x_pix - (BOAT_INNER_X + BOAT_NAV_CENTER_X);
       var nav_y = y_pix - (BOAT_INNER_Y + BOAT_NAV_CENTER_Y);
@@ -693,9 +1347,54 @@ function onClickBoats( e )
                && y_pix > (BOAT_INNER_Y + 135) && y_pix < (BOAT_INNER_Y + 185) ) {
          boat.nav_islands_clockwise = false;
          boat.decideNext();
+      } else if ( x_pix >= BOAT_INNER_X + 30 && x_pix <= BOAT_INNER_X + 200 &&
+                  y_pix >= BOAT_INNER_Y + BOAT_INNER_HEIGHT - 50 &&
+                  y_pix <= BOAT_INNER_Y + BOAT_INNER_HEIGHT - 20) {
+         if (boat.sail_style === 0 || boat.sail_style === 1)
+            boat.changeSailStyle( -1 );
+         else
+            boat.changeSailStyle( 0 );
+      } else if ( x_pix >= BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35 &&
+                  x_pix <= BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 15 &&
+                  y_pix >= BOAT_INNER_Y + 240 && y_pix <= BOAT_INNER_Y + 260) {
+         if (boat.explore_mod & 1)
+            boat.explore_mod &= 0xe;
+         else
+            boat .explore_mod|= 0x1;
+      } else if ( x_pix >= BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 35 &&
+                  x_pix <= BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 15 &&
+                  y_pix >= BOAT_INNER_Y + 285 && y_pix <= BOAT_INNER_Y + 305) {
+         if (boat.explore_mod & 2)
+            boat.explore_mod &= 0xd;
+         else
+            boat.explore_mod |= 0x2;
+      } else if ( x_pix >= BOAT_INNER_X + (BOAT_INNER_WIDTH/2) + 35 && 
+                  x_pix <= BOAT_INNER_X + (BOAT_INNER_WIDTH/2) + 195 &&
+                  y_pix >= BOAT_INNER_Y + BOAT_INNER_HEIGHT - 50 &&
+                  y_pix <= BOAT_INNER_Y + BOAT_INNER_HEIGHT - 20) {
+         if (boat.sail_style === 2 || boat.sail_style === 3)
+            boat.changeSailStyle( -1 );
+         else {
+            if (boat.journey_x !== -1 && boat.journey_y !== -1)
+               boat.changeSailStyle( 2 );
+            else
+               boat.changeSailStyle( 3 );
+         }
+      } else if ( x_pix > ( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 16 ) &&
+                  x_pix < ( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 106 ) &&
+                  y_pix > ( BOAT_INNER_Y + BOAT_INNER_HEIGHT - 90 ) &&
+                  y_pix < ( BOAT_INNER_Y + BOAT_INNER_HEIGHT - 64 ) ) {
+         text_box_selection = 'coords E';
+         boat.journey_x = -1;
+         boat.changeSailStyle( -1 );
+      } else if ( x_pix > ( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 120 ) &&
+                  x_pix < ( BOAT_INNER_X + (BOAT_INNER_WIDTH / 2) + 210 ) &&
+                  y_pix > ( BOAT_INNER_Y + BOAT_INNER_HEIGHT - 90 ) &&
+                  y_pix < ( BOAT_INNER_Y + BOAT_INNER_HEIGHT - 64 ) ) {
+         text_box_selection = 'coords S';
+         boat.journey_y = -1;
+         boat.changeSailStyle( -1 );
       }
-
-         boat_context.strokeRect( BOAT_INNER_X + (BOAT_INNER_WIDTH/2) - 59, BOAT_INNER_Y + 135, 50, 50 ); 
 
 
       refresh();
@@ -714,21 +1413,14 @@ function validatePlace( place ) {
    return 0;
 }
 
-function validateTerrain( terrain ) {
-   if ( terrain >= 0 && terrain <= TER_MAX )
-      return terrain;
-
-   return 0;
-}
-
-function MapLoc( ter, place )
+function MapLoc( ter )
 {
-   this.terrain = validateTerrain( ter );
-   this.place = validatePlace( place );
+   this.terrain = ter;
    this.discovered = false;
+   this.visible = false;
 }
 
-function loadMap( descriptor )
+function loadMap( map_str )
 {
 
 }
@@ -762,6 +1454,35 @@ function findSelectedBoat()
    var b = boats[ my_boats[boat_selection] ];
    if (b !== undefined)
       moveMap( b.x, b.y, map_zoom_level );
+}
+
+function addBoatVision( x, y )
+{
+   for (var i = x - 4; i <= x + 4; ++i) {
+      if (i < 0) continue;
+      if (i >= MAP_WIDTH) break;
+      for (var j = y - 4; j <= y + 4; ++j) {
+         if (j < 0) continue;
+         if (j >= MAP_WIDTH) break;
+         if ((j === y - 4 || j === y + 4) && (i === x - 4 || i === x + 4)) continue; // skip corners
+         map[i][j].discovered = true;
+         map[i][j].visible = true;
+         if (map[i][j].place !== undefined)
+            places[map[i][j].place].discovered = true;
+      }
+   }
+}
+
+function updateVision()
+{
+   for (var x = 0; x < MAP_WIDTH; ++x) {
+      for (var y = 0; y < MAP_HEIGHT; ++y) {
+         map[x][y].visible = false;
+      }
+   }
+
+   for (var i = 0; i < my_boats.length; ++i)
+      addBoatVision( boats[my_boats[i]].x, boats[my_boats[i]].y );
 }
 
 // Generation --
@@ -919,13 +1640,13 @@ function smoothIsland( x_min, y_min, x_max, y_max )
                }
                cur2++;
             }
-            map[x][y].terrain = constructTerrain( start, end, 0 );
+            map[x][y].terrain = constructTerrain( start, end, 0, terGetType(map[x][y].terrain) );
          }
       }
    }
 }
 
-function createIsland( x_min, y_min, x_max, y_max, technique )
+function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify )
 {
    if (technique === -1)
       technique = 1;
@@ -934,7 +1655,7 @@ function createIsland( x_min, y_min, x_max, y_max, technique )
       // Algorithm 1: Random walk edge mutations
       for (var x = x_min; x <= x_max; ++x) {
          for (var y = y_min; y <= y_max; ++y) {
-            map[x][y].terrain = 1;
+            map[x][y].terrain = ter_type;
             map[x][y].discovered = true;
          }
       }
@@ -986,12 +1707,123 @@ function createIsland( x_min, y_min, x_max, y_max, technique )
       // clean it up
       smoothIsland( x_min, y_min, x_max, y_max );
       
-      // TODO: river generation
+      // Enhance it:
+      var real_island_size = 0;
+      for (var x = x_min; x <= x_max; ++x) {
+         for (var y = y_min; y <= y_max; ++y) {
+            if (map[x][y].terrain !== 0)
+               real_island_size++;
+         }
+      }
 
-      // TODO: city generation
+      // Strategy: pick a spot on the coast,
+      // make an oblong shape and city-fy any land in that shape
+      var num_towns = 0;
+      if (specify && specify[0] !== undefined)
+         num_towns = specify[0];
+      else
+      {
+         var city_chance = (real_island_size - GEN_CITY_LAND_MIN) / GEN_CITY_CHANCE_DENOM;
+
+         if (Math.random() < city_chance) {
+            num_towns++;
+            city_chance = (city_chance - 1) / 5;
+            if (ter_type <= 4 && Math.random() < city_chance) {
+               num_towns++;
+               city_chance = (city_chance - 1) / 5;
+               if (ter_type <= 2 && Math.random() < city_chance) {
+                  num_towns++;
+         } } }
+      }
+
+      // Find the coast, and map it
+      var found = false;
+      var coast_x, coast_y, coast_length = 0;
+      for (x = x_min; !found && x <= x_max; ++x) {
+         for (y = y_min; !found && y <= y_max; ++y) {
+            if (map[x][y].terrain !== 0) {
+               coast_x = x;
+               coast_y = y;
+               found = true;
+      } } }
+
+      if (coast_x === undefined || coast_y === undefined)
+         return -5; // No land remains
+
+      x = coast_x;
+      y = coast_y;
+      do {
+         var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
+         x = next_coast[0];
+         y = next_coast[1];
+         coast_length++;
+      } while ( !( x === coast_x && y === coast_y ) );
+
+      var island_resources = ['bananas']; //randomResources( ter_type );
+      if (num_towns === 1) {
+         var coast_distance = Math.floor(Math.random() * coast_length), coast_traversed = 0;
+         while (coast_traversed < coast_distance) {
+            var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
+            x = next_coast[0];
+            y = next_coast[1];
+            coast_traversed++;
+         }
+
+         buildTown( x, y, island_resources, 5 );
+      } else if (num_towns === 2) {
+         var coast_distance1 = Math.floor(Math.random() * coast_length), 
+             coast_distance2 = Math.floor(Math.random() * coast_length / 3) + (coast_length / 3), 
+             coast_traversed = 0;
+         while (coast_traversed < coast_distance1) {
+            var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
+            x = next_coast[0];
+            y = next_coast[1];
+            coast_traversed++;
+         }
+         buildTown( x, y, island_resources, 5 );
+         while (coast_traversed < coast_distance1 + coast_distance2) {
+            var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
+            x = next_coast[0];
+            y = next_coast[1];
+            coast_traversed++;
+         }
+         buildTown( x, y, island_resources, 5 );
+      } else if (num_towns === 3) {
+         var coast_distance1 = Math.floor(Math.random() * coast_length), 
+             coast_distance2 = coast_distance1 + 
+                Math.floor(Math.random() * coast_length / 5) + (coast_length / 5), 
+             coast_distance3 = coast_distance2 + 
+                Math.floor(Math.random() * coast_length / 5) + (coast_length / 5), 
+             coast_traversed = 0;
+         while (coast_traversed < coast_distance1) {
+            var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
+            x = next_coast[0];
+            y = next_coast[1];
+            coast_traversed++;
+         }
+         buildTown( x, y, island_resources, 5 );
+         while (coast_traversed < coast_distance2) {
+            var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
+            x = next_coast[0];
+            y = next_coast[1];
+            coast_traversed++;
+         }
+         buildTown( x, y, island_resources, 5 );
+         while (coast_traversed < coast_distance3) {
+            var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
+            x = next_coast[0];
+            y = next_coast[1];
+            coast_traversed++;
+         }
+         buildTown( x, y, island_resources, 5 );
+      }
+
+
 
    } else if (technique === 2) {
       // Algorithm 2: Crescent moon with inner city
+
+      // specify[1], if it exists, contains the direction of the opening
 
       smoothIsland( x_min, y_min, x_max, y_max );
    }
@@ -1004,31 +1836,33 @@ function generateMap()
    for (var x = 0; x < MAP_WIDTH ; ++x) {
       map[x] = new Array( MAP_HEIGHT );
       for (var y = 0; y < MAP_HEIGHT ; ++y) {
-         map[x][y] = new MapLoc( 0, 0 );
+         map[x][y] = new MapLoc( 0 );
       }
    }
    map_zoom_level = 1;
 
-   map_center_x = 400;
-   map_center_y = 400;
+   map_center_x = 200;
+   map_center_y = 210;
 
-   /* custom testing
-   map[400][400].terrain = 1;
-   map[400][401].terrain = 1;
-   map[400][402].terrain = 1;
-   map[401][400].terrain = 1;
-   map[401][401].terrain = 1;
-   map[401][402].terrain = 1;
-   map[402][402].terrain = 1;
-   map[402][403].terrain = 1;
-   map[402][404].terrain = 1;
-   map[403][402].terrain = 1;
-   map[403][403].terrain = 1;
-   map[403][404].terrain = 1;
-
-   smoothIsland( 398, 398, 410, 410 );
-   return;
-   */
+   // Start by custom building the starting island
+   createIsland( 190, 190, 210, 210, -1, 1, [1, 6] );
+   for (var x = 195; x <= 205; ++x) {
+      for (var y = 210; y <= 220; ++y) {
+         map[x][y].discovered = true;
+      }
+   }
+   map[198][213].terrain = 1;
+   map[198][214].terrain = 1;
+   map[199][212].terrain = 1;
+   map[199][213].terrain = 1;
+   map[199][214].terrain = 1;
+   map[199][215].terrain = 1;
+   map[200][213].terrain = 1;
+   map[200][214].terrain = 1;
+   map[200][215].terrain = 1;
+   map[201][213].terrain = 1;
+   map[201][214].terrain = 1;
+   smoothIsland( 198, 211, 202, 215 );
 
    // Select randomly sized areas of the map to put islands in,
    // then randomly generate islands there
@@ -1042,8 +1876,8 @@ function generateMap()
       }
 
       if (i < GEN_NUM_BIG_ISLANDS) {
-         var x_width = Math.floor(Math.random() * GEN_WIDTH_DIFF * 2.5) + (GEN_WIDTH_MIN * 2);
-         var y_height = Math.floor(Math.random() * GEN_HEIGHT_DIFF * 2.5) + (GEN_HEIGHT_MIN * 2);
+         var x_width = Math.floor(Math.random() * GEN_WIDTH_DIFF * 2) + (GEN_WIDTH_MIN * 2);
+         var y_height = Math.floor(Math.random() * GEN_HEIGHT_DIFF * 2) + (GEN_HEIGHT_MIN * 2);
       } else {
          var x_width = Math.floor(Math.random() * GEN_WIDTH_DIFF) + GEN_WIDTH_MIN;
          var y_height = Math.floor(Math.random() * GEN_HEIGHT_DIFF) + GEN_HEIGHT_MIN;
@@ -1107,7 +1941,25 @@ function generateMap()
          continue;
       }
 
-      createIsland( x_min, y_min, x_max, y_max, -1 );
+      var ter_type;
+      var tropicality = (Math.min( y_center, MAP_HEIGHT - y_center ) * 2) / MAP_HEIGHT; 
+      if (i < GEN_NUM_BIG_ISLANDS) {
+         ter_type = (Math.random() < (tropicality - 0.5))?2:1; // Can't be jungle outside 50 degrees
+      } else {
+         var randomizer = Math.random() * 100;
+         var tropicality = (Math.min( y_center, MAP_HEIGHT - y_center ) * 2) / MAP_HEIGHT; 
+         // 0.0 (frozen) - 1.0 (tropical)
+         if (randomizer < 35 + (40 * tropicality)) {
+            ter_type = (Math.random() < (tropicality - 0.5))?2:1; // Can't be jungle outside 50 degrees
+         } else if (randomizer > 85 + Math.min( tropicality * 5, (1 - tropicality) * 5)) {
+            if (tropicality < 0.2) ter_type = 6;
+            else if (tropicality > 0.5) ter_type = 5;
+            else ter_type = ((Math.random() * 0.3)< (tropicality - 0.2))?5:6;
+         } else {
+            ter_type = (Math.random() < 0.3)?4:3; // More likely light stone
+         }
+      }
+      createIsland( x_min, y_min, x_max, y_max, -1, ter_type );
 
    }
 
@@ -1119,7 +1971,7 @@ function generateMap()
    for (var x = 0; x < MAP_WIDTH ; ++x) {
       map[x] = new Array( MAP_HEIGHT );
       for (var y = 0; y < MAP_HEIGHT ; ++y) {
-         map[x][y] = new MapLoc( 0, 0 );
+         map[x][y] = new MapLoc( 0 );
       }
    }
 
@@ -1147,16 +1999,21 @@ function generateMap()
    map[409][397].terrain = 0;
    map[409][404].terrain = 0;
    */
+   for (var x = 0; x < MAP_WIDTH ; ++x) {
+      for (var y = 0; y < MAP_HEIGHT ; ++y) {
+         map[x][y].discovered = false;
+      }
+   }
 }
 
 // Draw --
 
 function clearMap() {
    // Draw border
-   map_context.clearRect( 0, 0, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, MAP_FULL_DIM );
+   map_context.clearRect( 0, 0, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, MAP_FULL_DIM + MAP_CONTROLS_HEIGHT );
    map_context.fillStyle = "black";
    map_context.fillRect( 0, 0, MAP_FULL_DIM, MAP_FULL_DIM );
-   map_context.fillStyle = "rgba(85,205,255,255)";
+   map_context.fillStyle = "rgba(85,205,255,1)";
    map_context.fillRect( MAP_DRAW_EDGE, MAP_DRAW_EDGE, MAP_DRAW_DIM, MAP_DRAW_DIM );
 }
 
@@ -1192,22 +2049,16 @@ function getOffset( direction, dimension )
 
 function drawTerrain( terrain, grid_x, grid_y, dimension )
 {
-   if ((terrain & 1) === 0) return;
+   if ((terrain & 7) === 0) return;
 
-   map_context.fillStyle = "green";
+   terSetColor( terrain, map_context );
+
    var start_dir = terGetStart( terrain ),
        end_dir = terGetEnd( terrain );
    var octants = (start_dir - end_dir) % 8;
    if (octants === 0 || dimension < 5) {
       map_context.fillRect( grid_x, grid_y, dimension, dimension );
    } else {
-      /* Draw with images
-      var fromcorner = (terGetStart( terrain ) % 2 === 1);
-      var img = getTerrainImage( octants, fromcorner, dimension );
-      if (img !== null) {
-         map_context.drawImage( img, grid_x, grid_y );
-      }
-      */
       // Draw as an arc
       var start_off = getOffset( start_dir, dimension );
       var end_off = getOffset( end_dir, dimension );
@@ -1226,12 +2077,40 @@ function drawTerrain( terrain, grid_x, grid_y, dimension )
          }
       }
       map_context.fill();
-      //
    }
 }
 
-function drawPlace( place, grid_x, grid_y )
+function drawPlace( place, grid_x, grid_y, dimension )
 {
+   if (place !== undefined) {
+      map_context.fillStyle = places[place].color;
+      map_context.strokeStyle = places[place].color;
+      map_context.lineWidth = "" + (dimension / 10);
+      //map_context.strokeRect( grid_x + 1, grid_y + 1, dimension - 1, dimension - 1 );
+      map_context.beginPath();
+      map_context.moveTo( grid_x + (dimension / 3), grid_y + (dimension * 4 / 5) );
+      map_context.lineTo( grid_x + (dimension * 2 / 3), grid_y + (dimension * 4 / 5) );
+      map_context.lineTo( grid_x + (dimension * 2 / 3), grid_y + (dimension * 2 / 5) );
+      map_context.lineTo( grid_x + (dimension * 7 / 9), grid_y + (dimension * 2 / 5) );
+      map_context.lineTo( grid_x + (dimension / 2), grid_y + (dimension * 1 / 5) );
+      map_context.lineTo( grid_x + (dimension * 2 / 9), grid_y + (dimension * 2 / 5) );
+      map_context.lineTo( grid_x + (dimension * 7 / 9), grid_y + (dimension * 2 / 5) );
+      map_context.lineTo( grid_x + (dimension / 3), grid_y + (dimension * 2 / 5) );
+      map_context.lineTo( grid_x + (dimension / 3), grid_y + (dimension * 4 / 5) );
+      map_context.lineTo( grid_x + (dimension / 2), grid_y + (dimension * 4 / 5) );
+      map_context.lineTo( grid_x + (dimension / 2), grid_y + (dimension * 3 / 5) );
+      map_context.stroke();
+      if (dimension === 5)
+         map_context.fill();
+   }
+}
+
+function drawFog( grid_x, grid_y, dimension )
+{
+   if (discovery_fog_on) {
+      map_context.fillStyle = 'rgba(85,85,85,0.5)';
+      map_context.fillRect( grid_x, grid_y, dimension, dimension );
+   }
 }
 
 function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
@@ -1246,7 +2125,9 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
             map_context.fillRect( grid_x, grid_y, MAP_SQUARE_DIM, MAP_SQUARE_DIM );
          } else {
             drawTerrain( loc.terrain, grid_x, grid_y, MAP_SQUARE_DIM );
-            drawPlace( loc.place, grid_x, grid_y );
+            drawPlace( loc.place, grid_x, grid_y, MAP_SQUARE_DIM );
+            if (!loc.visible)
+               drawFog( grid_x, grid_y, MAP_SQUARE_DIM );
          }
       }
    }
@@ -1268,7 +2149,9 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
                map_context.fillRect( g_x, g_y, draw_step, draw_step );
             } else {
                drawTerrain( loc.terrain, g_x, g_y, draw_step );
-               drawPlace( loc.place, g_x, g_y );
+               drawPlace( loc.place, g_x, g_y, draw_step );
+               if (!loc.visible)
+                  drawFog( g_x, g_y, draw_step );
             }
             g_y += draw_step;
          }
@@ -1296,35 +2179,48 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
                   map_context.fillRect( g_x, g_y, draw_step, draw_step );
                } else {
                   drawTerrain( map[x][y].terrain, g_x, g_y, draw_step );
+                  drawPlace( map[x][y].place, g_x, g_y, draw_step );
+                  if (!map[x][y].visible)
+                     drawFog( g_x, g_y, draw_step );
                }
             } else {
-               // TODO: Make this look better
                // Attempt 1: if sum in area is > half, draw green
-               var land_count = 0;
-               var area_discovered = false;
+               var land_count = 0, sample_terrain = 0;
+               var area_discovered = false, area_visible = 0;
+               var place_here = undefined;
                for (var i = Math.max(0, x - Math.floor(map_step / 2)); 
                         i <= Math.min(MAP_WIDTH - 1, x + Math.floor(map_step / 2)); 
                         ++i) {
                   for (var j = Math.max(0, y - Math.floor(map_step / 2)); 
                            j <= Math.min(MAP_WIDTH - 1, y + Math.floor(map_step / 2));
                            ++j) {
-                     if (map[i][j].terrain !== 0)
+                     if (map[i][j].terrain !== 0) {
                         land_count++;
+                        sample_terrain = map[i][j].terrain;
+                     }
                      if (map[i][j].discovered === true)
                         area_discovered = true;
+                     if (map[i][j].visible === true)
+                        area_visible = true;
+                     if (map[i][j].place !== undefined)
+                        place_here = map[i][j].place;
                   }
                }
                if (discovery_fog_on && !area_discovered) {
                   map_context.fillStyle = "gray";
                   map_context.fillRect( g_x, g_y, draw_step, draw_step );
                } else if (land_count > (map_step * map_step) / 3) {
-                  map_context.fillStyle = "green";
+                  terSetColor( sample_terrain, map_context );
                   map_context.fillRect( g_x, g_y, draw_step, draw_step );
-               }
+                  if (!area_visible)
+                     drawFog( g_x, g_y, draw_step );
+               } else if (!area_visible)
+                  drawFog( g_x, g_y, draw_step );
+
+               if (place_here !== undefined &&
+                     !(discovery_fog_on && places[place_here].discovered === false))
+                  drawPlace( place_here, g_x, g_y, draw_step );
             }
-
-            // TODO: Draw places on zoomed out map
-
             g_y += draw_step;
          }
          g_x += draw_step;
@@ -1399,17 +2295,26 @@ function drawMapContents()
 
 function drawMapControls()
 {
-   map_context.fillStyle = "rgba(235,235,235,255)";
-   map_context.fillRect( MAP_FULL_DIM, 0, MAP_CONTROLS_WIDTH, MAP_HEIGHT );
+   map_context.fillStyle = "rgba(235,235,235,1)";
+   map_context.fillRect( MAP_FULL_DIM, 0, MAP_CONTROLS_WIDTH, MAP_FULL_DIM + MAP_CONTROLS_HEIGHT );
+   map_context.fillRect( 0, MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, MAP_CONTROLS_HEIGHT );
 
-   map_context.font = "36pt sans-serif";
    map_context.fillStyle = "black";
-   map_context.fillText("+", MAP_DRAW_DIM + 6, 100);
-   map_context.fillText("-", MAP_DRAW_DIM + 10, 150);
+   fitText( map_context, '+', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 20, 40, '36pt arial', true);
+   for (var i = 0; i <= 4; ++i) {
+      if (map_zoom_level === i) {
+         fitText( map_context, '=', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 65 + (i * 20), 20, '20pt arial', true);
+      } else {
+         fitText( map_context, '-', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 65 + (i * 20), 20, '20pt arial', true);
+      }
+   }
+   fitText( map_context, '-', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 165, 40, '60pt arial', true);
 
-   map_context.font = "14pt sans-serif";
-   map_context.fillText(map_center_x + "E", MAP_FULL_DIM + 5, 364);
-   map_context.fillText(map_center_y + "S", MAP_FULL_DIM + 15, 390);
+   var cur_place = map[map_center_x][map_center_y].place;
+   if (cur_place !== undefined)
+      fitText( map_context, "> " + places[cur_place].name, 5, MAP_FULL_DIM / 2, MAP_FULL_DIM + 1, 16, '14pt arial', false);
+
+   fitText( map_context, map_center_x + "E - " + map_center_y + "S", MAP_FULL_DIM - 130, MAP_FULL_DIM, MAP_FULL_DIM + 1, 16, '14pt arial', true);
 }
 
 function drawMap() {
@@ -1419,17 +2324,31 @@ function drawMap() {
    drawMapControls();
 }
 
+// Controls --
+
 function onClickMap( e ) {
    var x_pix = e.pageX - map_canvas.offsetLeft;
    var y_pix = e.pageY - map_canvas.offsetTop;
 
+   text_box_selection = '';
+
    if (x_pix > MAP_FULL_DIM) {
-      if (y_pix > 60 && y_pix < 100) {
+      if (y_pix > 20 && y_pix < 60) {
          plusZoom();
          refresh();
-      } else if (y_pix > 110 && y_pix < 150) {
+      } else if (y_pix > 165 && y_pix < 205) {
          minusZoom();
          refresh();
+      } else if (y_pix > 65 && y_pix < 165) {
+         var new_zoom = Math.floor((y_pix - 65) / 20);
+         moveMap( map_center_x, map_center_y, new_zoom );
+         refresh();
+      }
+   } else if (y_pix > MAP_FULL_DIM) {
+      if (x_pix < MAP_FULL_DIM / 2) {
+         var center_place = map[map_center_x][map_center_y].place;
+         if (center_place !== undefined)
+            changeBoatMenu( 5 );
       }
    }
 }
@@ -1478,6 +2397,16 @@ function onMouseMoveMap( e ) {
    var map_dx = Math.round(dx / step);
    var map_dy = Math.round(dy / step);
 
+   if (map_zoom_level === 3) {
+      map_dx -= map_dx % 3;
+      map_dy -= map_dy % 3;
+   }
+   if (map_zoom_level === 4) {
+      map_dx -= map_dx % 9;
+      map_dy -= map_dy % 9;
+   }
+
+
    if (map_dx != mapDragLast_dx || map_dy != mapDragLast_dy) {
       moveMap( mapDragBase_x + map_dx, mapDragBase_y + map_dy, map_zoom_level );
       mapDragLast_dx = map_dx;
@@ -1487,6 +2416,30 @@ function onMouseMoveMap( e ) {
 }
 $('#map_canvas').mousemove( onMouseMoveMap );
 
+function onMouseWheelMap( e ) {
+   var delta = 0;
+   if (!e) /* For IE. */
+      e = window.e;
+   if (e.wheelDelta) { /* IE/Opera. */
+      delta = e.wheelDelta/120;
+   } else if (e.detail) { /** Mozilla case. */
+      /** In Mozilla, sign of delta is different than in IE.
+       * Also, delta is multiple of 3.
+       */
+       delta = -e.detail/3;
+   }
+
+   moveMap( map_center_x, map_center_y, map_zoom_level - delta );
+   refresh();
+}
+if (map_canvas.addEventListener) {
+	// IE9, Chrome, Safari, Opera
+	map_canvas.addEventListener("mousewheel", onMouseWheelMap, false);
+	// Firefox
+	map_canvas.addEventListener("DOMMouseScroll", onMouseWheelMap, false);
+}
+// IE 6/7/8
+else map_canvas.attachEvent("onmousewheel", onMouseWheelMap);
 
 /////////////////////////////////////////////////////////////////////
 // General controls ---
@@ -1496,10 +2449,21 @@ function onMouseUp( e ) {
    mapMouseDown = false;
 
 }
-$('html').mouseup( onMouseUp );
+$(document).mouseup( onMouseUp );
 
 function onKeyDown( e ) {
    LOG.html( "DOWN: " + e.which );
+
+   if (e.which === 8) {
+      e.preventDefault();
+   }
+
+   if (text_box_selection !== '') {
+      updateTextBox( e.which );
+
+      refresh();
+      return;
+   }
 
    switch( e.which ) {
       case 16: // Shift
@@ -1524,9 +2488,13 @@ function onKeyDown( e ) {
          if (shift_down)
             discovery_fog_on = !discovery_fog_on;
          break;
+      case 71: // g key
+         growTown( places[0], true );
+         refresh();
+         break;
    }
 }
-$('html').keydown( onKeyDown );
+$(document).keydown( onKeyDown );
 
 function onKeyUp( e ) {
    LOG.html( "UP: " + e.which );
@@ -1534,7 +2502,7 @@ function onKeyUp( e ) {
    if ( e.which === 16 )
       shift_down = false;
 }
-$('html').keyup( onKeyUp );
+$(document).keyup( onKeyUp );
 
 function refresh()
 {
@@ -1545,6 +2513,8 @@ function refresh()
 function update()
 {
    updateBoats();
+   updatePlaces();
+   updateVision();
 
    refresh();
 }
@@ -1553,14 +2523,15 @@ function start() {
    LOG.append(" Start");
    generateMap();
    initBoats();
+   updateVision();
    refresh();
 
-   setInterval(update, 500); // .5 sec
+   setInterval(update, 200); // .2 sec
 }
 
 // Load images
 var images_ready = 0;
-var total_images = 17;
+var total_images = 18;
 
 function addReadyImage() {
    images_ready++;
@@ -1601,9 +2572,40 @@ island_nav_cc_img.src = 'IslandNavCC.png';
 
 bananas_img.onload = addReadyImage;
 bananas_img.src = 'Bananas.png';
+coconuts_img.onload = addReadyImage;
+coconuts_img.src = 'Coconuts.png';
+lemons_img.onload = addReadyImage;
+lemons_img.src = 'Lemons.png';
+limes_img.onload = addReadyImage;
+limes_img.src = 'Limes.png';
+apple_img.onload = addReadyImage;
+apple_img.src = 'Apple.png';
 peanuts_img.onload = addReadyImage;
 peanuts_img.src = 'Peanuts.png';
+carrots_img.onload = addReadyImage;
+carrots_img.src = 'Carrots.png';
+
+chickens_img.onload = addReadyImage;
+chickens_img.src = 'Chicken.png';
+turkeys_img.onload = addReadyImage;
+turkeys_img.src = 'Turkey.png';
+
+burlap_img.onload = addReadyImage;
+burlap_img.src = 'Burlap.png';
 cotton_img.onload = addReadyImage;
 cotton_img.src = 'Cotton.png';
 silk_img.onload = addReadyImage;
 silk_img.src = 'Silk.png';
+doll_img.onload = addReadyImage;
+doll_img.src = 'Doll.png';
+
+copper_img.onload = addReadyImage;
+copper_img.src = 'Copper.png';
+tin_img.onload = addReadyImage;
+tin_img.src = 'Tin.png';
+bronze_img.onload = addReadyImage;
+bronze_img.src = 'Bronze.png';
+iron_img.onload = addReadyImage;
+iron_img.src = 'Iron.png';
+steel_img.onload = addReadyImage;
+steel_img.src = 'Steel.png';

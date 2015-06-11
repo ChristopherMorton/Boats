@@ -14,8 +14,8 @@ session_start();
    a Javascript enabled browser.</noscript>
    <div id="header_div"><h2>Boats</h2></div>
    <div id="game_div">
-   <canvas id="boat_canvas" width="550" height="409"></canvas>
-   <canvas id="map_canvas" width="489" height="409"></canvas>
+   <canvas id="boat_canvas" width="550" height="429"></canvas>
+   <canvas id="map_canvas" width="449" height="429"></canvas>
    </div>
    <center><div id="log">LOG</div></center>
    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
