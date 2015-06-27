@@ -19,6 +19,8 @@ session_start();
    </div>
    <center><div id="log">LOG</div></center>
    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+   <script type="text/javascript" src="../.libraries/pathfinding-browser.min.js"></script>
+   <script type="text/javascript" src="../.libraries/heap.js"></script>
    <script src="boats.js" type="text/javascript"></script>
    </body>
 </html>
