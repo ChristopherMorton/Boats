@@ -695,26 +695,6 @@ Boat.prototype.calculateJourney = function()
    } else if (!map[this.journey_x][this.journey_y].discovered) {
       this.calculateBlindJourney();
    } else {
-
-      // A*
-      /* Setup grid
-      var astar_grid = new PF.Grid( MAP_WIDTH, MAP_HEIGHT );
-      for (var x = 0; x < MAP_WIDTH; ++x) {
-         for (var y = 0; y < MAP_HEIGHT; ++y) {
-            var map_loc = map[x][y];
-            if (//map_loc.discovered && 
-                  (map_loc.terrain !== 0 &&
-                        terGetStart(map_loc.terrain) === terGetEnd(map_loc.terrain)))
-               astar_grid.setWalkableAt( x, y, false );
-         }
-      }
-      var finder = new PF.AStarFinder({
-         allowDiagonal: true,
-         heuristic: calculateDistanceMetric
-      });
-      */
-
-      //var path = finder.findPath( this.x, this.y, this.journey_x, this.journey_y, astar_grid );
       var path = astar( this.x, this.y, this.journey_x, this.journey_y );
 
       if (path.length === 0) {
