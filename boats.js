@@ -35,8 +35,10 @@ var passionfruit_img = new Image();
 var peach_img = new Image();
 var pineapple_img = new Image();
 
-var peanuts_img = new Image();
 var carrots_img = new Image();
+var corn_img = new Image();
+var eggplants_img = new Image();
+var peanuts_img = new Image();
 
 var chickens_img = new Image();
 var turkeys_img = new Image();
@@ -68,8 +70,8 @@ var cargo_index = {
    pineapples: { name:'pineapples', image:pineapple_img, desc:'a stange spiky fruit', weight:2, foodvalue:4 },
    // Vegetables
    carrots: { name:'carrots', image:carrots_img, desc:'a phallic root vegetable', weight:1, foodvalue:2 },
-   corn: { name:'corn', image:carrots_img, desc:'a truly a-maize-ing vegetable', weight:1, foodvalue:2 },
-   eggplants: { name:'eggplant', image:carrots_img, desc:'what the heck is this thing', weight:1, foodvalue:2 },
+   corn: { name:'corn', image:corn_img, desc:'a truly a-maize-ing vegetable', weight:1, foodvalue:2 },
+   eggplants: { name:'eggplants', image:eggplants_img, desc:'what the heck is this thing', weight:1, foodvalue:2 },
    onions: { name:'onions', image:bananas_img, desc:'many-layered like a parfait', weight:1, foodvalue:2 },
    peanuts: { name:'peanuts', image:peanuts_img, desc:'a nut that vaguely resembles a pea, i guess', weight:1, foodvalue:2 },
    potatoes: { name:'potatoes', image:peanuts_img, desc:'a lumpy root vegetable', weight:1, foodvalue:2 }, 
@@ -3411,7 +3413,7 @@ function start() {
 
 // Load images
 var images_ready = 0;
-var total_images = 37;
+var total_images = 39;
 
 function addReadyImage() {
    images_ready++;
@@ -3420,86 +3422,56 @@ function addReadyImage() {
    }
 }
 
-boat_1_sz5_img.onload = addReadyImage;
-boat_1_sz5_img.src = 'Boat_image_1_5px.png';
-boat_2_sz5_img.onload = addReadyImage;
-boat_2_sz5_img.src = 'Boat_image_2_5px.png';
-boat_3_sz5_img.onload = addReadyImage;
-boat_3_sz5_img.src = 'Boat_image_3_5px.png';
-boat_4_sz5_img.onload = addReadyImage;
-boat_4_sz5_img.src = 'Boat_image_4_5px.png';
+function loadImage( img, src ) {
+   img.onload = addReadyImage;
+   img.src = src;
+}
 
-rowboat_sz15_img.onload = addReadyImage;
-rowboat_sz15_img.src = 'Rowboat_15px.png';
-rowboat_sz45_img.onload = addReadyImage;
-rowboat_sz45_img.src = 'Rowboat_45px.png';
+loadImage( boat_1_sz5_img, 'Boat_image_1_5px.png' );
+loadImage( boat_2_sz5_img, 'Boat_image_2_5px.png' );
+loadImage( boat_3_sz5_img, 'Boat_image_3_5px.png' );
+loadImage( boat_4_sz5_img, 'Boat_image_4_5px.png' );
 
-rowboat_sz60_img.onload = addReadyImage;
-rowboat_sz60_img.src = 'Rowboat_60px.png';
+loadImage( rowboat_sz15_img, 'Rowboat_15px.png' );
+loadImage( rowboat_sz45_img, 'Rowboat_45px.png' );
 
-west_arrow_img.onload = addReadyImage;
-west_arrow_img.src = 'NavArrow.png';
-west_arrow_selected_img.onload = addReadyImage;
-west_arrow_selected_img.src = 'NavArrowSelected.png';
-anchor_img.onload = addReadyImage;
-anchor_img.src = 'Anchor.png';
-anchor_selected_img.onload = addReadyImage;
-anchor_selected_img.src = 'AnchorSelected.png';
-island_nav_c_img.onload = addReadyImage;
-island_nav_c_img.src = 'IslandNavC.png';
-island_nav_cc_img.onload = addReadyImage;
-island_nav_cc_img.src = 'IslandNavCC.png';
+loadImage( rowboat_sz60_img, 'Rowboat_60px.png' );
 
-coins_img.onload = addReadyImage;
-coins_img.src = 'Coins.png';
+loadImage( west_arrow_img, 'NavArrow.png' );
+loadImage( west_arrow_selected_img, 'NavArrowSelected.png' );
+loadImage( anchor_img, 'Anchor.png' );
+loadImage( anchor_selected_img, 'AnchorSelected.png' );
+loadImage( island_nav_c_img, 'IslandNavC.png' );
+loadImage( island_nav_cc_img, 'IslandNavCC.png' );
 
-apple_img.onload = addReadyImage;
-apple_img.src = 'Apple.png';
-bananas_img.onload = addReadyImage;
-bananas_img.src = 'Bananas.png';
-berries_img.onload = addReadyImage;
-berries_img.src = 'Berries.png';
-coconuts_img.onload = addReadyImage;
-coconuts_img.src = 'Coconuts.png';
-lemons_img.onload = addReadyImage;
-lemons_img.src = 'Lemons.png';
-limes_img.onload = addReadyImage;
-limes_img.src = 'Limes.png';
-mangoes_img.onload = addReadyImage;
-mangoes_img.src = 'Mangoes.png';
-passionfruit_img.onload = addReadyImage;
-passionfruit_img.src = 'Limes.png';
-peach_img.onload = addReadyImage;
-peach_img.src = 'Peach.png';
-pineapple_img.onload = addReadyImage;
-pineapple_img.src = 'Limes.png';
+loadImage( coins_img, 'Coins.png' );
 
-peanuts_img.onload = addReadyImage;
-peanuts_img.src = 'Peanuts.png';
-carrots_img.onload = addReadyImage;
-carrots_img.src = 'Carrots.png';
+loadImage( apple_img, 'Apple.png' );
+loadImage( bananas_img, 'Bananas.png' );
+loadImage( berries_img, 'Berries.png' );
+loadImage( coconuts_img, 'Coconuts.png' );
+loadImage( lemons_img, 'Lemons.png' );
+loadImage( limes_img, 'Limes.png' );
+loadImage( mangoes_img, 'Mangoes.png' );
+loadImage( passionfruit_img, 'Passionfruit.png' );
+loadImage( peach_img, 'Peach.png' );
+loadImage( pineapple_img, 'Pineapple.png' );
 
-chickens_img.onload = addReadyImage;
-chickens_img.src = 'Chicken.png';
-turkeys_img.onload = addReadyImage;
-turkeys_img.src = 'Turkey.png';
+loadImage( carrots_img, 'Carrots.png' );
+loadImage( corn_img, 'Corn.png' );
+loadImage( eggplants_img, 'Eggplant.png' );
+loadImage( peanuts_img, 'Peanuts.png' );
 
-burlap_img.onload = addReadyImage;
-burlap_img.src = 'Burlap.png';
-cotton_img.onload = addReadyImage;
-cotton_img.src = 'Cotton.png';
-silk_img.onload = addReadyImage;
-silk_img.src = 'Silk.png';
-doll_img.onload = addReadyImage;
-doll_img.src = 'Doll.png';
+loadImage( chickens_img, 'Chicken.png' );
+loadImage( turkeys_img, 'Turkey.png' );
 
-copper_img.onload = addReadyImage;
-copper_img.src = 'Copper.png';
-tin_img.onload = addReadyImage;
-tin_img.src = 'Tin.png';
-bronze_img.onload = addReadyImage;
-bronze_img.src = 'Bronze.png';
-iron_img.onload = addReadyImage;
-iron_img.src = 'Iron.png';
-steel_img.onload = addReadyImage;
-steel_img.src = 'Steel.png';
+loadImage( burlap_img, 'Burlap.png' );
+loadImage( cotton_img, 'Cotton.png' );
+loadImage( silk_img, 'Silk.png' );
+loadImage( doll_img, 'Doll.png' );
+
+loadImage( copper_img, 'Copper.png' );
+loadImage( tin_img, 'Tin.png' );
+loadImage( bronze_img, 'Bronze.png' );
+loadImage( iron_img, 'Iron.png' );
+loadImage( steel_img, 'Steel.png' );
