@@ -38,98 +38,199 @@ var pineapple_img = new Image();
 var carrots_img = new Image();
 var corn_img = new Image();
 var eggplants_img = new Image();
+var onions_img = new Image();
 var peanuts_img = new Image();
+var peppers_img = new Image();
+var potatoes_img = new Image();
+var rice_img = new Image();
+var tomatoes_img = new Image();
+var wheat_img = new Image();
 
 var chickens_img = new Image();
+var cow_img = new Image();
+var crabs_img = new Image();
+var ducks_img = new Image();
+var fish_img = new Image();
+var monkeys_img = new Image();
+var penguins_img = new Image();
+var pigs_img = new Image();
+var seals_img = new Image();
+var sheep_img = new Image();
 var turkeys_img = new Image();
+var turtles_image = new Image();
 
+var softwood_img = new Image();
+var hardwood_img = new Image();
 var burlap_img = new Image();
 var cotton_img = new Image();
+var wool_img = new Image();
 var silk_img = new Image();
-var doll_img = new Image();
+var salt_img = new Image();
 
+var stone_img = new Image();
+var pavingstone_img = new Image();
+var granite_img = new Image();
+var obsidian_img = new Image();
+var coal_img = new Image();
 var copper_img = new Image();
 var tin_img = new Image();
 var bronze_img = new Image();
 var iron_img = new Image();
 var steel_img = new Image();
 
+var stonetools_img = new Image();
+
+var doll_img = new Image();
+
 // Cargo
 var cargo_index = {
-   coins: { name:'coins', image:coins_img, desc:'cash money', weight:0.01 },
+   coins: { name:'coins', image:coins_img, price:1, novelty:1.0,
+      desc:'cash money', weight:0.01 },
    // Fruits
-   apples: { name:'apples', image:apple_img, desc:'a strangely crunchy red fruit', weight:1, foodvalue:2 },
-   bananas: { name:'bananas', image:bananas_img, desc:'a strangely shaped fruit', weight:2, foodvalue:4 },
-   berries: { name:'berries', image:berries_img, desc:'strange tiny fruits', weight:2, foodvalue:4 },
-   coconuts: { name:'coconuts', image:coconuts_img, desc:'a strange fruit full of milk', weight:2, foodvalue:4 },
-   lemons: { name:'lemons', image:lemons_img, desc:'a strangely tart yellow fruit', weight:1, foodvalue:2 },
-   limes: { name:'limes', image:limes_img, desc:'a strangely sour green fruit', weight:1, foodvalue:2 },
-   mangoes: { name:'mangoes', image:mangoes_img, desc:'a perfectly normal fruit', weight:1, foodvalue:2 },
-   passionfruit: { name:'passionfruit', image:passionfruit_img, desc:'a stange fruit full of seeds', weight:1, foodvalue:2 },
-   peaches: { name:'peaches', image:peach_img, desc:'a stange fuzzy fruit', weight:1, foodvalue:2 },
-   pineapples: { name:'pineapples', image:pineapple_img, desc:'a stange spiky fruit', weight:2, foodvalue:4 },
+   apples: { name:'apples', image:apple_img, price:3, novelty:2.8,
+      desc:'a strangely crunchy red fruit', weight:1, foodvalue:2 },
+   bananas: { name:'bananas', image:bananas_img, price:7, novelty:4.9,
+      desc:'a strangely shaped fruit', weight:2, foodvalue:4 },
+   berries: { name:'berries', image:berries_img, price:2, novelty:2.4,
+      desc:'strange tiny fruits', weight:1, foodvalue:2 },
+   coconuts: { name:'coconuts', image:coconuts_img, price:7, novelty:4.4,
+      desc:'a strange fruit full of milk', weight:2, foodvalue:4 },
+   lemons: { name:'lemons', image:lemons_img, price:3, novelty:2.8,
+      desc:'a strangely tart yellow fruit', weight:1, foodvalue:2 },
+   limes: { name:'limes', image:limes_img, price:3, novelty:3.0,
+      desc:'a strangely sour green fruit', weight:1, foodvalue:2 },
+   mangoes: { name:'mangoes', image:mangoes_img, price:4, novelty:3.1,
+      desc:'a perfectly normal fruit', weight:1, foodvalue:2 },
+   passionfruit: { name:'passionfruit', image:passionfruit_img, price:5, novelty:3.0,
+      desc:'a stange fruit full of seeds', weight:1, foodvalue:2 },
+   peaches: { name:'peaches', image:peach_img, price:3, novelty:2.5,
+      desc:'a stange fuzzy fruit', weight:1, foodvalue:2 },
+   pineapples: { name:'pineapples', image:pineapple_img, price:8, novelty:4.7,
+      desc:'a stange spiky fruit', weight:2, foodvalue:4 },
    // Vegetables
-   carrots: { name:'carrots', image:carrots_img, desc:'a phallic root vegetable', weight:1, foodvalue:2 },
-   corn: { name:'corn', image:corn_img, desc:'a truly a-maize-ing vegetable', weight:1, foodvalue:2 },
-   eggplants: { name:'eggplants', image:eggplants_img, desc:'what the heck is this thing', weight:1, foodvalue:2 },
-   onions: { name:'onions', image:bananas_img, desc:'many-layered like a parfait', weight:1, foodvalue:2 },
-   peanuts: { name:'peanuts', image:peanuts_img, desc:'a nut that vaguely resembles a pea, i guess', weight:1, foodvalue:2 },
-   potatoes: { name:'potatoes', image:peanuts_img, desc:'a lumpy root vegetable', weight:1, foodvalue:2 }, 
-   rice: { name:'rice', image:peanuts_img, desc:"or 'Condy' as I call her", weight:1, foodvalue:2 }, 
-   tomatoes: { name:'tomatoes', image:carrots_img, desc:'a squishy red vegetable, or fruit maybe', weight:1, foodvalue:2 },
-   wheat: { name:'wheat', image:carrots_img, desc:'amber waves of grain', weight:1, foodvalue:2 },
+   carrots: { name:'carrots', image:carrots_img, price:3, novelty:2.5,
+      desc:'a phallic root vegetable', weight:1, foodvalue:2 },
+   corn: { name:'corn', image:corn_img, price:3, novelty:2.8,
+      desc:'a truly a-maize-ing vegetable', weight:1, foodvalue:2 },
+   eggplants: { name:'eggplant', image:eggplants_img, price:5, novelty:3.4,
+      desc:'what the heck is this thing', weight:1, foodvalue:2 },
+   onions: { name:'onions', image:onions_img, price:2, novelty:2.0,
+      desc:'many-layered like a parfait', weight:1, foodvalue:2 },
+   peanuts: { name:'peanuts', image:peanuts_img, price:4, novelty:3.4,
+      desc:'sort of resembles a pea, i guess', weight:1, foodvalue:2 },
+   peppers: { name:'peppers', image:peppers_img, price:3, novelty:3.2,
+      desc:'a bright crunchy vegetable', weight:1, foodvalue:2 },
+   potatoes: { name:'potatoes', image:potatoes_img, price:2, novelty:1.9,
+      desc:'a lumpy root vegetable', weight:1, foodvalue:2 }, 
+   rice: { name:'rice', image:rice_img, price:2, novelty:2.2,
+      desc:"or 'Condy' as I call her", weight:1, foodvalue:2 }, 
+   tomatoes: { name:'tomatoes', image:tomatoes_img, price:4, novelty:2.9,
+      desc:'a squishy red vegetable, or fruit maybe', weight:1, foodvalue:2 },
+   wheat: { name:'wheat', image:wheat_img, price:2, novelty:2.4,
+      desc:'amber waves of grain', weight:1, foodvalue:2 },
    // Animals
-   chickens: { name:'chickens', image:chickens_img, desc:'cluck cluck', weight:4, foodvalue: 9 },
-   cows: { name:'cows', image:turkeys_img, desc:'moooo', weight:500, foodvalue:1100 },
-   crabs: { name:'crabs', image:turkeys_img, desc:'scuttle', weight:2, foodvalue:6 },
-   ducks: { name:'ducks', image:chickens_img, desc:'quack', weight:4, foodvalue: 9 },
-   fish: { name:'fish', image:turkeys_img, desc:'blub', weight:5, foodvalue:10 },
-   monkeys: { name:'monkeys', image:turkeys_img, desc:'ook ook', weight:22, foodvalue:40 },
-   penguins: { name:'penguins', image:turkeys_img, desc:'squaaawk', weight:8, foodvalue:25 },
-   pigs: { name:'pigs', image:turkeys_img, desc:'oink', weight:110, foodvalue:250 },
-   seals: { name:'seals', image:turkeys_img, desc:'ark ark ark', weight:215, foodvalue:500 },
-   sheep: { name:'sheep', image:turkeys_img, desc:'baaaa', weight:110, foodvalue:180 },
-   turkeys: { name:'turkeys', image:turkeys_img, desc:'gobble gobble', weight:14, foodvalue:32 },
-   turtles: { name:'turtles', image:turkeys_img, desc:'*silence*', weight:2, foodvalue:4 },
+   chickens: { name:'chickens', image:chickens_img, price:30, novelty:3.0,
+      desc:'cluck cluck', weight:4, foodvalue: 7 },
+   cows: { name:'cows', image:cow_img, price:3000, novelty:2.7,
+      desc:'moooo', weight:350, foodvalue:500 },
+   crabs: { name:'crabs', image:crabs_img, price:14, novelty:3.0,
+      desc:'scuttle', weight:2, foodvalue:4 },
+   ducks: { name:'ducks', image:ducks_img, price:32, novelty:3.5,
+      desc:'quack', weight:4, foodvalue: 7 },
+   fish: { name:'fish', image:fish_img, price:16, novelty:1.8,
+      desc:'blub', weight:5, foodvalue:9 },
+   monkeys: { name:'monkeys', image:monkeys_img, price:185, novelty:4.4,
+      desc:'ook ook', weight:22, foodvalue:28 },
+   penguins: { name:'penguins', image:penguins_img, price:90, novelty:4.8,
+      desc:'squaaawk', weight:9, foodvalue:15 },
+   pigs: { name:'pigs', image:pigs_img, price:820, novelty:3.0,
+      desc:'oink', weight:110, foodvalue:170 },
+   seals: { name:'seals', image:seals_img, price:1700, novelty:4.1,
+      desc:'ark ark ark', weight:215, foodvalue:310 },
+   sheep: { name:'sheep', image:sheep_img, price:940, novelty:2.4,
+      desc:'baaaa', weight:110, foodvalue:120 },
+   turkeys: { name:'turkeys', image:turkeys_img, price:85, novelty:2.8,
+      desc:'gobble gobble', weight:14, foodvalue:22 },
+   turtles: { name:'turtles', image:turtles_image, price:13, novelty:3.2,
+      desc:'*silence*', weight:2, foodvalue:4 },
 
    // Various resources
-   softwood: { name:'soft wood', image:bananas_img, desc:"don't knock it", weight:1.5 },
-   hardwood: { name:'hard wood', image:bananas_img, desc:"if you know what I mean", weight:2 },
-   burlap: { name:'burlap', image:burlap_img, desc:"not the softest, I'll admit", weight:1 },
-   cotton: { name:'cotton', image:cotton_img, desc:'this stuff is way softer than burlap', weight:1 },
-   wool: { name:'wool', image:cotton_img, desc:'this stuff is way softer than burlap', weight:1 },
-   silk: { name:'silk', image:silk_img, desc:'woven from butterfly wings and maybe rainbows', weight:1 },
+   softwood: { name:'softwood', image:softwood_img, price:22, novelty:2.4,
+      desc:"don't knock it", weight:8 },
+   hardwood: { name:'hardwood', image:hardwood_img, price:32, novelty:2.8,
+      desc:'if you know what I mean', weight:12 },
+   burlap: { name:'burlap', image:burlap_img, price:1, novelty:2.0,
+      desc:"not the softest, I'll admit", weight:1 },
+   cotton: { name:'cotton', image:cotton_img, price:3, novelty:2.9,
+      desc:'this stuff is pretty soft wow', weight:1 },
+   wool: { name:'wool', image:wool_img, price:3, novelty:2.7,
+      desc:'great for sweaters, but there are no sweaters in this game...', weight:1 },
+   silk: { name:'silk', image:silk_img, price:8, novelty:3.8,
+      desc:'woven from butterfly wings and maybe rainbows', weight:1 },
+   salt: { name:'salt', image:salt_img, price:6, novelty:4.4,
+      desc:"for curing meat, except meat doesn't spoil in this game...", weight:1 },
    // Stone/metal
-   stone: { name:'cut stone', image:bananas_img, desc:'I want a rock! (Rock!)', weight:6 },
-   pavingstone: { name:'paving stone', image:bananas_img, desc:'We built this city / On paving stone', weight:6 },
-   granite: { name:'granite', image:bananas_img, desc:'level up your kitchen', weight:8 },
-   obsidian: { name:'obsidian', image:bananas_img, desc:'frozen fire, in the tongue of old Valyria', weight:4 },
-   coal: { name:'coal', image:bananas_img, desc:'I think I have the black lung', weight:4 },
-   copper: { name:'copper', image:copper_img, desc:'great for electrical wiring', weight:6 },
-   tin: { name:'tin', image:tin_img, desc:'you know, the metal', weight:6 },
-   bronze: { name:'bronze', image:bronze_img, desc:'a new age is upon us', weight:6 },
-   iron: { name:'iron', image:iron_img, desc:"the workhorse of the iron age, unsurprisingly", weight:10 },
-   steel: { name:'steel', image:steel_img, desc:"pretty much the best metal you could ask for", weight:12 },
+   stone: { name:'stone', image:stone_img, price:5, novelty:2.2,
+      desc:'I want a rock! (Rock!)', weight:6 },
+   pavingstone: { name:'paving stone', image:pavingstone_img, price:9, novelty:2.5,
+      desc:'We built this city / On paving stone', weight:6 },
+   granite: { name:'granite', image:granite_img, price:19, novelty:2.8,
+      desc:'level up your kitchen', weight:8 },
+   obsidian: { name:'obsidian', image:obsidian_img, price:22, novelty:3.3,
+      desc:'frozen fire, in the tongue of old Valyria', weight:2 },
+   coal: { name:'coal', image:coal_img, price:10, novelty:2.8,
+      desc:'I think I have the black lung', weight:2 },
+   copper: { name:'copper', image:copper_img, price:27, novelty:3.0,
+      desc:'great for electrical wiring', weight:6 },
+   tin: { name:'tin', image:tin_img, price:26, novelty:3.0,
+      desc:'you know, the metal', weight:6 },
+   bronze: { name:'bronze', image:bronze_img, price:40, novelty:3.3,
+      desc:'a new age is upon us', weight:6 },
+   iron: { name:'iron', image:iron_img, price:75, novelty:3.4,
+      desc:"the workhorse of the iron age, unsurprisingly", weight:10 },
+   steel: { name:'steel', image:steel_img, price:160, novelty:4.0,
+      desc:"pretty much the best metal you could ask for", weight:12 },
    // Usable Resources
-   bronzetools: { name:'bronze tools', image:bananas_img, desc:'as the name suggests', weight:6 },
-   irontools: { name:'iron tools', image:bananas_img, desc:'better than bronze (?)', weight:8 },
+   stonetools: { name:'stone tools', image:stonetools_img, price:24, novelty:3.5,
+      desc:'hammers and axes and the like', weight:7 },
+   bronzetools: { name:'bronze tools', image:bananas_img, price:45, novelty:3.8,
+      desc:'fancy stuff like sickles', weight:6 },
+   irontools: { name:'iron tools', image:bananas_img, price:85, novelty:4.0,
+      desc:'better than bronze (?)', weight:8 },
    // Crafted Items
-   chairs: { name:'chairs', image:doll_img, desc:"for sitting", weight:24 },
-   tables: { name:'tables', image:doll_img, desc:"for putting things on", weight:56 },
-   desks: { name:'desks', image:doll_img, desc:"for working", weight:260 },
-   figurines: { name:'figurines', image:doll_img, desc:"an adult's plaything", weight:1 },
-   dolls: { name:'dolls', image:doll_img, desc:"a child's plaything", weight:1 },
-   shirts: { name:'shirts', image:bananas_img, desc:'gird your pecs', weight:1 },
-   pants: { name:'pants', image:bananas_img, desc:'gird your loins', weight:2 },
-   dresses: { name:'dresses', image:bananas_img, desc:'I feel pretty', weight:2.5 },
-   fancydresses: { name:'fancy dresses', image:bananas_img, desc:'high society', weight:4 },
-   fancyshirts: { name:'fancy dresses', image:bananas_img, desc:'high society', weight:2 },
-   pillows: { name:'pillows', image:bananas_img, desc:'downy, or cottony, depends how you make them', weight:1 },
+   chairs: { name:'chairs', image:bananas_img, price:80, novelty:2.8,
+      desc:"for sitting", weight:24 },
+   tables: { name:'tables', image:bananas_img, price:165, novelty:3.0,
+      desc:"for putting things on", weight:56 },
+   beds: { name:'beds', image:bananas_img, price:245, novelty:3.2,
+      desc:"for sleeping", weight:140 },
+   desks: { name:'desks', image:bananas_img, price:450, novelty:3.4,
+      desc:"for sitting at", weight:260 },
+   figurines: { name:'figurines', image:bananas_img, price:32, novelty:4.8,
+      desc:"an adult's plaything", weight:2 },
+   dolls: { name:'dolls', image:doll_img, price:16, novelty:4.4,
+      desc:"a child's plaything", weight:1 },
+   shirts: { name:'shirts', image:bananas_img, price:18, novelty:2.6,
+      desc:'gird your pecs', weight:1 },
+   pants: { name:'pants', image:bananas_img, price:35, novelty:2.7,
+      desc:'gird your loins', weight:2 },
+   dresses: { name:'dresses', image:bananas_img, price:54, novelty:3.1,
+      desc:'I feel pretty', weight:2.5 },
+   fancydresses: { name:'fancy dresses', image:bananas_img, price:175, novelty:3.8,
+      desc:'for high society lasses', weight:4 },
+   fancyshirts: { name:'fancy shirts', image:bananas_img, price:85, novelty:3.2,
+      desc:'for high society chappies', weight:2 },
+   pillows: { name:'pillows', image:bananas_img, price:11, novelty:2.8,
+      desc:'downy, or cottony, depends how you make them', weight:1 },
 }
 
 // Type lists
-var food_list = [ 'apples', 'bananas', 'berries', 'coconuts', 'lemons', 'limes', 'mangoes', 'passionfruit', 'pineapples', 'peaches', 'carrots', 'corn', 'eggplants', 'onions', 'peanuts', 'rice', 'tomatoes', 'wheat', 'fish' ];
+var food_list = [ 'apples', 'bananas', 'berries', 'coconuts', 'lemons', 'limes', 'mangoes', 'passionfruit', 'peaches', 'pineapples', 'carrots', 'corn', 'eggplants', 'onions', 'peanuts', 'peppers', 'potatoes', 'rice', 'tomatoes', 'wheat', 'fish' ];
 var animal_list = [ 'chickens', 'cows', 'crabs', 'ducks', 'monkeys', 'penguins', 'pigs', 'seals', 'sheep', 'turkeys', 'turtles' ];
+var big_animal_list = [ 'cows', 'pigs', 'seals', 'sheep' ];
+//var farming_list = 
+//[ 'apples', 'bananas', 'berries', 'coconuts', 'lemons', 'limes', 'mangoes', 'passionfruit', 'peaches', 'pineapples', 'carrots', 'corn', 'eggplants', 'onions', 'peanuts', 'peppers', 'potatoes', 'rice', 'tomatoes', 'wheat', 'fish', 'chickens', 'cows', 'crabs', 'ducks', 'monkeys', 'penguins', 'pigs', 'seals', 'sheep', 'turkeys', 'turtles', 'burlap', 'cotton', 'silk' ];
+var mining_list = [ 'stone', 'pavingstone', 'granite', 'obsidian', 'coal', 'copper', 'tin', 'iron' ];
 
 // Places
 var places = [];
@@ -463,7 +564,8 @@ function Place( type, name )
          woodcraft: 0,
          stonecraft: 0,
          metalcraft: 0,
-         weaving: 0 
+         weaving: 0,
+         boatcraft: 0
       };
       this.stock = {};
       this.stock_selected = '';
@@ -563,7 +665,7 @@ function generateResources( ter_type )
        * veggies: potatoes, onions
        * animals: chickens, sheep, fish
        * resources: 
-       * stone: stone, coal, tin, iron, obsidian
+       * stone: stone, coal, tin, iron, granite, obsidian
        */
       var res = selectNResources( 1,
             [ 'berries', 'potatoes', 'onions' ] );
@@ -572,7 +674,7 @@ function generateResources( ter_type )
             [ 'chickens', 'sheep', 'fish' ] );
       Array.prototype.push.apply( resources, res );
       res = selectNResources( Math.round( Math.random() * 2) + 1,
-            [ 'stone', 'coal', 'tin', 'iron', 'obsidian' ] );
+            [ 'stone', 'coal', 'tin', 'iron', 'granite', 'obsidian' ] );
       Array.prototype.push.apply( resources, res );
    } else if (ter_type === 5) {
       /* Yellow desert
@@ -605,7 +707,7 @@ function generateResources( ter_type )
             [ 'potatoes', 'onions', 'fish', 'penguins', 'seals' ] );
       Array.prototype.push.apply( resources, res );
       res = selectNResources( Math.round( Math.random() * 1),
-            [ 'hardwood', 'iron' ] );
+            [ 'hardwood', 'iron', 'granite' ] );
       Array.prototype.push.apply( resources, res );
       if (Math.random() > 0.7) resources.push( 'salt' );
    }
@@ -759,18 +861,19 @@ function growTown( town, inland )
    }
    // Success
    town.size++;
+   for (var res in town.resources) {
+      if ($.inArray (res, animal_list ) === -1) {// animals are not resources
+         if ($.inArray (res, food_list ) === -1)
+            town.resources[res] += 3;
+         else
+            town.resources[res]++;
+   }
    return true;
 }
 
-function buildTown( center_x, center_y, island_resources, size )
+function buildTown( center_x, center_y, island_resources )
 {
    var new_town = new Place( 'town', townNameGen() );
-
-   for (var i = 0; i < island_resources.length; ++i) {
-      new_town.resources[island_resources[i]] = Math.ceil( Math.random() * 3 ) + 1;
-   }
-   new_town.upgrade();
-   new_town.upgrade();
 
    // Add it to the map
    map[center_x][center_y].place = new_town.id;
@@ -778,23 +881,170 @@ function buildTown( center_x, center_y, island_resources, size )
    new_town.y = center_y;
    new_town.size = 1;
 
-   for (var i = 1; i < size; ++i)
-      growTown( new_town, true );
+   for (var i = 0; i < island_resources.length; ++i) {
+      var res = island_resources[i];
+      if ($.inArray( res, food_list ) !== -1)
+         new_town.resources[res] = Math.ceil( Math.random() * 9 ) + 4;
+      else if ($.inArray( res, big_animal_list ) !== -1)
+         new_town.stock[res] = Math.ceil(Math.random() * 3 + 2);
+      else if ($.inArray( res, animal_list ) !== -1)
+         new_town.stock[res] = Math.ceil(Math.random() * 9 + 8);
+      else
+         new_town.resources[res] = Math.ceil( Math.random() * 4 ) + 1;
+   }
+   new_town.upgrade();
 
    places.push( new_town );
 }
 
 Place.prototype.getPrice = function( cargo_id )
 {
-   // TODO
-   return 5;
+   // Strategy:
+   // 1- Get base price
+   // 2- Multiply by a factor of novelty based on how many you have
+   // 3- Multiply by 1.5 if it's the last thing needed for an upgrade
+   var price = cargo_index[ cargo_id ].price;
+   if (this.stock[ cargo_id ] === undefined || this.stock[ cargo_id ] < 15) {
+      var count = this.stock[ cargo_id ] || 0;
+
+      // TODO: Fancier math?
+      // Linear version
+      var multiplier = 1 + (((15 - count) / 15) * (cargo_index[ cargo_id ].novelty - 1));
+
+      price *= multiplier;
+   }
+   // TODO: Check if needed for upgrade
+   return price;
+}
+
+Place.prototype.attemptEat = function( food_target ) {
+   // First check if we have enough
+   var total = 0;
+   for( var stock in this.stock ) {
+      if ($.inArray( stock, animal_list ) !== -1 ||
+          $.inArray( stock, food_list ) !== -1)
+         total += (cargo_index[ stock ].foodvalue * this.stock[ stock ]);
+   }
+
+   if (total < food_target) return false; // Starvation
+
+   for( var stock in this.stock ) {
+      if (food_target <= 0) break;
+
+      var limit = 10 + Math.round(Math.random() * 10);
+      if ($.inArray( stock, animal_list ) !== -1) {
+         if( this.stock[stock] > limit) {
+            total = (this.stock[stock] - limit) * cargo_index[ stock ].foodvalue;
+            if (total < food_target) {
+               this.stock[stock] = limit;
+               food_target -= total;
+            } else {
+               total = Math.ceil( food_target / cargo_index[ stock ].foodvalue );
+               this.stock[stock] -= total; 
+               return true;
+            }
+         }
+      }
+   }
+   for( var stock in this.stock ) {
+      if (food_target <= 0) break;
+
+      var limit = 10 + Math.round(Math.random() * 10);
+      if ($.inArray( stock, food_list ) !== -1) {
+         if( this.stock[stock] > limit) {
+            total = (this.stock[stock] - limit) * cargo_index[ stock ].foodvalue;
+            if (total < food_target) {
+               this.stock[stock] = limit;
+               food_target -= total;
+            } else {
+               total = Math.ceil( food_target / cargo_index[ stock ].foodvalue );
+               this.stock[stock] -= total; 
+               return true;
+            }
+         }
+      }
+   }
+   for( var stock in this.stock ) {
+      if (food_target <= 0) break;
+
+      var limit = 3 + Math.round(Math.random() * 4);
+      if ($.inArray( stock, animal_list ) !== -1) {
+         if( this.stock[stock] > limit) {
+            total = (this.stock[stock] - limit) * cargo_index[ stock ].foodvalue;
+            if (total < food_target) {
+               this.stock[stock] = limit;
+               food_target -= total;
+            } else {
+               total = Math.ceil( food_target / cargo_index[ stock ].foodvalue );
+               this.stock[stock] -= total; 
+               return true;
+            }
+         }
+      }
+   }
+   for( var stock in this.stock ) {
+      if (food_target <= 0) break;
+
+      var limit = 3 + Math.round(Math.random() * 4);
+      if ($.inArray( stock, food_list ) !== -1) {
+         if( this.stock[stock] > limit) {
+            total = (this.stock[stock] - limit) * cargo_index[ stock ].foodvalue;
+            if (total < food_target) {
+               this.stock[stock] = limit;
+               food_target -= total;
+            } else {
+               total = Math.ceil( food_target / cargo_index[ stock ].foodvalue );
+               this.stock[stock] -= total; 
+               return true;
+            }
+         }
+      }
+   }
+   for( var stock in this.stock ) {
+      if (food_target <= 0) break;
+
+      var limit = 2; // Always leave a breeding pair
+      if ($.inArray( stock, animal_list ) !== -1) {
+         if( this.stock[stock] > limit) {
+            total = (this.stock[stock] - limit) * cargo_index[ stock ].foodvalue;
+            if (total < food_target) {
+               this.stock[stock] = limit;
+               food_target -= total;
+            } else {
+               total = Math.ceil( food_target / cargo_index[ stock ].foodvalue );
+               this.stock[stock] -= total; 
+               return true;
+            }
+         }
+      }
+   }
+   for( var stock in this.stock ) {
+      if (food_target <= 0) break;
+
+      if ($.inArray( stock, food_list ) !== -1) {
+         if( this.stock[stock] > 0) {
+            total = this.stock[stock] * cargo_index[ stock ].foodvalue;
+            if (total < food_target) {
+               this.stock[stock] = 0;
+               food_target -= total;
+            } else {
+               total = Math.ceil( food_target / cargo_index[ stock ].foodvalue );
+               this.stock[stock] -= total; 
+               return true;
+            }
+         }
+      }
+   }
+
+   return true;
 }
 
 Place.prototype.upgrade = function() {
    // Strategy:
    // 1- Gather resources
+   // 1.2- Resource loss
+   // 1.5- Eat food, if not enough food then NO UPGRADE FOR YOU
    // 2- Craft resources
-   // 2.5- Resource loss
    // 3- Attempt to upgrade industries
    // 4- Attempt to grow the town
 
@@ -808,37 +1058,69 @@ Place.prototype.upgrade = function() {
       this.stock[res] = cur;
    }
 
-   // TODO: 2- Craft
+   // 1.2
+   for (var stock in this.stock) {
+      // Animal breeding
+      if ($.inArray( stock, animal_list ) !== -1) {
+         var breed_power = 0.5 + (0.03 * this.industries.farming);
+         var gain = Math.floor( Math.pow( this.stock[stock] * Math.random(), breed_power ) );
+         this.stock[stock] += gain;
+         // TODO: Calculate more e.g. Population bounds
+      }
+      // Random loss
+      var size_factor = 0.04 * this.size;
+      var loss = (Math.random() * size_factor) + 0.9 - size_factor;
+      this.stock[stock] = Math.ceil( this.stock[stock] * loss );
+   }
+
+   // 1.5- Eat
+   if (this.attemptEat( Math.round( Math.pow(this.size, 1.5) * 50 )) === false)
+      return;
+
+   // 2- Craft
+   // TODO: More?
    var craft_count = 0;
-   if (this.industries.boatmaking > 0) {
-
-   }
-   if (this.industries.farming > 0) {
-
-   }
    if (this.industries.woodcraft > 0) {
       // Furniture
       if (this.stock.hardwood) {
          craft_count = Math.floor( this.stock.hardwood / 4 );
          if (craft_count > this.industries.woodcraft)
             craft_count = this.industries.woodcraft;
-         this.stock.hardwood -= craft_count;
-         if (craft_count > 7) {
+         craft_count -= (craft_count % 2);
+         if (craft_count > 15 && this.industries.woodcraft >= 3) {
             this.stock.desks++;
-            craft_count -= 8;
+            craft_count -= 16;
+            this.stock.hardwood -= 16;
          }
-         if (craft_count > 1) {
+         if (craft_count > 6 && this.industries.woodcraft >= 2) {
+            this.stock.beds++;
+            craft_count -= 7;
+            this.stock.hardwood -= 7;
+         }
+         if (craft_count > 3) {
             this.stock.tables++;
-            craft_count -= 2;
+            craft_count -= 4;
+            this.stock.hardwood -= 4;
          }
-         this.stock.chairs += craft_count;
+
+         this.stock.chairs += (craft_count / 2);
+         this.stock.hardwood -= craft_count;
       }
       // Wooden utensils
 
    }
    if (this.industries.stonecraft > 0) {
+      // Stone tools
+      if (this.stock.stone && this.stock.hardwood) {
+         craft_count = Math.floor( Math.min( this.stock.stone, this.stock.hardwood ) / 4 );
+         if (craft_count > this.industries.stonecraft)
+            craft_count = this.industries.stonecraft;
+         this.stock.stone -= craft_count;
+         this.stock.hardwood -= craft_count;
+         this.stock.stonetools += craft_count;
+      }
       // Paving stone - used for growth
-      if (this.stock.stone) {
+      if (this.stock.stone && this.industries.stonecraft > 1) {
          craft_count = Math.floor( this.stock.stone / 4 );
          if (craft_count > this.industries.stonecraft)
             craft_count = this.industries.stonecraft;
@@ -846,7 +1128,7 @@ Place.prototype.upgrade = function() {
          this.stock.pavingstone += craft_count;
       }
       // Obsidian figurines
-      if (this.stock.obsidian) {
+      if (this.stock.obsidian && this.industries.stonecraft > 3) {
          craft_count = Math.floor( this.stock.obsidian / 4 );
          if (craft_count > this.industries.stonecraft)
             craft_count = this.industries.stonecraft;
@@ -854,7 +1136,8 @@ Place.prototype.upgrade = function() {
          this.stock.figurines += craft_count;
       }
    }
-   if (this.industries.metalcraft > 0) {
+   if (this.industries.metalcraft > 0 &&
+         (this.stock['stonetools'] > 0 || this.stock['bronzetools'] > 0 || this.stock['irontools'] > 0)) {
       // Smelt bronze
       if (this.stock.tin && this.stock.copper && this.stock.coal) {
          craft_count = Math.floor( Math.min( this.stock.tin, this.stock.copper, this.stock.coal ) / 4 );
@@ -956,21 +1239,251 @@ Place.prototype.upgrade = function() {
       }
    }
 
-   // 2.5
-   for (var stock in this.stock) {
-      // Animal breeding
-      if ($.inArray( stock, animal_list ) !== -1) {
-         var gain = Math.floor( Math.sqrt( this.stock[stock] * Math.random() ) );
-         this.stock[stock] += gain;
+   // 3- Upgrade industry
+   this.attemptUpgrades();
+
+   // 4- Grow town
+   this.attemptGrowth();
+}
+
+Place.prototype.upgradeFarming = function()
+{
+   for (var res in resources) {
+      if ($.inArray( res, food_list ) !== -1)
+         resources[res] += 2;
+   }
+}
+
+Place.prototype.upgradeMining = function()
+{
+   for (var res in resources) {
+      if ($.inArray( res, mining_list ) !== -1)
+         resources[res] += 2;
+   }
+}
+
+Place.prototype.upgradeWoodcraft = function()
+{
+   for (var res in resources) {
+      if (res === 'hardwood' || res === 'softwood')
+         resources[res] += 2;
+   }
+}
+
+Place.prototype.upgradeStonecraft = function()
+{
+   for (var res in resources) {
+      if (res === 'stone' || res === 'granite' || res === 'obsidian' || res === 'coal')
+         resources[res]++;
+   }
+}
+
+Place.prototype.upgradeMetalcraft = function()
+{
+   for (var res in resources) {
+      if (res === 'copper' || res === 'tin' || res === 'iron')
+         resources[res]++;
+   }
+}
+
+Place.prototype.upgradeWeaving = function()
+{
+   for (var res in resources) {
+      if (res === 'burlap' || res === 'cotton' || res === 'silk' || res === 'sheep')
+         resources[res] += 2;
+   }
+}
+
+Place.prototype.attemptUpgrades = function() {
+   // TODO
+   /* Industies:
+         farming
+         mining
+         woodcraft
+         stonecraft
+         metalcraft
+         weaving
+         boatcraft
+         */
+
+   // Farming - mostly you need better tools I guess
+   if (this.farming === 0) {
+      var tools = (this.stock.stonetools || 0) + (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
+      if (tools > 1) {
+         tools = 2;
+         while( tools > 0 ) {
+            if (this.stock.stonetools && this.stock.stonetools > 0) this.stock.stonetools--;
+            else if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
+            else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
+            tools--;
+         }
+         this.upgradeFarming();
       }
-      // Random loss
-      var loss = (Math.random() * 0.4) + 0.6;
-      if (loss < 1) this.stock[stock] = Math.floor( this.stock[stock] * loss );
+   } else if (this.farming === 1) {
+      var tools = (this.stock.stonetools || 0) + (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
+      if (tools > 8) {
+         tools = 9;
+         while( tools > 0 ) {
+            if (this.stock.stonetools && this.stock.stonetools > 0) this.stock.stonetools--;
+            else if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
+            else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
+            tools--;
+         }
+         this.upgradeFarming();
+      }
+   } else if (this.farming === 2) {
+      var tools = (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
+      if (tools > 4) {
+         tools = 5;
+         while( tools > 0 ) {
+            if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
+            else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
+            tools--;
+         }
+         this.upgradeFarming();
+      }
+   } else if (this.farming === 3) {
+      var tools = (this.stock.irontools || 0);
+      if (tools > 4) {
+         this.stock.irontools -= 5;
+         this.upgradeFarming();
+      }
+   } else if (this.farming === 4) {
+      var tools = (this.stock.irontools || 0);
+      if (tools > 29) {
+         this.stock.irontools -= 30;
+         this.upgradeFarming();
+      }
    }
 
-   // TODO: 3- Upgrade industry
+   // TODO: Mining
+   // TODO: woodcraft
+   // TODO: stonecraft
+   if (this.stonecraft === 0) {
+      if (this.stock.stone && this.stock.stone > 11) {
+         this.stock.stone -= 12;
+         this.upgradeStonecraft();
+      }
+   } else if (this.stonecraft === 1) {
+      if (this.stock.stone && this.stock.stone > 19
+         && this.stock.stonetools && this.stock.stonetools > 3) {
+         this.stock.stone -= 20;
+         this.stock.stonetools -= 4;
+         this.upgradeStonecraft();
+      }
+   }
+   // TODO: metalcraft
+   // TODO: weaving
+   // TODO: boatcraft
+}
 
-   // TODO: 4- Grow town
+Place.prototype.attemptGrowth = function() {
+   if (this.size < 4) {
+      // Only need sufficient food
+      var food_req = (this.size * 400) + 200;
+
+      if (this.attemptEat( food_req ) === true) {
+         growTown( this, true );
+         return true;
+      }
+   } else if (this.size < 7) {
+      // Need tools and decent clothing
+      var food_req = (this.size * 450) + 300;
+      var tool_req = (this.size * 4) + 8;
+      var clothing_req = (this.size * 6) + 5;
+
+      var tools = (this.stock.stonetools || 0) + (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
+      if (tools >= tool_req &&
+          (this.stock.pants || 0) >= clothing_req && 
+          (this.stock.shirts || 0) >= clothing_req && 
+          (this.stock.dresses || 0) >= clothing_req) {
+         if (this.attemptEat( food_req ) === true) {
+            this.stock.pants -= clothing_req;
+            this.stock.shirts -= clothing_req;
+            this.stock.dresses -= clothing_req;
+            tools = tool_req;
+            while( tools > 0 ) {
+               if (this.stock.stonetools && this.stock.stonetools > 0) this.stock.stonetools--;
+               else if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
+               else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
+               tools--;
+            }
+            growTown( this, true );
+            return true;
+         }
+      }
+   } else if (this.size < 10) {
+      // Need paving stone, furniture, and better tools
+      var food_req = (this.size * 500) + 300;
+      var tool_req = (this.size * 4) + 3;
+      var clothing_req = (this.size * 7) + 5;
+      var paving_req = (this.size * 15) + 40;
+      var furniture_req = (this.size * 2) + 2;
+
+      var tools = (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
+      if (tools >= tool_req &&
+          (this.stock.pants || 0) >= clothing_req && 
+          (this.stock.shirts || 0) >= clothing_req && 
+          (this.stock.dresses || 0) >= clothing_req &&
+          (this.stock.pavingstone || 0) >= paving_req &&
+          (this.stock.chairs || 0) >= (furniture_req * 4) && 
+          (this.stock.tables || 0) >= (furniture_req * 2) && 
+          (this.stock.desks || 0) >= furniture_req && 
+          (this.stock.pillows || 0) >= (furniture_req * 2) && 
+          (this.stock.beds || 0) >= furniture_req) {
+         if (this.attemptEat( food_req ) === true) {
+            this.stock.desks -= furniture_req;
+            this.stock.beds -= furniture_req;
+            this.stock.tables -= 2 * furniture_req;
+            this.stock.chairs -= 4 * furniture_req;
+            this.stock.pavingstone -= paving_req;
+            this.stock.pants -= clothing_req;
+            this.stock.shirts -= clothing_req;
+            this.stock.dresses -= clothing_req;
+            tools = tool_req;
+            while( tools > 0 ) {
+               if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
+               else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
+               tools--;
+            }
+            growTown( this, true );
+            return true;
+         }
+      }
+   } else {
+      // Need the best tools and fancy clothing
+      var food_req = (this.size * 500) + 400;
+      var tool_req = (this.size * 5) + 2;
+      var clothing_req = (this.size * 8) + 4;
+      var paving_req = (this.size * 15) + 40;
+      var furniture_req = (this.size * 2) + 2;
+
+      if ((this.stock.irontools || 0) >= tool_req &&
+          (this.stock.fancyshirts || 0) >= clothing_req && 
+          (this.stock.fancydresses || 0) >= clothing_req &&
+          (this.stock.pavingstone || 0) >= paving_req &&
+          (this.stock.chairs || 0) >= (furniture_req * 4) && 
+          (this.stock.tables || 0) >= (furniture_req * 2) && 
+          (this.stock.desks || 0) >= furniture_req && 
+          (this.stock.pillows || 0) >= (furniture_req * 4) && 
+          (this.stock.beds || 0) >= furniture_req) {
+         if (this.attemptEat( food_req ) === true) {
+            this.stock.desks -= furniture_req;
+            this.stock.beds -= furniture_req;
+            this.stock.tables -= 2 * furniture_req;
+            this.stock.chairs -= 4 * furniture_req;
+            this.stock.pavingstone -= paving_req;
+            this.stock.pants -= clothing_req;
+            this.stock.shirts -= clothing_req;
+            this.stock.dresses -= clothing_req;
+            this.stock.irontools -= tool_req;
+            growTown( this, true );
+            return true;
+         }
+      }
+   }
+
+   return false;
 }
 
 Place.prototype.update = function() {
@@ -1356,18 +1869,7 @@ function initBoats()
    b.mine = true;
    b.x = 199;
    b.y = 212;
-   b.addCargo( 'bananas', 2 );
-   b.addCargo( 'cotton', 2 );
-   b.addCargo( 'chickens', 2 );
-   b.addCargo( 'turkeys', 1 );
-   b.addCargo( 'peanuts', 2 );
-   b.addCargo( 'copper', 1 );
-   b.addCargo( 'tin', 1 );
-   b.addCargo( 'silk', 1 );
-   b.addCargo( 'carrots', 2 );
-   b.addCargo( 'iron', 1 );
-   b.addCargo( 'limes', 1 );
-   b.addCargo( 'coconuts', 2 );
+   b.addCargo( 'bananas', 5 );
    boats.push( b );
    my_boats.push( b.id );
    var b2 = new Boat( 1 );
@@ -1378,8 +1880,8 @@ function initBoats()
    b2.speed = 0.1;
    b2.maxhealth = 9999;
    b2.health = 9999;
-   b2.maxcargo = 999;
-   b2.addCargo( 'turkeys', 8 );
+   b2.maxcargo = 9999;
+   b2.addCargo( 'cows', 3 );
    b2.addCargo( 'apples', 9 );
    b2.addCargo( 'coconuts', 100 );
    boats.push( b2 );
@@ -1478,11 +1980,11 @@ function drawBoatContent()
          var dur_string = Math.ceil(b.health) + "\/" + b.maxhealth;
          var width = dur_string.width("14pt serif");
          boat_context.fillText("Dur: ", grid_x + 280, grid_y + 24);
-         boat_context.fillText(dur_string, BOAT_WIDTH - (100 + width), grid_y + 24);
+         boat_context.fillText(dur_string, BOAT_WIDTH - (82 + width), grid_y + 24);
          var cargo_string = Math.ceil(b.cargoweight) + "\/" + b.maxcargo;
          width = cargo_string.width("14pt serif");
          boat_context.fillText("Cargo: ", grid_x + 280, grid_y + 50);
-         boat_context.fillText(cargo_string, BOAT_WIDTH - (100 + width), grid_y + 50);
+         boat_context.fillText(cargo_string, BOAT_WIDTH - (82 + width), grid_y + 50);
 
          // Goto Button
          boat_context.fillStyle = "white";
@@ -1596,7 +2098,6 @@ function drawBoatContent()
             y = fitText( boat_context, weight_str, x_divider + 10, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y, 20, '12pt serif', true );
 
             // Actions
-            var price = Math.round( places[place].getPrice( selection ) * 1.2 );
             boat_context.fillStyle = 'rgba(85,85,85,1)';
             if (boat_menu === 3)
                boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
@@ -1615,18 +2116,20 @@ function drawBoatContent()
             boat_context.fillStyle = 'black';
             if (boat_menu === 3) {
                if (place !== undefined && selection !== 'coins') {
-                  var sell_str = 'Sell (' + places[place].getPrice( selection ) + ')';
-                  fitText( boat_context, sell_str, x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 111, 22, '22px arial', true);
+                  var sell_price = Math.round( places[place].getPrice( selection ) );
+                  var sell_str = 'Sell (' + sell_price + ')';
+                  fitText( boat_context, sell_str, x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110, 20, '20px arial', true);
                }
 
-               fitText( boat_context, 'Discard 1', x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75, 22, '22px arial', true);
-               fitText( boat_context, 'Discard All', x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39, 22, '22px arial', true);
+               fitText( boat_context, 'Discard 1', x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 74, 20, '20px arial', true);
+               fitText( boat_context, 'Discard All', x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 38, 20, '20px arial', true);
             } else {
                boat_context.fillStyle = 'black';
 
-               var buy_str = 'Buy (' + price + ')';
-               fitText( boat_context, buy_str, x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75, 22, '22px arial', true);
-               if (boat.cargo['coins'] < price) {
+               var buy_price = Math.round( places[place].getPrice( selection ) * 1.2 );
+               var buy_str = 'Buy (' + buy_price + ')';
+               fitText( boat_context, buy_str, x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 74, 20, '20px arial', true);
+               if (boat.cargo['coins'] < buy_price) {
                   boat_context.strokeStyle = 'rgba(85,85,85,1)';
                   boat_context.beginPath();
                   boat_context.moveTo( x_divider + 16, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 74 );
@@ -1869,12 +2372,17 @@ function drawBoatContent()
       // Information:
       // - Town name
       // - Size of various industries
-      // - Talk to a guy who says what sort of things they need to upgrade those industries
+      // - What sort of things they need to upgrade those industries
+      // - Locations of nearby towns
       // - Flavor stuff
       // Possible Services:
       // - Buy a boat (boat_menu === 6)
       // - Rename a boat (boat_menu === 7)
+      if (place === 0) {
+         // TODO: Special 'talk to dad' section, wherein plot + goals
+      } else {
 
+      }
    }
 }
 
@@ -1965,32 +2473,36 @@ function onClickBoats( e )
       if (x_pix > x_divider + 18 && x_pix < BOAT_INNER_X + BOAT_INNER_WIDTH - 18) {
          // In info pane
          if (boat_menu === 3) {
-            if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110 
-             && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110 + 28 
-             && place !== undefined) {
-               boat.sellCargo( boat.cargo_selected, 1 );
-               if (boat.cargo[ boat.cargo_selected ] === 0)
+            if (boat.cargo_selected !== '') {
+               if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110 
+                && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110 + 28 
+                && place !== undefined) {
+                  boat.sellCargo( boat.cargo_selected, 1 );
+                  if (boat.cargo[ boat.cargo_selected ] === 0)
+                     boat.cargo_selected = '';
+                  refresh();
+               } else if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 
+                && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 + 28 ) {
+                  boat.addCargo( boat.cargo_selected, -1 ); // discard 1
+                  if (boat.cargo[ boat.cargo_selected ] === 0)
+                     boat.cargo_selected = '';
+                  refresh();
+               } else if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39 
+                     && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39 + 28 ) {
+                  boat.addCargo( boat.cargo_selected, -boat.cargo[boat.cargo_selected] ); // discard all
                   boat.cargo_selected = '';
-               refresh();
-            } else if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 
-             && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 + 28 ) {
-               boat.addCargo( boat.cargo_selected, -1 ); // discard 1
-               if (boat.cargo[ boat.cargo_selected ] === 0)
-                  boat.cargo_selected = '';
-               refresh();
-            } else if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39 
-                  && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39 + 28 ) {
-               boat.addCargo( boat.cargo_selected, -boat.cargo[boat.cargo_selected] ); // discard all
-               boat.cargo_selected = '';
-               refresh();
+                  refresh();
+               }
             }
          } else {
-            if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 
-             && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 + 28) {
-               boat.buyCargo( places[place].stock_selected, 1 );
-               if (places[place].stock[ places[place].stock_selected ] === 0)
-                  places[place].stock_selected = '';
-               refresh();
+            if (places[place].stock_selected !== '') {
+               if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 
+                && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 + 28) {
+                  boat.buyCargo( places[place].stock_selected, 1 );
+                  if (places[place].stock[ places[place].stock_selected ] === 0)
+                     places[place].stock_selected = '';
+                  refresh();
+               }
             }
          }
       } else {
@@ -2649,7 +3161,7 @@ function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify 
             coast_traversed++;
          }
 
-         buildTown( x, y, island_resources, Math.ceil( (Math.random() * 2) + 1 ) );
+         buildTown( x, y, island_resources );
       } else if (num_towns === 2) {
          var coast_distance1 = Math.floor(Math.random() * coast_length), 
              coast_distance2 = Math.floor(Math.random() * coast_length / 3) + (coast_length / 3), 
@@ -2660,14 +3172,14 @@ function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify 
             y = next_coast[1];
             coast_traversed++;
          }
-         buildTown( x, y, island_resources, Math.ceil( (Math.random() * 2) + 1 ) );
+         buildTown( x, y, island_resources );
          while (coast_traversed < coast_distance1 + coast_distance2) {
             var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
             x = next_coast[0];
             y = next_coast[1];
             coast_traversed++;
          }
-         buildTown( x, y, island_resources, Math.ceil( (Math.random() * 2) + 1 ) );
+         buildTown( x, y, island_resources );
       } else if (num_towns === 3) {
          var coast_distance1 = Math.floor(Math.random() * coast_length), 
              coast_distance2 = coast_distance1 + 
@@ -2681,21 +3193,21 @@ function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify 
             y = next_coast[1];
             coast_traversed++;
          }
-         buildTown( x, y, island_resources, Math.ceil( (Math.random() * 2) + 1 ) );
+         buildTown( x, y, island_resources );
          while (coast_traversed < coast_distance2) {
             var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
             x = next_coast[0];
             y = next_coast[1];
             coast_traversed++;
          }
-         buildTown( x, y, island_resources, Math.ceil( (Math.random() * 2) + 1 ) );
+         buildTown( x, y, island_resources );
          while (coast_traversed < coast_distance3) {
             var next_coast = addDirection( x, y, terGetStart( map[x][y].terrain ) );
             x = next_coast[0];
             y = next_coast[1];
             coast_traversed++;
          }
-         buildTown( x, y, island_resources, Math.ceil( (Math.random() * 2) + 1 ) );
+         buildTown( x, y, island_resources );
       }
 
 
@@ -3413,7 +3925,7 @@ function start() {
 
 // Load images
 var images_ready = 0;
-var total_images = 39;
+var total_images = 45;
 
 function addReadyImage() {
    images_ready++;
@@ -3460,18 +3972,46 @@ loadImage( pineapple_img, 'Pineapple.png' );
 loadImage( carrots_img, 'Carrots.png' );
 loadImage( corn_img, 'Corn.png' );
 loadImage( eggplants_img, 'Eggplant.png' );
+loadImage( onions_img, 'Onions.png' );
 loadImage( peanuts_img, 'Peanuts.png' );
+loadImage( peppers_img, 'Peppers.png' );
+loadImage( potatoes_img, 'Potatoes.png' );
+loadImage( rice_img, 'Rice.png' );
+loadImage( tomatoes_img, 'Tomatoes.png' );
+loadImage( wheat_img, 'Wheat.png' );
 
 loadImage( chickens_img, 'Chicken.png' );
+loadImage( cow_img, 'Cow.png' );
+loadImage( crabs_img, 'Crabs.png' );
+loadImage( ducks_img, 'Duck.png' );
+loadImage( fish_img, 'Fish.png' );
+loadImage( monkeys_img, 'Monkey.png' );
+loadImage( penguins_img, 'Penguin.png' );
+loadImage( pigs_img, 'Pig.png' );
+loadImage( seals_img, 'Seal.png' );
+loadImage( sheep_img, 'Sheep.png' );
 loadImage( turkeys_img, 'Turkey.png' );
+loadImage( turtles_image, 'Turtle.png' );
 
+loadImage( softwood_img, 'Softwood.png' );
+loadImage( hardwood_img, 'Hardwood.png' );
 loadImage( burlap_img, 'Burlap.png' );
 loadImage( cotton_img, 'Cotton.png' );
+loadImage( wool_img, 'Wool.png' );
 loadImage( silk_img, 'Silk.png' );
-loadImage( doll_img, 'Doll.png' );
+loadImage( salt_img, 'Salt.png' );
 
+loadImage( stone_img, 'Stone.png' );
+loadImage( pavingstone_img, 'PavingStone.png' );
+loadImage( granite_img, 'Granite.png' );
+loadImage( obsidian_img, 'Obsidian.png' );
+loadImage( coal_img, 'Coal.png' );
 loadImage( copper_img, 'Copper.png' );
 loadImage( tin_img, 'Tin.png' );
 loadImage( bronze_img, 'Bronze.png' );
 loadImage( iron_img, 'Iron.png' );
 loadImage( steel_img, 'Steel.png' );
+
+loadImage( stonetools_img, 'Stonetools.png' );
+
+loadImage( doll_img, 'Doll.png' );
