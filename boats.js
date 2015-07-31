@@ -3926,6 +3926,8 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
          if (discovery_fog_on && !loc.discovered) {
             map_context.fillStyle = "gray";
             map_context.fillRect( grid_x, grid_y, MAP_SQUARE_DIM, MAP_SQUARE_DIM );
+            if (loc.place && places[loc.place].discovered)
+               drawPlace( loc.place, grid_x, grid_y, MAP_SQUARE_DIM );
          } else {
             drawTerrain( loc.terrain, grid_x, grid_y, MAP_SQUARE_DIM );
             drawPlace( loc.place, grid_x, grid_y, MAP_SQUARE_DIM );
@@ -3950,6 +3952,8 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
             if (discovery_fog_on && !loc.discovered) {
                map_context.fillStyle = "gray";
                map_context.fillRect( g_x, g_y, draw_step, draw_step );
+               if (loc.place && places[loc.place].discovered)
+                  drawPlace( loc.place, g_x, g_y, draw_step );
             } else {
                drawTerrain( loc.terrain, g_x, g_y, draw_step );
                drawPlace( loc.place, g_x, g_y, draw_step );
@@ -3977,12 +3981,15 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
             }
 
             if (map_step === 1) {
+               var place = map[x][y].place;
                if (discovery_fog_on && !map[x][y].discovered) {
                   map_context.fillStyle = "gray";
                   map_context.fillRect( g_x, g_y, draw_step, draw_step );
+                  if (place && places[place].discovered)
+                     drawPlace( place, g_x, g_y, draw_step );
                } else {
                   drawTerrain( map[x][y].terrain, g_x, g_y, draw_step );
-                  drawPlace( map[x][y].place, g_x, g_y, draw_step );
+                  drawPlace( place, g_x, g_y, draw_step );
                   if (!map[x][y].visible)
                      drawFog( g_x, g_y, draw_step );
                }
