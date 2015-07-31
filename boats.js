@@ -6,6 +6,8 @@ var LOG = $( "#log" );
 // Data ---
 
 // Images 
+var oldman_img = new Image();
+
 var boat_1_sz5_img = new Image();
 var boat_2_sz5_img = new Image();
 var boat_3_sz5_img = new Image();
@@ -89,11 +91,11 @@ var cargo_index = {
    // Fruits
    apples: { name:'apples', image:apple_img, price:3, novelty:2.8,
       desc:'a strangely crunchy red fruit', weight:1, foodvalue:2 },
-   bananas: { name:'bananas', image:bananas_img, price:7, novelty:4.9,
+   bananas: { name:'bananas', image:bananas_img, price:7, novelty:4.0,
       desc:'a strangely shaped fruit', weight:2, foodvalue:4 },
    berries: { name:'berries', image:berries_img, price:2, novelty:2.4,
       desc:'strange tiny fruits', weight:1, foodvalue:2 },
-   coconuts: { name:'coconuts', image:coconuts_img, price:7, novelty:4.4,
+   coconuts: { name:'coconuts', image:coconuts_img, price:7, novelty:3.4,
       desc:'a strange fruit full of milk', weight:2, foodvalue:4 },
    lemons: { name:'lemons', image:lemons_img, price:3, novelty:2.8,
       desc:'a strangely tart yellow fruit', weight:1, foodvalue:2 },
@@ -105,7 +107,7 @@ var cargo_index = {
       desc:'a stange fruit full of seeds', weight:1, foodvalue:2 },
    peaches: { name:'peaches', image:peach_img, price:3, novelty:2.5,
       desc:'a stange fuzzy fruit', weight:1, foodvalue:2 },
-   pineapples: { name:'pineapples', image:pineapple_img, price:8, novelty:4.7,
+   pineapples: { name:'pineapples', image:pineapple_img, price:8, novelty:3.7,
       desc:'a stange spiky fruit', weight:2, foodvalue:4 },
    // Vegetables
    carrots: { name:'carrots', image:carrots_img, price:3, novelty:2.5,
@@ -135,23 +137,23 @@ var cargo_index = {
       desc:'moooo', weight:350, foodvalue:500 },
    crabs: { name:'crabs', image:crabs_img, price:14, novelty:3.0,
       desc:'scuttle', weight:2, foodvalue:4 },
-   ducks: { name:'ducks', image:ducks_img, price:32, novelty:3.5,
+   ducks: { name:'ducks', image:ducks_img, price:32, novelty:3.2,
       desc:'quack', weight:4, foodvalue: 7 },
    fish: { name:'fish', image:fish_img, price:16, novelty:1.8,
       desc:'blub', weight:5, foodvalue:9 },
-   monkeys: { name:'monkeys', image:monkeys_img, price:185, novelty:4.4,
+   monkeys: { name:'monkeys', image:monkeys_img, price:185, novelty:3.4,
       desc:'ook ook', weight:22, foodvalue:28 },
-   penguins: { name:'penguins', image:penguins_img, price:90, novelty:4.8,
+   penguins: { name:'penguins', image:penguins_img, price:90, novelty:3.8,
       desc:'squaaawk', weight:9, foodvalue:15 },
    pigs: { name:'pigs', image:pigs_img, price:820, novelty:3.0,
       desc:'oink', weight:110, foodvalue:170 },
-   seals: { name:'seals', image:seals_img, price:1700, novelty:4.1,
+   seals: { name:'seals', image:seals_img, price:1700, novelty:3.3,
       desc:'ark ark ark', weight:215, foodvalue:310 },
    sheep: { name:'sheep', image:sheep_img, price:940, novelty:2.4,
       desc:'baaaa', weight:110, foodvalue:120 },
    turkeys: { name:'turkeys', image:turkeys_img, price:85, novelty:2.8,
       desc:'gobble gobble', weight:14, foodvalue:22 },
-   turtles: { name:'turtles', image:turtles_image, price:13, novelty:3.2,
+   turtles: { name:'turtles', image:turtles_image, price:13, novelty:2.9,
       desc:'*silence*', weight:2, foodvalue:4 },
 
    // Various resources
@@ -165,10 +167,12 @@ var cargo_index = {
       desc:'this stuff is pretty soft wow', weight:1 },
    wool: { name:'wool', image:wool_img, price:3, novelty:2.7,
       desc:'great for sweaters, but there are no sweaters in this game...', weight:1 },
-   silk: { name:'silk', image:silk_img, price:8, novelty:3.8,
+   silk: { name:'silk', image:silk_img, price:8, novelty:3.1,
       desc:'woven from butterfly wings and maybe rainbows', weight:1 },
-   salt: { name:'salt', image:salt_img, price:6, novelty:4.4,
-      desc:"for curing meat, except meat doesn't spoil in this game...", weight:1 },
+   salt: { name:'salt', image:salt_img, price:23, novelty:3.4,
+      desc:"great for curing meat, but meat doesn't spoil in this game...", weight:1 },
+   spices: { name:'spices', image:salt_img, price:24, novelty:3.6,
+      desc:"that is after all a spicy meatball", weight:1 },
    // Stone/metal
    stone: { name:'stone', image:stone_img, price:5, novelty:2.2,
       desc:'I want a rock! (Rock!)', weight:6 },
@@ -191,11 +195,11 @@ var cargo_index = {
    steel: { name:'steel', image:steel_img, price:160, novelty:4.0,
       desc:"pretty much the best metal you could ask for", weight:12 },
    // Usable Resources
-   stonetools: { name:'stone tools', image:stonetools_img, price:24, novelty:3.5,
+   stonetools: { name:'stone tools', image:stonetools_img, price:24, novelty:2.8,
       desc:'hammers and axes and the like', weight:7 },
-   bronzetools: { name:'bronze tools', image:bananas_img, price:45, novelty:3.8,
+   bronzetools: { name:'bronze tools', image:bananas_img, price:45, novelty:3.5,
       desc:'fancy stuff like sickles', weight:6 },
-   irontools: { name:'iron tools', image:bananas_img, price:85, novelty:4.0,
+   irontools: { name:'iron tools', image:bananas_img, price:85, novelty:3.7,
       desc:'better than bronze (?)', weight:8 },
    // Crafted Items
    chairs: { name:'chairs', image:bananas_img, price:80, novelty:2.8,
@@ -206,9 +210,9 @@ var cargo_index = {
       desc:"for sleeping", weight:140 },
    desks: { name:'desks', image:bananas_img, price:450, novelty:3.4,
       desc:"for sitting at", weight:260 },
-   figurines: { name:'figurines', image:bananas_img, price:32, novelty:4.8,
+   figurines: { name:'figurines', image:bananas_img, price:32, novelty:3.8,
       desc:"an adult's plaything", weight:2 },
-   dolls: { name:'dolls', image:doll_img, price:16, novelty:4.4,
+   dolls: { name:'dolls', image:doll_img, price:16, novelty:3.4,
       desc:"a child's plaything", weight:1 },
    shirts: { name:'shirts', image:bananas_img, price:18, novelty:2.6,
       desc:'gird your pecs', weight:1 },
@@ -218,7 +222,7 @@ var cargo_index = {
       desc:'I feel pretty', weight:2.5 },
    fancydresses: { name:'fancy dresses', image:bananas_img, price:175, novelty:3.8,
       desc:'for high society lasses', weight:4 },
-   fancyshirts: { name:'fancy shirts', image:bananas_img, price:85, novelty:3.2,
+   fancysuits: { name:'fancy suits', image:bananas_img, price:85, novelty:3.4,
       desc:'for high society chappies', weight:2 },
    pillows: { name:'pillows', image:bananas_img, price:11, novelty:2.8,
       desc:'downy, or cottony, depends how you make them', weight:1 },
@@ -299,6 +303,9 @@ var shift_down = false;
 var discovery_fog_on = true;
 
 var text_box_selection = '';
+
+var quest_status = 0;
+var quest_goals = [ 'q0', 'q1', 'q2', 'q3', 'q4' ];
 
 /////////////////////////////////////////////////////////////////////
 // Misc ---
@@ -419,6 +426,182 @@ function updateTextBox( char_code )
 }
 
 /////////////////////////////////////////////////////////////////////
+// Quests ---
+
+function payForQuest( cargo, cargo_num )
+{
+   for (var i = 0; i < my_boats.length; ++i) {
+      var boat = boats[ my_boats[ i ] ];
+      if (map[ boat.x ][ boat.y ].place === 0) {
+         var b_num = boat.cargo[cargo];
+         if (b_num) {
+            if (b_num < cargo_num) {
+               cargo_num -= b_num;
+               boat.cargo[cargo] = 0;
+            } else {
+               boat.cargo[cargo] -= cargo_num;
+               cargo_num = 0;
+            }
+         }
+      }
+      if (cargo_num === 0)
+         break;
+   } 
+}
+
+function testQuest()
+{
+   var cargo_at_home = {};
+   for (var i = 0; i < my_boats.length; ++i) {
+      var boat = boats[ my_boats[ i ] ];
+      if (map[ boat.x ][ boat.y ].place === 0) {
+         for (var cargo_id in boat.cargo) {
+            cargo_at_home[cargo_id] = 
+               (cargo_at_home[cargo_id] === undefined)?
+                  (boat.cargo[cargo_id]):
+                  (cargo_at_home[cargo_id] + boat.cargo[cargo_id]);
+         }
+      }
+   }
+
+   if (quest_status === 0) {
+      if (cargo_at_home.hardwood >= 3) {
+         payForQuest( 'hardwood', 3 );
+         quest_status = 1;
+         map[199][212].place = 0;
+      }
+   } else if (quest_status === 1) {
+      var foods = [];
+      for (var cargo in cargo_at_home) {
+         if (cargo != 'bananas' && $.inArray (cargo, food_list ) !== -1) {
+            foods.push( cargo );
+         }
+      }
+      if (foods.length >= 5) {
+         for (var i = 0; i < 5; ++i)
+            payForQuest( foods[i], 1 );
+         
+         quest_status = 2;
+         map[199][213].place = 0;
+      }
+   } else if (quest_status === 2) {
+      if (cargo_at_home.stonetools >= 3) {
+         payForQuest( 'stonetools', 3 );
+         quest_status = 3;
+         map[201][213].place = 0;
+      } else if (cargo_at_home.bronzetools >= 1) {
+         payForQuest( 'bronzetools', 1 );
+         quest_status = 3;
+         map[201][213].place = 0;
+      } else if (cargo_at_home.irontools >= 1) {
+         payForQuest( 'irontools', 1 );
+         quest_status = 3;
+         map[201][213].place = 0;
+      }
+   } else if (quest_status === 3) {
+      var animals = [];
+      for (var cargo in cargo_at_home) {
+         if ($.inArray (cargo, animal_list ) !== -1) {
+            if (cargo_at_home[cargo] >= 2)
+               animals.push( cargo );
+         }
+      }
+      if (animals.length >= 2) {
+         for (var i = 0; i < 2; ++i)
+            payForQuest( animals[i], 2 );
+         
+         quest_status = 4;
+         map[201][214].place = 0;
+      }
+   } else if (quest_status === 4) {
+      if (cargo_at_home.beds >= 1 && cargo_at_home.pillows >= 2) {
+         payForQuest( 'beds', 1 );
+         payForQuest( 'pillows', 2 );
+         
+         quest_status = 5;
+         quest_goals = selectNResources( 5, food_list.slice() );
+         map[198][213].place = 0;
+      }
+   } else if (quest_status === 5) {
+      if (cargo_at_home[quest_goals[0]] >= 5 &&
+          cargo_at_home[quest_goals[1]] >= 5 &&
+          cargo_at_home[quest_goals[2]] >= 5 &&
+          cargo_at_home[quest_goals[3]] >= 5 &&
+          cargo_at_home[quest_goals[4]] >= 5) {
+         payForQuest( quest_goals[0], 5 );
+         payForQuest( quest_goals[1], 5 );
+         payForQuest( quest_goals[2], 5 );
+         payForQuest( quest_goals[3], 5 );
+         payForQuest( quest_goals[4], 5 );
+
+         quest_status = 6;
+         map[200][214].place = 0;
+      }
+   } else if (quest_status === 6) {
+      if (cargo_at_home.chairs >= 4 && cargo_at_home.tables >= 1 &&
+          cargo_at_home.granite >= 4) {
+         if (cargo_at_home.bronzetools >= 2) {
+            payForQuest( 'chairs', 4 );
+            payForQuest( 'tables', 1 );
+            payForQuest( 'granite', 4 );
+            payForQuest( 'bronzetools', 2 );
+
+            quest_status = 7
+            map[200][215].place = 0;
+         } else if (cargo_at_home.irontools >= 2) {
+            payForQuest( 'chairs', 4 );
+            payForQuest( 'tables', 1 );
+            payForQuest( 'granite', 4 );
+            payForQuest( 'irontools', 2 );
+
+            quest_status = 7
+            map[200][215].place = 0;
+         }
+      }
+   } else if (quest_status === 7) {
+      if (cargo_at_home.pants >= 2 && cargo_at_home.shirts >= 2 &&
+          cargo_at_home.fancysuits >= 1 && cargo_at_home.figurines >= 3) {
+         payForQuest( 'pants', 2 );
+         payForQuest( 'shirts', 2 );
+         payForQuest( 'fancysuits', 1 );
+         payForQuest( 'figurines', 3 );
+         
+         quest_status = 8;
+         map[199][214].place = 0;
+         quest_goals = selectNResources( 5, food_list.slice() );
+         quest_goals.push.apply( selectNResources( 2, animal_list.slice() ) );
+         quest_goals.push.apply( selectNResources( 2, big_animal_list.slice() ) );
+      }
+   } else if (quest_status === 8) {
+      if (cargo_at_home[quest_goals[0]] >= 10 &&
+          cargo_at_home[quest_goals[1]] >= 10 &&
+          cargo_at_home[quest_goals[2]] >= 10 &&
+          cargo_at_home[quest_goals[3]] >= 10 &&
+          cargo_at_home[quest_goals[4]] >= 10 &&
+          cargo_at_home[quest_goals[5]] >= 4 &&
+          cargo_at_home[quest_goals[6]] >= 4 &&
+          cargo_at_home[quest_goals[7]] >= 4 &&
+          cargo_at_home[quest_goals[8]] >= 4 &&
+          cargo_at_home.salt >= 5 && cargo_at_home.spices >= 5) {
+         payForQuest( quest_goals[0], 10 );
+         payForQuest( quest_goals[1], 10 );
+         payForQuest( quest_goals[2], 10 );
+         payForQuest( quest_goals[3], 10 );
+         payForQuest( quest_goals[4], 10 );
+         payForQuest( quest_goals[5], 4 );
+         payForQuest( quest_goals[6], 4 );
+         payForQuest( quest_goals[7], 4 );
+         payForQuest( quest_goals[8], 4 );
+         payForQuest( 'salt', 5 );
+         payForQuest( 'spices', 5 );
+
+         quest_status = 9;
+         map[198][214].place = 0;
+      }
+   }
+}
+
+/////////////////////////////////////////////////////////////////////
 // Terrain ---
 
 /* First we have bits to describe the kind of terrain.
@@ -498,16 +681,17 @@ function terSetColor( terrain, context ) {
    }
 }
 
-function addDirection( x, y, dir )
+function addDirection( x, y, dir, toadd )
 {
-   if (dir === 0) return [ x-1, y ];
-   if (dir === 1) return [ x-1, y-1 ];
-   if (dir === 2) return [ x, y-1 ];
-   if (dir === 3) return [ x+1, y-1 ];
-   if (dir === 4) return [ x+1, y ];
-   if (dir === 5) return [ x+1, y+1 ];
-   if (dir === 6) return [ x, y+1 ];
-   if (dir === 7) return [ x-1, y+1 ];
+   var d = toadd || 1;
+   if (dir === 0) return [ x-d, y ];
+   if (dir === 1) return [ x-d, y-d ];
+   if (dir === 2) return [ x, y-d ];
+   if (dir === 3) return [ x+d, y-d ];
+   if (dir === 4) return [ x+d, y ];
+   if (dir === 5) return [ x+d, y+d ];
+   if (dir === 6) return [ x, y+d ];
+   if (dir === 7) return [ x-d, y+d ];
 
    return [x, y]
 }
@@ -621,14 +805,14 @@ function generateResources( ter_type )
       /* Jungle
        * Possible resources:
        *
-       * fruits: bananas, mangoes, passionfruit, berries
+       * fruits: mangoes, passionfruit, berries
        * veggies: eggplants, tomatoes, peppers
        * animals: turkeys, ducks, pigs, turtles, fish, monkeys
        * resources: softwood, hardwood, cotton, burlap
        * stone: stone
        */
       var res = selectNResources( Math.round( Math.random() * 3 ) + 1,
-            [ 'bananas', 'mangoes', 'passionfruit', 'lemons', 'limes', 'eggplants', 'tomatoes', 'peppers' ] );
+            [ 'mangoes', 'passionfruit', 'lemons', 'limes', 'eggplants', 'tomatoes', 'peppers' ] );
       Array.prototype.push.apply( resources, res );
       res = selectNResources( Math.round( Math.random() * 3),
             [ 'pigs', 'turkeys', 'ducks', 'turtles', 'fish', 'monkeys' ] );
@@ -862,11 +1046,12 @@ function growTown( town, inland )
    // Success
    town.size++;
    for (var res in town.resources) {
-      if ($.inArray (res, animal_list ) === -1) {// animals are not resources
-         if ($.inArray (res, food_list ) === -1)
-            town.resources[res] += 3;
+      if ($.inArray(res, animal_list ) === -1) { // SKIP non-animals - they are not resources
+         if ($.inArray (res, food_list ) !== -1)
+            town.resources[res] += 3; // Add lots to food
          else
             town.resources[res]++;
+      }
    }
    return true;
 }
@@ -1064,8 +1249,8 @@ Place.prototype.upgrade = function() {
       if ($.inArray( stock, animal_list ) !== -1) {
          var breed_power = 0.5 + (0.03 * this.industries.farming);
          var gain = Math.floor( Math.pow( this.stock[stock] * Math.random(), breed_power ) );
-         this.stock[stock] += gain;
          // TODO: Calculate more e.g. Population bounds
+         this.stock[stock] += gain;
       }
       // Random loss
       var size_factor = 0.04 * this.size;
@@ -1181,7 +1366,6 @@ Place.prototype.upgrade = function() {
          craft_count = Math.floor( this.stock.sheep / 4 );
          if (craft_count > this.industries.weaving)
             craft_count = this.industries.weaving;
-         this.stock.sheep -= craft_count;
          this.stock.wool += craft_count;
       }
       // Other weaving resources are grown naturally
@@ -1203,30 +1387,35 @@ Place.prototype.upgrade = function() {
             else this.stock.cotton--;
          }
       }
-      // Dolls and pillows - wool/cotton outside, plus down/wool/cotton filling
-      if (this.stock.wool || this.stock.cotton) {
+      // Pillows wool/cotton outside, down filling
+      if ((this.stock.wool || this.stock.cotton) && this.industries.weaving > 1) {
          craft_count = Math.min( Math.floor( (this.stock.wool + this.stock.cotton) / 4 ),
-            Math.floor( (this.stock.wool + this.stock.cotton + this.stock.chickens + this.stock.ducks) / 8 ) );
+            Math.floor( (this.stock.chickens + this.stock.ducks + this.stock.penguins) / 8 ) );
          if (craft_count > this.industries.weaving)
             craft_count = this.industries.weaving;
 
-         var r1 = Math.round( craft_count * this.industry_randomizer1 );
-         this.stock.dolls += r1;
-         this.stock.pillows += craft_count - r1;
-         var temp = craft_count;
+         this.stock.pillows += craft_count;
          while (craft_count-- > 0) {
             if (this.stock.wool > this.stock.cotton) this.stock.wool--;
             else this.stock.cotton--;
          }
-         if (this.stock.chickens) temp -= Math.floor( this.stock.chickens / 8 );
-         if (this.stock.ducks) temp -= Math.floor( this.stock.ducks / 8 );
-         while (temp-- > 0) {
-            if (this.stock.wool > this.stock.cotton) this.stock.wool -= 2;
-            else this.stock.cotton -= 2;
+         // Down is free if you have the poultry
+      }
+      // Dolls wool/cotton outside, wool/cotton filling
+      if ((this.stock.wool || this.stock.cotton) && this.industries.weaving > 1) {
+         craft_count = Math.floor( (this.stock.wool + this.stock.cotton) / 12 ); 
+         if (craft_count > this.industries.weaving)
+            craft_count = this.industries.weaving;
+
+         this.stock.dolls += craft_count;
+         craft_count *= 3;
+         while (craft_count-- > 0) {
+            if (this.stock.wool > this.stock.cotton) this.stock.wool--;
+            else this.stock.cotton--;
          }
       }
       // Fancy Clothing
-      if (this.stock.silk) {
+      if (this.stock.silk && this.industries.weaving > 2) {
          craft_count = Math.floor( this.stock.silk / 4 );
          if (craft_count > this.industries.weaving)
             craft_count = this.industries.weaving;
@@ -1799,6 +1988,7 @@ Boat.prototype.update = function ()
    if (this.next_direction === -1) return;
 
    this.sailing_progress++;
+   var new_draw_loc = addDirection( this.x, this.y, this.next_direction, (this.sailing_progress / this.sail_complete) );
 
    if (this.sailing_progress >= this.sail_complete)
       this.sail();
@@ -1867,8 +2057,8 @@ function initBoats()
 {
    var b = new Boat( 1 );
    b.mine = true;
-   b.x = 199;
-   b.y = 212;
+   b.x = 200;
+   b.y = 213;
    b.addCargo( 'bananas', 5 );
    boats.push( b );
    my_boats.push( b.id );
@@ -1881,9 +2071,17 @@ function initBoats()
    b2.maxhealth = 9999;
    b2.health = 9999;
    b2.maxcargo = 9999;
-   b2.addCargo( 'cows', 3 );
-   b2.addCargo( 'apples', 9 );
-   b2.addCargo( 'coconuts', 100 );
+   b2.addCargo( 'hardwood', 3 );
+   b2.addCargo( 'apples', 1 );
+   b2.addCargo( 'coconuts', 1 );
+   b2.addCargo( 'peppers', 1 );
+   b2.addCargo( 'peaches', 1 );
+   b2.addCargo( 'wheat', 1 );
+   b2.addCargo( 'stonetools', 3 );
+   b2.addCargo( 'chickens', 2 );
+   b2.addCargo( 'turtles', 2 );
+   b2.addCargo( 'beds', 1 );
+   b2.addCargo( 'pillows', 2 );
    boats.push( b2 );
    my_boats.push( b2.id );
 }
@@ -1891,10 +2089,13 @@ function initBoats()
 function changeBoatMenu( new_menu )
 {
    if (new_menu < 1) new_menu = 1;
-   if (new_menu > 5) new_menu = 5;
+   if (new_menu > 9) new_menu = 9;
 
    if (new_menu === 2)
       initDestinations();
+
+   if (new_menu >= 5)
+      testQuest();
 
    boat_menu = new_menu;
    refresh();
@@ -1911,7 +2112,15 @@ function initDestinations()
          destination_list.push( i );
    }
 
-   // TODO: Sort
+   destination_list.sort( function(a, b) {
+      var boat = boats[ my_boats[boat_selection] ];
+      var place_a = places[a];
+      var place_b = places[b];
+      var dist_a = calculateDistanceMetric( boat.x - place_a.x, boat.y - place_a.y );
+      var dist_b = calculateDistanceMetric( boat.x - place_b.x, boat.y - place_b.y );
+
+      return dist_a - dist_b;
+   });
 }
 
 function selectDestination( index )
@@ -2367,20 +2576,112 @@ function drawBoatContent()
       boat_context.stroke();
 
    } else if (boat_menu >= 5) {
-      // TODO: Town menu
-      // Should be mostly information and some services
-      // Information:
-      // - Town name
-      // - Size of various industries
-      // - What sort of things they need to upgrade those industries
-      // - Locations of nearby towns
-      // - Flavor stuff
-      // Possible Services:
-      // - Buy a boat (boat_menu === 6)
-      // - Rename a boat (boat_menu === 7)
       if (place === 0) {
-         // TODO: Special 'talk to dad' section, wherein plot + goals
+         // Special 'talk to dad' section, wherein plot + goals
+
+         // Draw yer old man
+         boat_context.drawImage( oldman_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 90 );
+         boat_context.fillStyle = "black";
+         fitText( boat_context, 'The Old Man', BOAT_INNER_X + 20, BOAT_INNER_X + 162, BOAT_INNER_Y + 260, 26, '22pt arial', true );
+
+         // Quest text
+         // TODO: Images of quest goals
+         if (quest_status === 0) {
+
+            var quest_text = "Ah my child, just who I was looking for! I'm getting a bit old now, so it's up to you to take our bananas to market.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 80, 18, '13pt arial', true );
+
+            quest_text = "Use the 'Sail' menu to navigate to Market Town, and then sell the bananas from the 'Cargo' menu. Then maybe buy five hardwood from the 'Market' so I can fix that hole in our roof.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            y = fitText( boat_context, "Hurry back!", BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 1) {
+            var quest_text = "Hoho! Well done kiddo!";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            quest_text = "You're a pretty savvy trader. You know you can make good money by buying goods where they're abundant and then selling them where they're lacking. The cartographer in Market Town can tell you where to find other towns.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "Here, take some more bananas and bring back five different kinds of food. We'll have a proper meal for a change!";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 2) {
+            var quest_text = "Ah that was delicious. But we can't rest on our laurels.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            quest_text = "There's a lot of work to be done to fix this place up. I think there are some towns that produce tools, if not you'll have to stimulate their economy until they learn how.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "I think three stone tools will do it, or a single metal tool if you can find one.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 3) {
+            var quest_text = "Oh this is perfect! Thanks kiddo.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            quest_text = "What would really improve our situation though: some animals. If you bring me a pair of animals, I'll get them to start breeding. Though you may need a bigger boat if you want to carry a big animal.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "I think two breeding pairs of animals should be enough to get us started. Get to it!";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 4) {
+            var quest_text = "Hey, nice. We'll have a proper farm soon at this rate.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            quest_text = "Though, to be honest, all this work is taking its toll on me. I'd really appreciate if you could find me a nice bed. A town with decent carpenters should be able to make one. Oh, and how about a couple of downy pillows?";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "I'm counting on you - I'm an old man after all.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 5) {
+            var quest_text = "Great, great, just what I needed.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            quest_text = "Hey listen, you're something of a traveller now right? Well I've heard tell of some interesting foods I'd like to try. What do you say?";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "Can you could find me five each of " + quest_goals[0] + ", " + quest_goals[1] + ", " + quest_goals[2] + ", " + quest_goals[3] + ", and " + quest_goals[4] + "? We'll have a bit of a feast, it'll be fun.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 6) {
+            var quest_text = "Ah that hit the spot. Good work kiddo.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            quest_text = "I'm getting to know my way around these foreign foods pretty well, but to tell the truth the kitchen here is pretty lousy. Hey, why don't you bring some stuff to spruce it up?";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "A nice new table with four chairs to start, I think. Oh, and you know what would be perfect - a granite countertop. Bring me four slabs of granite and a two sets of metal tools and I'll handle the rest.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 7) {
+            var quest_text = "That's great, thanks. I'll just get some of the servants to refurbish the kitchen, you'll love what we're doing with the place.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 60, 18, '13pt arial', true );
+            quest_text = "There's one problem though. The house is looking great, but I'm embarrassed to have people over looking the way I do. Could you go get a me a new wardrobe?";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "I think two pairs of pants, two shirts, and a nice suit should be sufficient. Oh, and while you're at it a few obsidian figurines would be great - a house isn't a house without some art to spice it up.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 8) {
+            var quest_text = "Ah I look fantastic! This calls for a celebration.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            quest_text = "I trust I can rely on you to get what we need. Food-wise, I think ten each of " + quest_goals[0] + ", " + quest_goals[1] + ", " + quest_goals[2] + ", " + quest_goals[3] + ", and " + quest_goals[4] + ". And for meat we'll need four each of " + quest_goals[5] + ", " + quest_goals[6] + ", " + quest_goals[7] + ", and " + quest_goals[8] + ". Also five bags of salt and spice.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "Well? What are you waiting for?";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+
+         } else if (quest_status === 9) {
+            var quest_text = "Finally, you're here. The guests are waiting, you know. Did you bring everything? Yes?";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            quest_text = "Look, just give it to the servants, and try to stay out of the way. The kids' table is over there.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            quest_text = "Don't worry, there's plenty of juice to go around.";
+            y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            y = fitText( boat_context, "THE END", BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 20, '15pt arial', true );
+
+         }
       } else {
+         // TODO: Town menu
+         // Should be mostly information and some services
+         // Information:
+         // - Town name
+         // - Size of various industries
+         // - What sort of things they need to upgrade those industries
+         // - Locations of nearby towns
+         // - Flavor stuff
+         // Possible Services:
+         // - Buy a boat (boat_menu === 6)
+         // - Rename a boat (boat_menu === 7)
+         // - Buy map (boat_menu === 8)
 
       }
    }
@@ -3236,10 +3537,7 @@ function generateMap()
    map_center_x = 200;
    map_center_y = 210;
 
-   // Start by custom building the starting island
-   createIsland( 190, 190, 210, 210, -1, 1, [1, 6] );
-   places[0].discovered = true;
-
+   // Start by custom building the home island
    for (var x = 195; x <= 205; ++x) {
       for (var y = 210; y <= 220; ++y) {
          map[x][y].discovered = true;
@@ -3250,13 +3548,25 @@ function generateMap()
    map[199][212].terrain = 1;
    map[199][213].terrain = 1;
    map[199][214].terrain = 1;
-   map[199][215].terrain = 1;
    map[200][213].terrain = 1;
    map[200][214].terrain = 1;
    map[200][215].terrain = 1;
    map[201][213].terrain = 1;
    map[201][214].terrain = 1;
    smoothIsland( 198, 211, 202, 215 );
+   // Manually set up town
+   var hometown = new Place( 'town', 'Home' );
+   map[200][213].place = hometown.id;
+   hometown.x = 200;
+   hometown.y = 213;
+   hometown.size = 1;
+   hometown.color = 'white';
+   places.push( hometown );
+
+   // Then make the first major island
+   // TODO: Set certain characteristics manually - e.g. mandatory hardwood
+   createIsland( 190, 190, 210, 210, -1, 1, [1, 6] );
+   places[0].discovered = true;
 
    // Select randomly sized areas of the map to put islands in,
    // then randomly generate islands there
@@ -3660,7 +3970,7 @@ function drawMapContents()
       for (var i = 0; i < num_boats + num_other_boats; ++i) {
          var b;
          if (i < num_boats) b = boats[ my_boats[i] ];
-         else b = boats[ other_boats[i] ];
+         else b = boats[ other_boats[i - num_boats] ];
 
          if (b !== undefined && b.alive) {
             if (b.x >= min_x && b.x <= max_x && b.y >= min_y && b.y <= max_y) {
@@ -3681,6 +3991,7 @@ function drawMapContents()
                   map_context.drawImage( boat_1_sz5_img, g_x, g_y );
 
                }
+               // TODO: draw boat progress bar
             }
          }
       }
@@ -3938,6 +4249,8 @@ function loadImage( img, src ) {
    img.onload = addReadyImage;
    img.src = src;
 }
+
+loadImage( oldman_img, 'OldMan.png' );
 
 loadImage( boat_1_sz5_img, 'Boat_image_1_5px.png' );
 loadImage( boat_2_sz5_img, 'Boat_image_2_5px.png' );
