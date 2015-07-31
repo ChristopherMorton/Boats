@@ -465,8 +465,8 @@ function testQuest()
    }
 
    if (quest_status === 0) {
-      if (cargo_at_home.hardwood >= 3) {
-         payForQuest( 'hardwood', 3 );
+      if (cargo_at_home.softwood >= 2) {
+         payForQuest( 'softwood', 2 );
          quest_status = 1;
          map[199][212].place = 0;
       }
@@ -2071,7 +2071,7 @@ function initBoats()
    b2.maxhealth = 9999;
    b2.health = 9999;
    b2.maxcargo = 9999;
-   b2.addCargo( 'hardwood', 3 );
+   b2.addCargo( 'softwood', 2 );
    b2.addCargo( 'apples', 1 );
    b2.addCargo( 'coconuts', 1 );
    b2.addCargo( 'peppers', 1 );
@@ -2591,7 +2591,7 @@ function drawBoatContent()
             var quest_text = "Ah my child, just who I was looking for! I'm getting a bit old now, so it's up to you to take our bananas to market.";
             var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 80, 18, '13pt arial', true );
 
-            quest_text = "Use the 'Sail' menu to navigate to Market Town, and then sell the bananas from the 'Cargo' menu. Then maybe buy five hardwood from the 'Market' so I can fix that hole in our roof.";
+            quest_text = "Use the 'Sail' menu to navigate to Market Town, and then sell the bananas from the 'Cargo' menu. Then maybe buy two softwood from the 'Market' so I can fix that hole in our roof.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
             y = fitText( boat_context, "Hurry back!", BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
@@ -3243,7 +3243,7 @@ function checkIfJoin( x, y )
    return false;
 }
 
-function smoothIsland( x_min, y_min, x_max, y_max )
+function smoothIsland( x_min, y_min, x_max, y_max, ter_type )
 {
    // Cleaning sweep - from the outside in
    var clean_repeat = Math.floor(3 + ((x_max - x_min) / 20) + ((y_max - y_min) / 20));
@@ -3277,6 +3277,17 @@ function smoothIsland( x_min, y_min, x_max, y_max )
                if (adj_count < GEN_MIN_ADJ || checkIfJoin( x_max - peel, y ))
                   map[x_max - peel][y].terrain = 0;
             }
+         }
+      }
+   }
+
+   // Fill accidental holes
+   for (var x = x_min; x <= x_max; ++x) {
+      for (var y = y_min; y <= y_max; ++y) {
+         if (map[x][y].terrain === 0) {
+            var adj_count = countAdjacencies( x, y );
+            if (adj_count >= 7)
+               map[x][y].terrain === ter_type;
          }
       }
    }
@@ -3337,12 +3348,22 @@ function smoothIsland( x_min, y_min, x_max, y_max )
          }
       }
    }
+   // TODO: Get rid of those 2x2 little islands
 }
 
 function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify )
 {
-   if (technique === -1)
-      technique = 1;
+   if (technique === -1) {
+      if (x_max + y_max - x_min - y_min > 40 && Math.random() > 0.7)
+         technique = 2;
+      else
+         technique = 1;
+   }
+
+   if (x_min < 0) x_min = 0;
+   if (y_min < 0) y_min = 0;
+   if (x_max >= MAP_WIDTH) x_max = MAP_WIDTH - 1;
+   if (y_max >= MAP_HEIGHT) y_max = MAP_HEIGHT - 1;
 
    if (technique === 1) {
       // Algorithm 1: Random walk edge mutations
@@ -3398,7 +3419,7 @@ function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify 
             map[x][y].terrain = 0;
       }
       // clean it up
-      smoothIsland( x_min, y_min, x_max, y_max );
+      smoothIsland( x_min, y_min, x_max, y_max, ter_type );
       
       // Enhance it:
       var real_island_size = 0;
@@ -3515,10 +3536,86 @@ function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify 
 
    } else if (technique === 2) {
       // Algorithm 2: Crescent moon with inner city
+      for (var x = x_min; x <= x_max; ++x) {
+         for (var y = y_min; y <= y_max; ++y) {
+            map[x][y].discovered = true;
+         }
+      }
 
+      // Define big ellipse and small ellipse
+      var big_center_x = Math.round( (x_min + x_max) / 2 );
+      var big_center_y = Math.round( (y_min + y_max) / 2 );
+      var big_width = (x_max - x_min) / 2;
+      var big_height = (y_max - y_min) / 2;
+
+      var inner_width = big_width * 3 / 5;
+      var inner_height = big_height * 3 / 5;
       // specify[1], if it exists, contains the direction of the opening
+      var shift_dir = Math.floor( Math.random() * 8 );
+      if (specify && specify[1] !== undefined)
+         shift_dir = specify[1];
 
-      smoothIsland( x_min, y_min, x_max, y_max );
+      var shift_amount = 0;
+      if (shift_dir === 0 || shift_dir === 4)
+         shift_amount = big_width / 3;
+      else if (shift_dir === 2 || shift_dir === 6)
+         shift_amount = big_height / 3;
+      else
+         shift_amount = (big_height + big_width) / 6;
+      var shift_center = addDirection( big_center_x, big_center_y, shift_dir, shift_amount);
+      var inner_center_x = Math.round( shift_center[0] );
+      var inner_center_y = Math.round( shift_center[1] );
+
+      // For each point in the area, check if it's in the big ellipse and not in the small one
+      for (var x = x_min; x <= x_max; ++x) {
+         for (var y = y_min; y <= y_max; ++y) {
+            // ((x - w)^2 / (r_x)^2) + ((y - h)^2 / (r_y)^2) <= 1
+            var t1 = (Math.pow((x-big_center_x),2) / (big_width * big_width));
+            var t2 = (Math.pow((y-big_center_y),2) / (big_height * big_height));
+            var in_big = (t1 + t2 <= 1);
+            if (in_big && t1 + t2 > 0.8) {// fuzzy edges
+               in_big = (Math.random() < 0.7);
+            }
+            if (in_big) {
+               t1 = (Math.pow((x-inner_center_x),2) / (inner_width * inner_width));
+               t2 = (Math.pow((y-inner_center_y),2) / (inner_height * inner_height));
+               var in_inner = (t1 + t2 <= 1);
+               if (in_inner && t1 + t2 > 0.8) // fuzzy edges
+                  in_inner = (Math.random() < 0.7);
+               if (!in_inner) {
+                  map[x][y].terrain = ter_type;
+               }
+            }
+         }
+      }
+
+      smoothIsland( x_min, y_min, x_max, y_max, ter_type );
+
+      // Place town by shooting into the island from a direction, and stopping at first land
+      var shoot_start = addDirection( big_center_x, big_center_y, shift_dir, Math.ceil(Math.min(big_width, big_height) ) );
+      var shoot_dir = (shift_dir + 4) % 8;
+      x = shoot_start[0];
+      y = shoot_start[1];
+      // Get in area
+      while( x < x_min || x > x_max || y < y_min || y > y_max ) {
+         shoot_start = addDirection( x, y, shoot_dir, 1 );
+         x = shoot_start[0];
+         y = shoot_start[1];
+      }
+      x = x;
+      // Find land
+      while( map[x][y].terrain === 0 ) {
+         shoot_start = addDirection( x, y, shoot_dir, 1 );
+         x = shoot_start[0];
+         y = shoot_start[1];
+         if ( x < x_min || x > x_max || y < y_min || y > y_max ) {
+            // Error, no land encountered??
+            return;
+         }
+      }
+      // Land found!
+      var island_resources = generateResources( ter_type );
+      buildTown( x, y, island_resources );
    }
 }
 
@@ -3538,8 +3635,8 @@ function generateMap()
    map_center_y = 210;
 
    // Start by custom building the home island
-   for (var x = 195; x <= 205; ++x) {
-      for (var y = 210; y <= 220; ++y) {
+   for (var x = 196; x <= 204; ++x) {
+      for (var y = 211; y <= 216; ++y) {
          map[x][y].discovered = true;
       }
    }
@@ -3553,7 +3650,7 @@ function generateMap()
    map[200][215].terrain = 1;
    map[201][213].terrain = 1;
    map[201][214].terrain = 1;
-   smoothIsland( 198, 211, 202, 215 );
+   smoothIsland( 198, 211, 202, 215, 1 );
    // Manually set up town
    var hometown = new Place( 'town', 'Home' );
    map[200][213].place = hometown.id;
@@ -3564,9 +3661,12 @@ function generateMap()
    places.push( hometown );
 
    // Then make the first major island
-   // TODO: Set certain characteristics manually - e.g. mandatory hardwood
-   createIsland( 190, 190, 210, 210, -1, 1, [1, 6] );
+   createIsland( 190, 190, 210, 210, 2, 1, [1, 6] );
    places[0].discovered = true;
+   places[1].discovered = true;
+   // Customized
+   places[1].resources.softwood = 5;
+   places[1].name = "Market Town";
 
    // Select randomly sized areas of the map to put islands in,
    // then randomly generate islands there
@@ -3790,7 +3890,6 @@ function drawPlace( place, grid_x, grid_y, dimension )
       map_context.fillStyle = places[place].color;
       map_context.strokeStyle = places[place].color;
       map_context.lineWidth = "" + (dimension / 10);
-      //map_context.strokeRect( grid_x + 1, grid_y + 1, dimension - 1, dimension - 1 );
       map_context.beginPath();
       map_context.moveTo( grid_x + (dimension / 3), grid_y + (dimension * 4 / 5) );
       map_context.lineTo( grid_x + (dimension * 2 / 3), grid_y + (dimension * 4 / 5) );
