@@ -275,7 +275,7 @@ var MAP_DRAW_DIM = 405, MAP_SQUARE_DIM = 45, MAP_DRAW_EDGE = 2, MAP_FULL_DIM = M
 var MAP_CONTROLS_WIDTH = 40;
 var MAP_CONTROLS_HEIGHT = 20;
 var MAP_GRID_SIZE = 9, MAP_ZOOM_RATIO = 3;
-var MAP_HEIGHT = 400, MAP_WIDTH = 400;
+var MAP_HEIGHT = 300, MAP_WIDTH = 300;
 
 var map;
 var map_zoom_level = 0; // 1 tick = GRID_SIZE ^ zoom_level
@@ -283,7 +283,7 @@ var map_center_x = 300, map_center_y = 300;
 var shift_down = false;
 
 // Generation
-var GEN_NUM_ISLANDS = 200, GEN_NUM_BIG_ISLANDS = 15;
+var GEN_NUM_ISLANDS = 150, GEN_NUM_BIG_ISLANDS = 15;
 var GEN_HEIGHT_MIN = 5, GEN_WIDTH_MIN = 5;
 var GEN_HEIGHT_DIFF = 10, GEN_WIDTH_DIFF = 10;
 var GEN_MIN_ADJ = 3;
@@ -468,7 +468,7 @@ function testQuest()
       if (cargo_at_home.softwood >= 2) {
          payForQuest( 'softwood', 2 );
          quest_status = 1;
-         map[199][212].place = 0;
+         map[149][162].place = 0;
       }
    } else if (quest_status === 1) {
       var foods = [];
@@ -482,21 +482,21 @@ function testQuest()
             payForQuest( foods[i], 1 );
          
          quest_status = 2;
-         map[199][213].place = 0;
+         map[149][163].place = 0;
       }
    } else if (quest_status === 2) {
       if (cargo_at_home.stonetools >= 3) {
          payForQuest( 'stonetools', 3 );
          quest_status = 3;
-         map[201][213].place = 0;
+         map[151][163].place = 0;
       } else if (cargo_at_home.bronzetools >= 1) {
          payForQuest( 'bronzetools', 1 );
          quest_status = 3;
-         map[201][213].place = 0;
+         map[151][163].place = 0;
       } else if (cargo_at_home.irontools >= 1) {
          payForQuest( 'irontools', 1 );
          quest_status = 3;
-         map[201][213].place = 0;
+         map[151][163].place = 0;
       }
    } else if (quest_status === 3) {
       var animals = [];
@@ -511,7 +511,7 @@ function testQuest()
             payForQuest( animals[i], 2 );
          
          quest_status = 4;
-         map[201][214].place = 0;
+         map[151][164].place = 0;
       }
    } else if (quest_status === 4) {
       if (cargo_at_home.beds >= 1 && cargo_at_home.pillows >= 2) {
@@ -520,7 +520,7 @@ function testQuest()
          
          quest_status = 5;
          quest_goals = selectNResources( 5, food_list.slice() );
-         map[198][213].place = 0;
+         map[148][163].place = 0;
       }
    } else if (quest_status === 5) {
       if (cargo_at_home[quest_goals[0]] >= 5 &&
@@ -535,7 +535,7 @@ function testQuest()
          payForQuest( quest_goals[4], 5 );
 
          quest_status = 6;
-         map[200][214].place = 0;
+         map[150][164].place = 0;
       }
    } else if (quest_status === 6) {
       if (cargo_at_home.chairs >= 4 && cargo_at_home.tables >= 1 &&
@@ -547,7 +547,7 @@ function testQuest()
             payForQuest( 'bronzetools', 2 );
 
             quest_status = 7
-            map[200][215].place = 0;
+            map[150][165].place = 0;
          } else if (cargo_at_home.irontools >= 2) {
             payForQuest( 'chairs', 4 );
             payForQuest( 'tables', 1 );
@@ -555,7 +555,7 @@ function testQuest()
             payForQuest( 'irontools', 2 );
 
             quest_status = 7
-            map[200][215].place = 0;
+            map[150][165].place = 0;
          }
       }
    } else if (quest_status === 7) {
@@ -567,10 +567,10 @@ function testQuest()
          payForQuest( 'figurines', 3 );
          
          quest_status = 8;
-         map[199][214].place = 0;
+         map[149][164].place = 0;
          quest_goals = selectNResources( 5, food_list.slice() );
-         quest_goals.push.apply( selectNResources( 2, animal_list.slice() ) );
-         quest_goals.push.apply( selectNResources( 2, big_animal_list.slice() ) );
+         quest_goals = quest_goals.concat( selectNResources( 2, animal_list.slice() ) );
+         quest_goals = quest_goals.concat( selectNResources( 2, big_animal_list.slice() ) );
       }
    } else if (quest_status === 8) {
       if (cargo_at_home[quest_goals[0]] >= 10 &&
@@ -596,7 +596,7 @@ function testQuest()
          payForQuest( 'spices', 5 );
 
          quest_status = 9;
-         map[198][214].place = 0;
+         map[148][164].place = 0;
       }
    }
 }
@@ -758,10 +758,17 @@ function Place( type, name )
    }
 }
 
+var town_names = [ 'Abu Dhabi', 'Agrabah', 'Alexandria', 'Alubarna', 'Anchorage', 'Angband', 'Ankh', 'Arkadia', 'Arkham', 'Ascalon', 'Asshai', 'Astapor', 'Atlantis', 'Avalon', "Baldur's Gate", 'Barad-dur', 'Barbados', 'Bikini Bottom', 'Bombay', 'Braavos', 'Bratislava', 'Bree', 'Brno', 'Brunei', 'Burmecia', 'Camelot', 'Cinnabar', 'Cleyra', 'Clock Town', 'Cocoyashi', 'Coldchester', 'Columbia', 'Crickhollow', 'Daguerreo', 'Dale', 'Dali', 'Damascus', 'Darnassus', 'Detroit', 'Digitopolis', 'Dollet', 'Dorino', 'Dragonstone', 'Dressrosa', 'Duckburg', 'Dunwall', 'Dusseldorf', 'Edoras', 'El Dorado', 'Elbaf', 'Erumalu', 'Falujah', 'Fourside', 'Funkytown', 'Gadgetzan', 'Giza', 'Gondor', 'Gotham', 'Grandia', 'Gravity Falls', 'Guadalupe', 'Guantanamo', 'Hardhome', 'Harrenhal', 'Havana', 'Hicksville', 'Highgarden', 'Hobbiton', 'Hogsmeade', 'Hylia', 'Innsmouth', 'Ippswich', 'Isengard', 'Jakarta', 'Jamestown', 'Jericho', 'Kabul', 'Kakariko', 'Katorea', 'Kharbranth', 'Khazad-dum', 'Kholinar', 'Kodiak', 'Konoha', 'Lannisport', 'Lawenilothehl', 'Libreville', 'Lindblum', 'Loguetown', 'Lorath', 'Lorien', 'Lys', 'Manila', 'Mariejois', 'Marineford', 'Marrakesh', 'Meereen', 'Mecca', 'Megatokyo', 'Metropolis', 'Midgar', 'Minas Tirith', 'Minsk', 'Mmbutu', 'Mock Town', 'Mombasa', 'Morpork', 'Mos Eisley', 'Myr', 'Nanohana', 'Neotokyo', 'Neverwinter', 'New Dehli', 'Nibelheim', 'Nome', 'Nova Prospekt', 'Nowhere', 'Ohara', 'Onett', 'Orleans', 'Osgiliath', 'Oto', 'Pallet Town', 'Pandemonium', 'Pentos', 'Phronten', 'Porre', 'Portland', 'Praetoria', 'Pride Rock', 'Pyke', 'Pyongyang', 'Qarth', 'Quahog', 'Quito', "R'lyeh", 'Raftel', 'Rainbase', 'Rapture', 'Ravenholm', 'Risembool', 'Rivendell', 'Robotropolis', 'Rockville', 'Rogueport', 'Sabaody', 'Salem', 'Saskatoon', 'Scrabble', 'Shangri-la', 'Shelbyville', 'Silent Hill', 'Skagway', 'Sleepy Hollow', 'Smallville', 'Springfield', 'Stepford', 'Stormwind', 'Suez', 'Sunnydale', 'Sunspear', 'Tackleford', 'Terinyo', 'Terris', 'Threed', 'Timbuktu', 'Townsville', 'Treno', 'Truce', 'Twoson', 'Urithiru', 'Valyria', 'Vancouver', 'Varrock', 'Vector', 'Vedenar', 'Volantis', 'Walla Walla', 'Wano', 'Whiskey Peak', 'Winterfell', 'Whoville', 'Xanadu', 'Yunkai', 'Zanarkand', 'Zion' ];
+
 var name_count = 0;
 function townNameGen()
 {
-   return 'Praetoria ' + name_count++;
+   if (town_names.length === 0)
+      return 'Praetoria ' + name_count++;
+
+   var index = Math.floor(Math.random() * town_names.length);
+
+   return town_names.splice( index, 1 )[0];
 }
 
 function selectNResources( n, resources )
@@ -1707,28 +1714,28 @@ function Boat( type )
          this.name = "Mini boatster";
          this.typename = "Rowboat";
          this.maxhealth = 80;
-         this.speed = 30;
+         this.speed = 10;
          break;
       case 2:
          this.maxcargo = 120;
          this.name = genBoatName();
          this.typename = "Raft";
          this.maxhealth = 200;
-         this.speed = 42;
+         this.speed = 12;
          break;
       case 3:
          this.maxcargo = 15;
          this.name = genBoatName();
          this.typename = "Canoe";
          this.maxhealth = 50;
-         this.speed = 24;
+         this.speed = 9;
          break;
       case 4:
          this.maxcargo = 120;
          this.name = genBoatName();
          this.typename = "Sailboat";
          this.maxhealth = 120;
-         this.speed = 24;
+         this.speed = 7;
          break;
    }
 
@@ -2057,17 +2064,16 @@ function initBoats()
 {
    var b = new Boat( 1 );
    b.mine = true;
-   b.x = 200;
-   b.y = 213;
+   b.x = 150;
+   b.y = 163;
    b.addCargo( 'bananas', 5 );
    boats.push( b );
    my_boats.push( b.id );
    var b2 = new Boat( 1 );
    b2.mine = true;
-   b2.x = 200;
-   b2.y = 213;
+   b2.x = 150;
+   b2.y = 163;
    b2.name = "Secret Test Boat";
-   b2.speed = 0.1;
    b2.maxhealth = 9999;
    b2.health = 9999;
    b2.maxcargo = 9999;
@@ -2259,16 +2265,18 @@ function drawBoatContent()
             boat_context.drawImage( img, x, y );
 
          // Draw count
-         var count_str = String(count);
-         var count_width = count_str.width("14pt arial");
-            
-         boat_context.fillStyle = 'white';
-         boat_context.fillRect( x + 58 - count_width, y + 62 - 18, count_width + 4, 18 )
-         boat_context.strokeRect( x + 58 - count_width, y + 62 - 18, count_width + 4, 18 )
+         if (!(place === 0 && boat_menu === 4)) {
+            var count_str = String(count);
+            var count_width = count_str.width("14pt arial");
+               
+            boat_context.fillStyle = 'white';
+            boat_context.fillRect( x + 58 - count_width, y + 62 - 18, count_width + 4, 18 )
+            boat_context.strokeRect( x + 58 - count_width, y + 62 - 18, count_width + 4, 18 )
 
-         boat_context.fillStyle = 'black';
-         boat_context.font = '14pt arial';
-         boat_context.fillText( count_str, x + 60 - count_width, y + 60 );
+            boat_context.fillStyle = 'black';
+            boat_context.font = '14pt arial';
+            boat_context.fillText( count_str, x + 60 - count_width, y + 60 );
+         }
 
          x += 70;
          if (x + 60 > x_divider) {
@@ -2311,7 +2319,7 @@ function drawBoatContent()
             if (boat_menu === 3)
                boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
             boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
-            if (boat_menu === 3 && place !== undefined && selection !== 'coins')
+            if (boat_menu === 3 && place !== undefined && place !== 0 && selection !== 'coins')
                boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 111, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
 
 
@@ -2319,12 +2327,12 @@ function drawBoatContent()
             if (boat_menu === 3)
                boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 37, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
             boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 73, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
-            if (boat_menu === 3 && place !== undefined && selection !== 'coins')
+            if (boat_menu === 3 && place !== undefined && place !== 0 && selection !== 'coins')
                boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 109, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
 
             boat_context.fillStyle = 'black';
             if (boat_menu === 3) {
-               if (place !== undefined && selection !== 'coins') {
+               if (place !== undefined && place !== 0 && selection !== 'coins') {
                   var sell_price = Math.round( places[place].getPrice( selection ) );
                   var sell_str = 'Sell (' + sell_price + ')';
                   fitText( boat_context, sell_str, x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110, 20, '20px arial', true);
@@ -2337,8 +2345,11 @@ function drawBoatContent()
 
                var buy_price = Math.round( places[place].getPrice( selection ) * 1.2 );
                var buy_str = 'Buy (' + buy_price + ')';
+               if (place === 0)
+                  buy_str = 'Stock Up';
                fitText( boat_context, buy_str, x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 74, 20, '20px arial', true);
-               if (boat.cargo['coins'] < buy_price) {
+               if ((place === 0 && boat.cargo.bananas && boat.cargo.bananas >= 5) ||
+                   (place !== 0 && (boat.cargo['coins'] < buy_price))) {
                   boat_context.strokeStyle = 'rgba(85,85,85,1)';
                   boat_context.beginPath();
                   boat_context.moveTo( x_divider + 16, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 74 );
@@ -2350,7 +2361,8 @@ function drawBoatContent()
                   boat_context.fillStyle = 'rgba(235,0,0,1)';
                   //boat_context.fillRect( x_divider + 30, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 62, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 60, 2 );
                }
-               fitText( boat_context, 'Coins: ' + boat.cargo['coins'], x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39, 20, '20px arial', true);
+               if (place !== 0)
+                  fitText( boat_context, 'Coins: ' + boat.cargo['coins'], x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39, 20, '20px arial', true);
             }
          }
       }
@@ -2585,13 +2597,13 @@ function drawBoatContent()
          fitText( boat_context, 'The Old Man', BOAT_INNER_X + 20, BOAT_INNER_X + 162, BOAT_INNER_Y + 260, 26, '22pt arial', true );
 
          // Quest text
-         // TODO: Images of quest goals
+         // TODO: Images of quest goals?
          if (quest_status === 0) {
 
             var quest_text = "Ah my child, just who I was looking for! I'm getting a bit old now, so it's up to you to take our bananas to market.";
             var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 80, 18, '13pt arial', true );
 
-            quest_text = "Use the 'Sail' menu to navigate to Market Town, and then sell the bananas from the 'Cargo' menu. Then maybe buy two softwood from the 'Market' so I can fix that hole in our roof.";
+            quest_text = "Use the 'Sail' menu to navigate to Market Town, it's just north of here. You can sell the bananas from the 'Cargo' menu. Then maybe buy two softwood from the 'Market' so I can fix that hole in our roof.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
             y = fitText( boat_context, "Hurry back!", BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
@@ -2612,7 +2624,7 @@ function drawBoatContent()
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
          } else if (quest_status === 3) {
-            var quest_text = "Oh this is perfect! Thanks kiddo.";
+            var quest_text = "This is perfect! Thanks kiddo.";
             var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
             quest_text = "What would really improve our situation though: some animals. If you bring me a pair of animals, I'll get them to start breeding. Though you may need a bigger boat if you want to carry a big animal.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
@@ -2636,35 +2648,35 @@ function drawBoatContent()
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
          } else if (quest_status === 6) {
-            var quest_text = "Ah that hit the spot. Good work kiddo.";
-            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
+            var quest_text = "Ah that hit the spot.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 60, 18, '13pt arial', true );
             quest_text = "I'm getting to know my way around these foreign foods pretty well, but to tell the truth the kitchen here is pretty lousy. Hey, why don't you bring some stuff to spruce it up?";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
             quest_text = "A nice new table with four chairs to start, I think. Oh, and you know what would be perfect - a granite countertop. Bring me four slabs of granite and a two sets of metal tools and I'll handle the rest.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
          } else if (quest_status === 7) {
-            var quest_text = "That's great, thanks. I'll just get some of the servants to refurbish the kitchen, you'll love what we're doing with the place.";
-            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 60, 18, '13pt arial', true );
+            var quest_text = "That's great, thanks. I'll just get some servants to refurbish the kitchen, you'll love what we're doing with the place.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 50, 18, '13pt arial', true );
             quest_text = "There's one problem though. The house is looking great, but I'm embarrassed to have people over looking the way I do. Could you go get a me a new wardrobe?";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
-            quest_text = "I think two pairs of pants, two shirts, and a nice suit should be sufficient. Oh, and while you're at it a few obsidian figurines would be great - a house isn't a house without some art to spice it up.";
+            quest_text = "I think two pants, two shirts, and a nice suit should be sufficient. And while you're at it a few obsidian figurines would be great - a house isn't a house without some art to spice it up.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
          } else if (quest_status === 8) {
-            var quest_text = "Ah I look fantastic! This calls for a celebration.";
+            var quest_text = "Haha, I look fantastic! This calls for a celebration.";
             var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
-            quest_text = "I trust I can rely on you to get what we need. Food-wise, I think ten each of " + quest_goals[0] + ", " + quest_goals[1] + ", " + quest_goals[2] + ", " + quest_goals[3] + ", and " + quest_goals[4] + ". And for meat we'll need four each of " + quest_goals[5] + ", " + quest_goals[6] + ", " + quest_goals[7] + ", and " + quest_goals[8] + ". Also five bags of salt and spice.";
+            quest_text = "I hope I can rely on you to get what we need. Food-wise, I think ten each of " + quest_goals[0] + ", " + quest_goals[1] + ", " + quest_goals[2] + ", " + quest_goals[3] + ", and " + quest_goals[4] + " should do it. And for meat we'll need four each of " + quest_goals[5] + ", " + quest_goals[6] + ", " + quest_goals[7] + ", and " + quest_goals[8] + ". Also five bags of salt and spice.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
             quest_text = "Well? What are you waiting for?";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
          } else if (quest_status === 9) {
             var quest_text = "Finally, you're here. The guests are waiting, you know. Did you bring everything? Yes?";
-            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 70, 18, '13pt arial', true );
-            quest_text = "Look, just give it to the servants, and try to stay out of the way. The kids' table is over there.";
+            var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 80, 18, '13pt arial', true );
+            quest_text = "Look, just give it to the servants, and please try to stay out of the way. ";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
-            quest_text = "Don't worry, there's plenty of juice to go around.";
+            quest_text = "The kids' table is over there. Don't worry, there's plenty of juice to go around.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
             y = fitText( boat_context, "THE END", BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 20, '15pt arial', true );
 
@@ -2674,6 +2686,8 @@ function drawBoatContent()
          // Should be mostly information and some services
          // Information:
          // - Town name
+         boat_context.fillStyle = 'Black';
+         fitText( boat_context, "Welcome to " + places[place].name, BOAT_INNER_X, BOAT_INNER_X + BOAT_INNER_WIDTH, BOAT_INNER_Y + 6, 28, '18pt arial', true );
          // - Size of various industries
          // - What sort of things they need to upgrade those industries
          // - Locations of nearby towns
@@ -2799,10 +2813,15 @@ function onClickBoats( e )
             if (places[place].stock_selected !== '') {
                if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 
                 && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75 + 28) {
-                  boat.buyCargo( places[place].stock_selected, 1 );
-                  if (places[place].stock[ places[place].stock_selected ] === 0)
-                     places[place].stock_selected = '';
-                  refresh();
+                  if (place === 0) {
+                     // Acquire bananas
+                     boat.cargo.bananas = 5;
+                  } else {
+                     boat.buyCargo( places[place].stock_selected, 1 );
+                     if (places[place].stock[ places[place].stock_selected ] === 0)
+                        places[place].stock_selected = '';
+                     refresh();
+                  }
                }
             }
          }
@@ -3287,7 +3306,7 @@ function smoothIsland( x_min, y_min, x_max, y_max, ter_type )
          if (map[x][y].terrain === 0) {
             var adj_count = countAdjacencies( x, y );
             if (adj_count >= 7)
-               map[x][y].terrain === ter_type;
+               map[x][y].terrain = ter_type;
          }
       }
    }
@@ -3348,7 +3367,21 @@ function smoothIsland( x_min, y_min, x_max, y_max, ter_type )
          }
       }
    }
-   // TODO: Get rid of those 2x2 little islands
+
+   // Get rid of those 2x2 little islands
+   for (var x = x_min; x < x_max; ++x) {
+      for (var y = y_min; y < y_max; ++y) {
+         if (terGetStart( map[x][y].terrain ) === 4 &&
+             terGetStart( map[x+1][y].terrain ) === 6 &&
+             terGetStart( map[x+1][y+1].terrain ) === 0 &&
+             terGetStart( map[x][y+1].terrain ) === 2) {
+            map[x][y].terrain = 0;
+            map[x+1][y].terrain = 0;
+            map[x+1][y+1].terrain = 0;
+            map[x][y+1].terrain = 0;
+         }
+      }
+   }
 }
 
 function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify )
@@ -3573,14 +3606,14 @@ function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify 
             var t1 = (Math.pow((x-big_center_x),2) / (big_width * big_width));
             var t2 = (Math.pow((y-big_center_y),2) / (big_height * big_height));
             var in_big = (t1 + t2 <= 1);
-            if (in_big && t1 + t2 > 0.8) {// fuzzy edges
+            if (in_big && t1 + t2 > 0.7) {// fuzzy edges
                in_big = (Math.random() < 0.7);
             }
             if (in_big) {
                t1 = (Math.pow((x-inner_center_x),2) / (inner_width * inner_width));
                t2 = (Math.pow((y-inner_center_y),2) / (inner_height * inner_height));
                var in_inner = (t1 + t2 <= 1);
-               if (in_inner && t1 + t2 > 0.8) // fuzzy edges
+               if (in_inner && t1 + t2 > 0.7) // fuzzy edges
                   in_inner = (Math.random() < 0.7);
                if (!in_inner) {
                   map[x][y].terrain = ter_type;
@@ -3591,31 +3624,46 @@ function createIsland( x_min, y_min, x_max, y_max, technique, ter_type, specify 
 
       smoothIsland( x_min, y_min, x_max, y_max, ter_type );
 
-      // Place town by shooting into the island from a direction, and stopping at first land
-      var shoot_start = addDirection( big_center_x, big_center_y, shift_dir, Math.ceil(Math.min(big_width, big_height) ) );
-      var shoot_dir = (shift_dir + 4) % 8;
-      x = shoot_start[0];
-      y = shoot_start[1];
-      // Get in area
-      while( x < x_min || x > x_max || y < y_min || y > y_max ) {
-         shoot_start = addDirection( x, y, shoot_dir, 1 );
+      // Optional second/third towns on other sides
+      var num_towns = 1;
+      if (x_max + y_max - x_min - y_min > 40) 
+         num_towns = Math.ceil( Math.random() * 3 );
+
+      while (num_towns > 0) {
+         // Place town by shooting into the island from a direction, and stopping at first land
+         var shoot_start = addDirection( big_center_x, big_center_y, shift_dir, Math.ceil(Math.min(big_width, big_height) ) );
+         var shoot_dir = (shift_dir + 4) % 8;
          x = shoot_start[0];
          y = shoot_start[1];
-      }
-      x = x;
-      // Find land
-      while( map[x][y].terrain === 0 ) {
-         shoot_start = addDirection( x, y, shoot_dir, 1 );
-         x = shoot_start[0];
-         y = shoot_start[1];
-         if ( x < x_min || x > x_max || y < y_min || y > y_max ) {
-            // Error, no land encountered??
-            return;
+         // Get in area
+         while( x < x_min || x > x_max || y < y_min || y > y_max ) {
+            shoot_start = addDirection( x, y, shoot_dir, 1 );
+            x = shoot_start[0];
+            y = shoot_start[1];
          }
+         x = x;
+         // Find land
+         while( map[x][y].terrain === 0 ) {
+            shoot_start = addDirection( x, y, shoot_dir, 1 );
+            x = shoot_start[0];
+            y = shoot_start[1];
+            if ( x < x_min || x > x_max || y < y_min || y > y_max ) {
+               // Error, no land encountered??
+               return;
+            }
+         }
+         // Fix case where town is fully inland/unreachable
+         if (terGetStart( map[x][y].terrain ) === terGetEnd( map[x][y].terrain )) {
+            shoot_start = addDirection( x, y, (shoot_dir + 3) % 8, 1 );
+            x = shoot_start[0];
+            y = shoot_start[1];
+         }
+         // Land found!
+         var island_resources = generateResources( ter_type );
+         buildTown( x, y, island_resources );
+         num_towns--;
+         shift_dir += 3;
       }
-      // Land found!
-      var island_resources = generateResources( ter_type );
-      buildTown( x, y, island_resources );
    }
 }
 
@@ -3631,38 +3679,39 @@ function generateMap()
    }
    map_zoom_level = 1;
 
-   map_center_x = 200;
-   map_center_y = 210;
+   map_center_x = 150;
+   map_center_y = 160;
 
    // Start by custom building the home island
-   for (var x = 196; x <= 204; ++x) {
-      for (var y = 211; y <= 216; ++y) {
+   for (var x = 146; x <= 154; ++x) {
+      for (var y = 161; y <= 166; ++y) {
          map[x][y].discovered = true;
       }
    }
-   map[198][213].terrain = 1;
-   map[198][214].terrain = 1;
-   map[199][212].terrain = 1;
-   map[199][213].terrain = 1;
-   map[199][214].terrain = 1;
-   map[200][213].terrain = 1;
-   map[200][214].terrain = 1;
-   map[200][215].terrain = 1;
-   map[201][213].terrain = 1;
-   map[201][214].terrain = 1;
-   smoothIsland( 198, 211, 202, 215, 1 );
+   map[148][163].terrain = 1;
+   map[148][164].terrain = 1;
+   map[149][162].terrain = 1;
+   map[149][163].terrain = 1;
+   map[149][164].terrain = 1;
+   map[150][163].terrain = 1;
+   map[150][164].terrain = 1;
+   map[150][165].terrain = 1;
+   map[151][163].terrain = 1;
+   map[151][164].terrain = 1;
+   smoothIsland( 148, 161, 152, 165, 1 );
    // Manually set up town
    var hometown = new Place( 'town', 'Home' );
-   map[200][213].place = hometown.id;
-   hometown.x = 200;
-   hometown.y = 213;
+   map[150][163].place = hometown.id;
+   hometown.x = 150;
+   hometown.y = 163;
    hometown.size = 1;
    hometown.color = 'white';
    places.push( hometown );
 
    // Then make the first major island
-   createIsland( 190, 190, 210, 210, 2, 1, [1, 6] );
+   createIsland( 140, 140, 160, 160, 2, 1, [1, 6] );
    places[0].discovered = true;
+   places[0].stock.bananas = 1;
    places[1].discovered = true;
    // Customized
    places[1].resources.softwood = 5;
@@ -3767,42 +3816,6 @@ function generateMap()
 
    }
 
-
-
-   /* Custom
-
-   map = new Array( MAP_WIDTH );
-   for (var x = 0; x < MAP_WIDTH ; ++x) {
-      map[x] = new Array( MAP_HEIGHT );
-      for (var y = 0; y < MAP_HEIGHT ; ++y) {
-         map[x][y] = new MapLoc( 0 );
-      }
-   }
-
-   map_zoom_level = 0;
-   map_center_x = 400;
-   map_center_y = 400;
-
-   for (var x = 396; x < 410 ; ++x) {
-      for (var y = 397; y < 405 ; ++y) {
-         map[x][y].terrain = 1;
-      }
-   }
-   map[395][398].terrain = constructTerrain( 3, 4, 0 );
-   map[395][399].terrain = constructTerrain( 3, 6, 0 );
-   map[395][400].terrain = constructTerrain( 2, 6, 0 );
-   map[395][401].terrain = constructTerrain( 2, 5, 0 );
-   map[396][398].terrain = constructTerrain( 0, 7, 0 );
-   map[396][397].terrain = constructTerrain( 3, 7, 0 );
-   map[397][396].terrain = constructTerrain( 5, 7, 0 );
-   map[398][397].terrain = constructTerrain( 3, 1, 0 );
-   map[399][396].terrain = constructTerrain( 4, 7, 0 );
-   map[400][396].terrain = constructTerrain( 4, 0, 0 );
-   map[401][396].terrain = constructTerrain( 5, 0, 0 );
-   map[396][404].terrain = 0;
-   map[409][397].terrain = 0;
-   map[409][404].terrain = 0;
-   */
    for (var x = 0; x < MAP_WIDTH ; ++x) {
       for (var y = 0; y < MAP_HEIGHT ; ++y) {
          map[x][y].discovered = false;
@@ -4086,6 +4099,10 @@ function drawMapContents()
                   var g_y = MAP_DRAW_EDGE + ((b.y - min_y) * MAP_SQUARE_DIM);
                   map_context.drawImage( rowboat_sz45_img, g_x, g_y );
 
+                  // TODO: draw boat progress bar
+                  var progress = b.sailing_progress / b.sail_complete;
+                  map_context.fillStyle = 'white';
+                  map_context.fillRect( g_x + 5, g_y + 40, 35 * progress, 2 );
                } else if (map_zoom_level === 1) {
                   var g_x = MAP_DRAW_EDGE + ((b.x - min_x) * MAP_SQUARE_DIM / 3);
                   var g_y = MAP_DRAW_EDGE + ((b.y - min_y) * MAP_SQUARE_DIM / 3);
@@ -4097,7 +4114,6 @@ function drawMapContents()
                   map_context.drawImage( boat_1_sz5_img, g_x, g_y );
 
                }
-               // TODO: draw boat progress bar
             }
          }
       }
@@ -4337,7 +4353,7 @@ function start() {
    updateVision();
    refresh();
 
-   setInterval(update, 200); // .2 sec
+   setInterval(update, 100); // .1 sec
 }
 
 // Load images
