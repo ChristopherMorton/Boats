@@ -8,6 +8,18 @@ var LOG = $( "#log" );
 // Images 
 var oldman_img = new Image();
 
+var maps_closed_img = new Image();
+var maps_open_img = new Image();
+var boats_closed_img = new Image();
+var boats_open_img = new Image();
+var town_closed_img = new Image();
+var town_open_img = new Image();
+var guild_closed_img = new Image();
+var guild_open_img = new Image();
+
+var dirt_road_img = new Image();
+var stone_road_img = new Image();
+
 var boat_1_sz5_img = new Image();
 var boat_2_sz5_img = new Image();
 var boat_3_sz5_img = new Image();
@@ -16,6 +28,26 @@ var boat_4_sz5_img = new Image();
 var rowboat_sz60_img = new Image();
 var rowboat_sz45_img = new Image();
 var rowboat_sz15_img = new Image();
+
+var canoe_sz60_img = new Image();
+var canoe_sz45_img = new Image();
+var canoe_sz15_img = new Image();
+
+var sailboat_sz60_img = new Image();
+var sailboat_sz45_img = new Image();
+var sailboat_sz15_img = new Image();
+
+var schooner_sz60_img = new Image();
+var schooner_sz45_img = new Image();
+var schooner_sz15_img = new Image();
+
+var yacht_sz60_img = new Image();
+var yacht_sz45_img = new Image();
+var yacht_sz15_img = new Image();
+
+var galleon_sz60_img = new Image();
+var galleon_sz45_img = new Image();
+var galleon_sz15_img = new Image();
 
 var west_arrow_img = new Image();
 var west_arrow_selected_img = new Image();
@@ -247,6 +279,7 @@ boat_canvas.onselectstart = function () { return false; }
 var boat_context = boat_canvas.getContext('2d');
 var BOAT_WIDTH = 550, BOAT_HEIGHT = 429;
 var BOAT_SCROLLBAR_WIDTH = 15;
+var BOAT_SCROLLBAR_HEIGHT = 30;
 var BOAT_HEADER_HEIGHT = 22;
 var BOAT_INNER_X = BOAT_SCROLLBAR_WIDTH + 65, BOAT_INNER_Y = BOAT_HEADER_HEIGHT + 5;
 var BOAT_INNER_WIDTH = BOAT_WIDTH - (BOAT_INNER_X + 5);
@@ -266,6 +299,8 @@ var boat_id_gen = 0;
 var destination_list = [];
 var destination_selection = null;
 var destination_scroll = 0;
+
+var building_hover = 0;
 
 // Map
 var map_canvas = $('#map_canvas')[0]
@@ -642,22 +677,6 @@ function terGetEnd( terrain ) {
    return (terrain >> 6) & 7; 
 }
 
-/*
-function terGetRivers( terrain ) {
-   return (terrain >> 9) & 0xFF;
-}
-
-function terGetRiver( terrain, dir ) {
-   return (terrain >> (9 + dir)) & 0x1;
-}
-
-function terToggleRiver( terrain, dir ) {
-   var flipmask = 0x1 << (9 + dir);
-   terrain = terrain ^ flipmask;
-   return terrain;
-}
-*/
-
 function terSetColor( terrain, context ) {
    switch (terGetType( terrain )) {
       case 1:
@@ -667,16 +686,16 @@ function terSetColor( terrain, context ) {
          context.fillStyle = "rgba(0,135,0,1)"; // green jungle
          break;
       case 3:
-         map_context.fillStyle = "rgba(155,155,155,1)"; // light stone
+         context.fillStyle = "rgba(155,155,155,1)"; // light stone
          break;
       case 4:
-         map_context.fillStyle = "rgba(115,115,115,1)"; // dark stone
+         context.fillStyle = "rgba(115,115,115,1)"; // dark stone
          break;
       case 5:
-         map_context.fillStyle = "rgba(195,155,105,1)"; // sandy desert
+         context.fillStyle = "rgba(195,155,105,1)"; // sandy desert
          break;
       case 6:
-         map_context.fillStyle = "rgba(175,225,235,1)"; // icy desert
+         context.fillStyle = "rgba(175,225,235,1)"; // icy desert
          break;
    }
 }
@@ -1709,33 +1728,47 @@ function Boat( type )
    this.type = type;
 
    switch (type) {
-      case 1:
+      case 0:
          this.maxcargo = 50;
          this.name = "Mini boatster";
-         this.typename = "Rowboat";
+         this.typename = "Shitty Rowboat";
          this.maxhealth = 80;
-         this.speed = 10;
+         this.speed = 50;
+         break;
+      case 1:
+         this.maxcargo = 60;
+         this.name = genBoatName();
+         this.typename = "Outrigger Canoe";
+         this.maxhealth = 100;
+         this.speed = 32;
          break;
       case 2:
-         this.maxcargo = 120;
-         this.name = genBoatName();
-         this.typename = "Raft";
-         this.maxhealth = 200;
-         this.speed = 12;
-         break;
-      case 3:
-         this.maxcargo = 15;
-         this.name = genBoatName();
-         this.typename = "Canoe";
-         this.maxhealth = 50;
-         this.speed = 9;
-         break;
-      case 4:
-         this.maxcargo = 120;
+         this.maxcargo = 180;
          this.name = genBoatName();
          this.typename = "Sailboat";
-         this.maxhealth = 120;
-         this.speed = 7;
+         this.maxhealth = 225;
+         this.speed = 22;
+         break;
+      case 3:
+         this.maxcargo = 540;
+         this.name = genBoatName();
+         this.typename = "Schooner";
+         this.maxhealth = 340;
+         this.speed = 16;
+         break;
+      case 4:
+         this.maxcargo = 1200;
+         this.name = genBoatName();
+         this.typename = "Yacht";
+         this.maxhealth = 450;
+         this.speed = 15;
+         break;
+      case 5:
+         this.maxcargo = 4000;
+         this.name = genBoatName();
+         this.typename = "Galleon";
+         this.maxhealth = 660;
+         this.speed = 15;
          break;
    }
 
@@ -1765,6 +1798,48 @@ function Boat( type )
    this.journey_x = -1;
    this.journey_y = -1;
    this.journey_path = [];
+}
+
+Boat.prototype.getImage = function( size )
+{
+   if (this.type === 0) {
+      if (size === 5) return boat_1_sz5_img;
+      if (size === 15) return rowboat_sz15_img;
+      if (size === 45) return rowboat_sz45_img;
+      return rowboat_sz60_img;
+
+   } else if (this.type === 1) {
+      if (size === 5) return boat_1_sz5_img;
+      if (size === 15) return canoe_sz15_img;
+      if (size === 45) return canoe_sz45_img;
+      return canoe_sz60_img;
+
+   } else if (this.type === 2) {
+      if (size === 5) return boat_2_sz5_img;
+      if (size === 15) return sailboat_sz15_img;
+      if (size === 45) return sailboat_sz45_img;
+      return sailboat_sz60_img;
+
+   } else if (this.type === 3) {
+      if (size === 5) return boat_3_sz5_img;
+      if (size === 15) return schooner_sz15_img;
+      if (size === 45) return schooner_sz45_img;
+      return schooner_sz60_img;
+
+   } else if (this.type === 4) {
+      if (size === 5) return boat_3_sz5_img;
+      if (size === 15) return yacht_sz15_img;
+      if (size === 45) return yacht_sz45_img;
+      return yacht_sz60_img;
+
+   } else if (this.type === 5) {
+      if (size === 5) return boat_4_sz5_img;
+      if (size === 15) return galleon_sz15_img;
+      if (size === 45) return galleon_sz45_img;
+      return galleon_sz60_img;
+
+   }
+
 }
 
 function calculateDistanceMetric( dx, dy )
@@ -2062,7 +2137,7 @@ function updateBoats()
 
 function initBoats()
 {
-   var b = new Boat( 1 );
+   var b = new Boat( 0 );
    b.mine = true;
    b.x = 150;
    b.y = 163;
@@ -2071,7 +2146,7 @@ function initBoats()
    my_boats.push( b.id );
    var b2 = new Boat( 1 );
    b2.mine = true;
-   b2.x = 150;
+   b2.x = 151;
    b2.y = 163;
    b2.name = "Secret Test Boat";
    b2.maxhealth = 9999;
@@ -2090,6 +2165,30 @@ function initBoats()
    b2.addCargo( 'pillows', 2 );
    boats.push( b2 );
    my_boats.push( b2.id );
+   var b3 = new Boat( 2 );
+   b3.mine = true;
+   b3.x = 152;
+   b3.y = 163;
+   boats.push( b3 );
+   my_boats.push( b3.id );
+   var b4 = new Boat( 3 );
+   b4.mine = true;
+   b4.x = 153;
+   b4.y = 163;
+   boats.push( b4 );
+   my_boats.push( b4.id );
+   var b5 = new Boat( 4 );
+   b5.mine = true;
+   b5.x = 154;
+   b5.y = 163;
+   boats.push( b5 );
+   my_boats.push( b5.id );
+   var b6 = new Boat( 5 );
+   b6.mine = true;
+   b6.x = 155;
+   b6.y = 163;
+   boats.push( b6 );
+   my_boats.push( b6.id );
 }
 
 function changeBoatMenu( new_menu )
@@ -2161,21 +2260,38 @@ function scrollDestinations( dy )
 
 function drawBoatScrollbar()
 {
-   // TODO
-
+   if (my_boats.length > 5) {
+      if (boat_scroll > 0) {
+         // Draw scroll up button
+         boat_context.fillStyle = 'rgba(145,195,255,1)';
+         boat_context.beginPath();
+         boat_context.moveTo( BOAT_SCROLLBAR_WIDTH + 5, BOAT_HEADER_HEIGHT + 25 );
+         boat_context.lineTo( BOAT_SCROLLBAR_WIDTH + 30, BOAT_HEADER_HEIGHT + 7 );
+         boat_context.lineTo( BOAT_SCROLLBAR_WIDTH + 55, BOAT_HEADER_HEIGHT + 25 );
+         boat_context.fill();
+      }
+      if (boat_scroll < my_boats.length - 5) {
+         // Draw scroll down button
+         boat_context.fillStyle = 'rgba(145,195,255,1)';
+         boat_context.beginPath();
+         boat_context.moveTo( BOAT_SCROLLBAR_WIDTH + 5, BOAT_HEIGHT - 25 );
+         boat_context.lineTo( BOAT_SCROLLBAR_WIDTH + 30, BOAT_HEIGHT - 7 );
+         boat_context.lineTo( BOAT_SCROLLBAR_WIDTH + 55, BOAT_HEIGHT - 25 );
+         boat_context.fill();
+      }
+   }
 }
 
 function drawBoatContent()
 {
    var num_boats = my_boats.length;
-   var grid_x = BOAT_SCROLLBAR_WIDTH, grid_y = BOAT_HEADER_HEIGHT + 10;
+   var grid_x = BOAT_SCROLLBAR_WIDTH, grid_y = BOAT_HEADER_HEIGHT + BOAT_SCROLLBAR_HEIGHT + 5;
    for (var i = 0; i < 5; ++i) {
       var index = i + boat_scroll;
       if (index >= num_boats) break;
 
       var b = boats[ my_boats[index] ];
-      var b_img;
-      if (b.type === 1) b_img = rowboat_sz60_img;
+      var b_img = b.getImage( 60 );
 
       if (boat_selection === index) {
          boat_context.fillStyle = "rgba(185,185,185,1)";
@@ -2192,12 +2308,14 @@ function drawBoatContent()
          boat_context.fillText(b.typename, grid_x + 85, grid_y + 50);
 
          boat_context.font = "14pt serif";
+         /*
          var dur_string = Math.ceil(b.health) + "\/" + b.maxhealth;
          var width = dur_string.width("14pt serif");
          boat_context.fillText("Dur: ", grid_x + 280, grid_y + 24);
          boat_context.fillText(dur_string, BOAT_WIDTH - (82 + width), grid_y + 24);
+         */
          var cargo_string = Math.ceil(b.cargoweight) + "\/" + b.maxcargo;
-         width = cargo_string.width("14pt serif");
+         var width = cargo_string.width("14pt serif");
          boat_context.fillText("Cargo: ", grid_x + 280, grid_y + 50);
          boat_context.fillText(cargo_string, BOAT_WIDTH - (82 + width), grid_y + 50);
 
@@ -2681,22 +2799,70 @@ function drawBoatContent()
             y = fitText( boat_context, "THE END", BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 20, '15pt arial', true );
 
          }
-      } else {
-         // TODO: Town menu
-         // Should be mostly information and some services
-         // Information:
+      } else if (boat_menu === 5) {
+         // Backdrop
+         boat_context.fillStyle = "rgba(85,205,255,1)";
+         boat_context.fillRect( BOAT_INNER_X + 5, BOAT_INNER_Y + 5, BOAT_INNER_WIDTH - 10, 300 );
+
+         var ter_type = map[boat.x][boat.y].terrain;
+         terSetColor( ter_type, boat_context );
+         boat_context.beginPath();
+         boat_context.moveTo( BOAT_INNER_X + 5, BOAT_INNER_Y + 125 );
+         boat_context.bezierCurveTo( 
+                  BOAT_INNER_X + (BOAT_INNER_WIDTH / 2), BOAT_INNER_Y + 80,
+                  BOAT_INNER_X + (BOAT_INNER_WIDTH / 2), BOAT_INNER_Y + 80,
+                  BOAT_INNER_X + BOAT_INNER_WIDTH - 5, BOAT_INNER_Y + 125 );
+         boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 5, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 5 );
+         boat_context.lineTo( BOAT_INNER_X + 5, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 5 );
+         boat_context.lineTo( BOAT_INNER_X + 5, BOAT_INNER_Y + 125 );
+         boat_context.fill();
+
          // - Town name
          boat_context.fillStyle = 'Black';
-         fitText( boat_context, "Welcome to " + places[place].name, BOAT_INNER_X, BOAT_INNER_X + BOAT_INNER_WIDTH, BOAT_INNER_Y + 6, 28, '18pt arial', true );
-         // - Size of various industries
-         // - What sort of things they need to upgrade those industries
-         // - Locations of nearby towns
-         // - Flavor stuff
-         // Possible Services:
-         // - Buy a boat (boat_menu === 6)
-         // - Rename a boat (boat_menu === 7)
-         // - Buy map (boat_menu === 8)
+         fitText( boat_context, "Welcome to " + places[place].name, BOAT_INNER_X, BOAT_INNER_X + BOAT_INNER_WIDTH, BOAT_INNER_Y + 25, 28, '22pt arial', true );
 
+         // Path
+         var town_size = places[place].size;
+
+         if (town_size <= 3)
+            boat_context.drawImage( dirt_road_img, BOAT_INNER_X + Math.floor(BOAT_INNER_WIDTH / 2) - 150, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 305 );
+         else if (town_size <= 6)
+            boat_context.drawImage( stone_road_img, BOAT_INNER_X + Math.floor(BOAT_INNER_WIDTH / 2) - 150, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 305 );
+
+
+
+         // Buildings:
+         // - Maps (6): Reveal surrounding, or location of other towns
+         // - Boats (7): Buy new boat or rename your boat
+         // - Town hall (8): information about the town- industries, population
+         // - Guild hall (9): information about what's needed for upgrades
+         if (building_hover === 6)
+            boat_context.drawImage( maps_open_img, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
+         else
+            boat_context.drawImage( maps_closed_img, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
+
+         if (building_hover === 7)
+            boat_context.drawImage( boats_open_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 200 );
+         else
+            boat_context.drawImage( boats_closed_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 200 );
+
+         if (building_hover === 8)
+            boat_context.drawImage( town_open_img, BOAT_INNER_X + 267, BOAT_INNER_Y + 110 );
+         else
+            boat_context.drawImage( town_closed_img, BOAT_INNER_X + 267, BOAT_INNER_Y + 110 );
+
+         if (building_hover === 9)
+            boat_context.drawImage( guild_open_img, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
+         else
+            boat_context.drawImage( guild_closed_img, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
+      } else if (boat_menu === 6) {
+         // TODO Maps (6): Reveal surrounding, or location of other towns
+      } else if (boat_menu === 7) {
+         // - Boats (7): Buy new boat or rename your boat
+      } else if (boat_menu === 8) {
+         // - Town hall (8): information about the town- industries, population
+      } else if (boat_menu === 9) {
+         // - Guild hall (9): information about what's needed for upgrades
       }
    }
 }
@@ -2745,6 +2911,7 @@ function drawBoats()
    clearBoats();
    drawBoatHeader();
    drawBoatContent();
+   drawBoatScrollbar();
 }
 
 // Controls
@@ -2762,11 +2929,25 @@ function onClickBoats( e )
    } 
    else if (x_pix > BOAT_SCROLLBAR_WIDTH &&
          (x_pix < BOAT_SCROLLBAR_WIDTH + 90 || (boat_menu === 1 && x_pix < BOAT_WIDTH - 80))
-         && y_pix > BOAT_HEADER_HEIGHT + 10)
+         && y_pix > BOAT_HEIGHT - BOAT_SCROLLBAR_HEIGHT)
+   { // Scroll boats down
+      if (my_boats.length - boat_scroll > 5)
+         boat_scroll++;
+   } 
+   else if (x_pix > BOAT_SCROLLBAR_WIDTH &&
+         (x_pix < BOAT_SCROLLBAR_WIDTH + 90 || (boat_menu === 1 && x_pix < BOAT_WIDTH - 80))
+         && y_pix > BOAT_HEADER_HEIGHT && y_pix <= BOAT_HEADER_HEIGHT + BOAT_SCROLLBAR_HEIGHT)
+   { // Scroll boats down
+      if (boat_scroll > 0)
+         boat_scroll--;
+   } 
+   else if (x_pix > BOAT_SCROLLBAR_WIDTH &&
+         (x_pix < BOAT_SCROLLBAR_WIDTH + 90 || (boat_menu === 1 && x_pix < BOAT_WIDTH - 80))
+         && y_pix > BOAT_HEADER_HEIGHT + BOAT_SCROLLBAR_HEIGHT)
    { // Select a boat
-      var selection = Math.floor((y_pix - (BOAT_HEADER_HEIGHT + 10) ) / 70) + boat_scroll;
+      var selection = Math.floor((y_pix - (BOAT_HEADER_HEIGHT + BOAT_SCROLLBAR_HEIGHT + 5) ) / 70) + boat_scroll;
       if (selection < my_boats.length) {
-         selectBoat( selection + boat_scroll );
+         selectBoat( selection );
          refresh();
       }
    }
@@ -2779,7 +2960,7 @@ function onClickBoats( e )
          refresh();
       }
    }
-   else if ((boat_menu === 4 || boat_menu === 5) && place === undefined) {
+   else if (boat_menu >= 4 && place === undefined) {
       // Maybe some splash effects here
    }
    else if (boat_menu === 3 || boat_menu === 4)
@@ -2975,8 +3156,45 @@ function onClickBoats( e )
 
       refresh();
    }
+   else if (boat_menu === 5) {
+      if (x_pix > BOAT_INNER_X + 20 && x_pix <= BOAT_INNER_X + 120 &&
+            y_pix > BOAT_INNER_Y + 200 && y_pix <= BOAT_INNER_Y + 390)
+         changeBoatMenu( 7 );
+      else if (x_pix > BOAT_INNER_X + 77 && x_pix <= BOAT_INNER_X + 197 &&
+            y_pix > BOAT_INNER_Y + 110 && y_pix <= BOAT_INNER_Y + 300)
+         changeBoatMenu( 6 );
+      else if (x_pix > BOAT_INNER_X + 344 && x_pix <= BOAT_INNER_X + 444 &&
+            y_pix > BOAT_INNER_Y + 200 && y_pix <= BOAT_INNER_Y + 390)
+         changeBoatMenu( 9 );
+      else if (x_pix > BOAT_INNER_X + 267 && x_pix <= BOAT_INNER_X + 387 &&
+            y_pix > BOAT_INNER_Y + 110 && y_pix <= BOAT_INNER_Y + 300)
+         changeBoatMenu( 8 );
+   }
 }
 $('#boat_canvas').click( onClickBoats ); 
+
+function onMouseMoveBoats( e ) {
+   if (boat_menu === 5) {
+      var x_pix = e.pageX - boat_canvas.offsetLeft;
+      var y_pix = e.pageY - boat_canvas.offsetTop;
+
+      if (x_pix > BOAT_INNER_X + 20 && x_pix <= BOAT_INNER_X + 120 &&
+            y_pix > BOAT_INNER_Y + 200 && y_pix <= BOAT_INNER_Y + 390)
+         building_hover = 7;
+      else if (x_pix > BOAT_INNER_X + 77 && x_pix <= BOAT_INNER_X + 197 &&
+            y_pix > BOAT_INNER_Y + 110 && y_pix <= BOAT_INNER_Y + 300)
+         building_hover = 6;
+      else if (x_pix > BOAT_INNER_X + 344 && x_pix <= BOAT_INNER_X + 444 &&
+            y_pix > BOAT_INNER_Y + 200 && y_pix <= BOAT_INNER_Y + 390)
+         building_hover = 9;
+      else if (x_pix > BOAT_INNER_X + 267 && x_pix <= BOAT_INNER_X + 387 &&
+            y_pix > BOAT_INNER_Y + 110 && y_pix <= BOAT_INNER_Y + 300)
+         building_hover = 8;
+      else
+         building_hover = 0;
+   }
+}
+$('#boat_canvas').mousemove( onMouseMoveBoats );
 
 function onMouseWheelBoats( e ) {
    var delta = 0;
@@ -4097,21 +4315,21 @@ function drawMapContents()
                if (map_zoom_level === 0) {
                   var g_x = MAP_DRAW_EDGE + ((b.x - min_x) * MAP_SQUARE_DIM);
                   var g_y = MAP_DRAW_EDGE + ((b.y - min_y) * MAP_SQUARE_DIM);
-                  map_context.drawImage( rowboat_sz45_img, g_x, g_y );
+                  map_context.drawImage( b.getImage( 45 ), g_x, g_y );
 
-                  // TODO: draw boat progress bar
+                  // draw boat progress bar
                   var progress = b.sailing_progress / b.sail_complete;
                   map_context.fillStyle = 'white';
-                  map_context.fillRect( g_x + 5, g_y + 40, 35 * progress, 2 );
+                  map_context.fillRect( g_x + 9, g_y + 40, 27 * progress, 2 );
                } else if (map_zoom_level === 1) {
                   var g_x = MAP_DRAW_EDGE + ((b.x - min_x) * MAP_SQUARE_DIM / 3);
                   var g_y = MAP_DRAW_EDGE + ((b.y - min_y) * MAP_SQUARE_DIM / 3);
-                  map_context.drawImage( rowboat_sz15_img, g_x, g_y );
+                  map_context.drawImage( b.getImage( 15 ), g_x, g_y );
 
                } else if (map_zoom_level === 2) {
                   var g_x = MAP_DRAW_EDGE + ((b.x - min_x) * MAP_SQUARE_DIM / 9);
                   var g_y = MAP_DRAW_EDGE + ((b.y - min_y) * MAP_SQUARE_DIM / 9);
-                  map_context.drawImage( boat_1_sz5_img, g_x, g_y );
+                  map_context.drawImage( b.getImage( 5 ), g_x, g_y );
 
                }
             }
@@ -4353,7 +4571,7 @@ function start() {
    updateVision();
    refresh();
 
-   setInterval(update, 100); // .1 sec
+   setInterval(update, 50); // .1 sec
 }
 
 // Load images
@@ -4374,6 +4592,19 @@ function loadImage( img, src ) {
 
 loadImage( oldman_img, 'OldMan.png' );
 
+loadImage( maps_closed_img, 'MapStoreClosed.png' );
+loadImage( maps_open_img, 'MapStoreOpen.png' );
+loadImage( boats_closed_img, 'BoatStoreClosed.png' );
+loadImage( boats_open_img, 'BoatStoreOpen.png' );
+loadImage( town_closed_img, 'TownStoreClosed.png' );
+loadImage( town_open_img, 'TownStoreOpen.png' );
+loadImage( guild_closed_img, 'GuildStoreClosed.png' );
+loadImage( guild_open_img, 'GuildStoreOpen.png' );
+
+loadImage( dirt_road_img, 'DirtPath.png' );
+loadImage( stone_road_img, 'StonePath.png' );
+//loadImage( paved_road_img, 'PavedPath.png' );
+
 loadImage( boat_1_sz5_img, 'Boat_image_1_5px.png' );
 loadImage( boat_2_sz5_img, 'Boat_image_2_5px.png' );
 loadImage( boat_3_sz5_img, 'Boat_image_3_5px.png' );
@@ -4381,8 +4612,22 @@ loadImage( boat_4_sz5_img, 'Boat_image_4_5px.png' );
 
 loadImage( rowboat_sz15_img, 'Rowboat_15px.png' );
 loadImage( rowboat_sz45_img, 'Rowboat_45px.png' );
-
 loadImage( rowboat_sz60_img, 'Rowboat_60px.png' );
+loadImage( canoe_sz15_img, 'Canoe_15px.png' );
+loadImage( canoe_sz45_img, 'Canoe_45px.png' );
+loadImage( canoe_sz60_img, 'Canoe_60px.png' );
+loadImage( sailboat_sz15_img, 'Sailboat_15px.png' );
+loadImage( sailboat_sz45_img, 'Sailboat_45px.png' );
+loadImage( sailboat_sz60_img, 'Sailboat_60px.png' );
+loadImage( yacht_sz15_img, 'Yacht_15px.png' );
+loadImage( yacht_sz45_img, 'Yacht_45px.png' );
+loadImage( yacht_sz60_img, 'Yacht_60px.png' );
+loadImage( schooner_sz15_img, 'Schooner_15px.png' );
+loadImage( schooner_sz45_img, 'Schooner_45px.png' );
+loadImage( schooner_sz60_img, 'Schooner_60px.png' );
+loadImage( galleon_sz15_img, 'Galleon_15px.png' );
+loadImage( galleon_sz45_img, 'Galleon_45px.png' );
+loadImage( galleon_sz60_img, 'Galleon_60px.png' );
 
 loadImage( west_arrow_img, 'NavArrow.png' );
 loadImage( west_arrow_selected_img, 'NavArrowSelected.png' );
