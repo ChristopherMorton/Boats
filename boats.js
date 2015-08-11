@@ -6,7 +6,13 @@ var LOG = $( "#log" );
 // Data ---
 
 // Images 
+var backarrow_img = new Image();
+
 var oldman_img = new Image();
+var mapman_img = new Image();
+var boatman_img = new Image();
+var townman_img = new Image();
+var guildlady_img = new Image();
 
 var maps_closed_img = new Image();
 var maps_open_img = new Image();
@@ -228,11 +234,11 @@ var cargo_index = {
       desc:"pretty much the best metal you could ask for", weight:12 },
    // Usable Resources
    stonetools: { name:'stone tools', image:stonetools_img, price:24, novelty:2.8,
-      desc:'hammers and axes and the like', weight:7 },
+      desc:'hammers and axes and stuff', weight:7 },
    bronzetools: { name:'bronze tools', image:bananas_img, price:45, novelty:3.5,
-      desc:'fancy stuff like sickles', weight:6 },
+      desc:'useful stuff like sickles', weight:6 },
    irontools: { name:'iron tools', image:bananas_img, price:85, novelty:3.7,
-      desc:'better than bronze (?)', weight:8 },
+      desc:'just super useful stuff', weight:8 },
    // Crafted Items
    chairs: { name:'chairs', image:bananas_img, price:80, novelty:2.8,
       desc:"for sitting", weight:24 },
@@ -267,6 +273,35 @@ var big_animal_list = [ 'cows', 'pigs', 'seals', 'sheep' ];
 //var farming_list = 
 //[ 'apples', 'bananas', 'berries', 'coconuts', 'lemons', 'limes', 'mangoes', 'passionfruit', 'peaches', 'pineapples', 'carrots', 'corn', 'eggplants', 'onions', 'peanuts', 'peppers', 'potatoes', 'rice', 'tomatoes', 'wheat', 'fish', 'chickens', 'cows', 'crabs', 'ducks', 'monkeys', 'penguins', 'pigs', 'seals', 'sheep', 'turkeys', 'turtles', 'burlap', 'cotton', 'silk' ];
 var mining_list = [ 'stone', 'pavingstone', 'granite', 'obsidian', 'coal', 'copper', 'tin', 'iron' ];
+
+// Upgrade lists
+var farming_upgrade_list = [ { stonetools: 2 },
+                             { bronzetools: 2 },
+                             { irontools: 2 } ];
+var mining_upgrade_list = [ { stonetools: 7 },
+                            { bronzetools: 7 },
+                            { irontools: 7 } ];
+var woodcraft_upgrade_list = [ { hardwood: 10, stonetools: 5 },
+                               { hardwood: 10, stonetools: 10 },
+                               { hardwood: 15, stonetools: 10 },
+                               { hardwood: 20, stonetools: 10 } ];
+var stonecraft_upgrade_list = [ { stone: 10 },
+                                { stone: 20, stonetools: 2 },
+                                { stone: 30, obsidian: 2 },
+                                { stone: 40, irontools: 2, coal: 10 } ];
+var metalcraft_upgrade_list = [ { copper: 6, tin: 6 },
+                                { bronze: 6 },
+                                { iron: 6 },
+                                { iron: 26 } ];
+var weaving_upgrade_list = [ { burlap: 5 },
+                             { cotton: 5 },
+                             { wool: 5 },
+                             { silk: 5 } ];
+var boatcraft_upgrade_list = [ { hardwood: 5 },
+                               { hardwood: 15, burlap: 10, stonetools: 3 },
+                               { hardwood: 30, iron: 5, burlap: 20, bronzetools: 5 },
+                               { hardwood: 40, steel: 10, irontools: 8 },
+                               { hardwood: 120, iron: 40, burlap: 80, irontools: 28} ];
 
 // Places
 var places = [];
@@ -341,6 +376,10 @@ var text_box_selection = '';
 
 var quest_status = 0;
 var quest_goals = [ 'q0', 'q1', 'q2', 'q3', 'q4' ];
+
+var LOCAL_MAP_PRICE = 30;
+var FOREIGN_MAP_PRICE = 60;
+var DEFAULT_MAP_RADIUS = 11;
 
 /////////////////////////////////////////////////////////////////////
 // Misc ---
@@ -757,7 +796,7 @@ function Place( type, name )
       this.color = "rgba(255,55,55,1)";
 
       this.update_tick = 0;
-      this.upgrade_frequency = 500; // # of ticks
+      this.upgrade_frequency = 475 + Math.round( Math.random() * 50 ); // # of ticks
       this.resources = {};
       this.industries = {
          // Pure resource gen
@@ -774,6 +813,9 @@ function Place( type, name )
       this.stock_selected = '';
       this.industry_randomizer1 = Math.random();
       this.industry_randomizer2 = Math.random();
+      this.population = 5;
+
+      this.connected_towns = [];
    }
 }
 
@@ -1074,11 +1116,12 @@ function growTown( town, inland )
    for (var res in town.resources) {
       if ($.inArray(res, animal_list ) === -1) { // SKIP non-animals - they are not resources
          if ($.inArray (res, food_list ) !== -1)
-            town.resources[res] += 3; // Add lots to food
+            town.resources[res] += 2; // Add more to food
          else
             town.resources[res]++;
       }
    }
+   town.linkTowns();
    return true;
 }
 
@@ -1115,29 +1158,64 @@ Place.prototype.getPrice = function( cargo_id )
    // 2- Multiply by a factor of novelty based on how many you have
    // 3- Multiply by 1.5 if it's the last thing needed for an upgrade
    var price = cargo_index[ cargo_id ].price;
-   if (this.stock[ cargo_id ] === undefined || this.stock[ cargo_id ] < 15) {
-      var count = this.stock[ cargo_id ] || 0;
-
+   var count = this.stock[ cargo_id ] || 0;
+   if (count < 15) {
       // TODO: Fancier math?
       // Linear version
       var multiplier = 1 + (((15 - count) / 15) * (cargo_index[ cargo_id ].novelty - 1));
 
       price *= multiplier;
    }
-   // TODO: Check if needed for upgrade
-   return price;
+   // Check if needed for upgrade
+   if ( farming_upgrade_list[ this.industries.farming ][ cargo_id ] != undefined ) price *= 1.1;
+   if ( mining_upgrade_list[ this.industries.mining ][ cargo_id ] != undefined ) price *= 1.1;
+   if ( woodcraft_upgrade_list[ this.industries.woodcraft ][ cargo_id ] != undefined ) price *= 1.1;
+   if ( stonecraft_upgrade_list[ this.industries.stonecraft ][ cargo_id ] != undefined ) price *= 1.1;
+   if ( metalcraft_upgrade_list[ this.industries.metalcraft ][ cargo_id ] != undefined ) price *= 1.1;
+   if ( weaving_upgrade_list[ this.industries.weaving ][ cargo_id ] != undefined ) price *= 1.1;
+   if ( boatcraft_upgrade_list[ this.industries.boatcraft ][ cargo_id ] != undefined ) price *= 1.1;
+
+   return Math.floor( price );
 }
 
-Place.prototype.attemptEat = function( food_target ) {
-   // First check if we have enough
+Place.prototype.linkTowns = function() {
+   var link_radius = 24 + (6 * this.size);
+
+   var found = {};
+   for (var x = Math.max(0,this.x-link_radius); x < Math.min(MAP_WIDTH,this.x+link_radius); ++x) {
+      for (var y = Math.max(0,this.y-link_radius); y < Math.min(MAP_WIDTH,this.y+link_radius); ++y) {
+         if (map[x][y].place && map[x][y].place != this.id) {
+            var p = places[map[x][y].place];
+            var dist_sq = ((p.x - this.x) * (p.x - this.x)) + ((p.y - this.y) * (p.y - this.y));
+            if (dist_sq <= link_radius * link_radius)
+               found[p.id] = true;
+         }
+      }
+   }
+
+   this.connected_towns = [];
+   for (var t in found) {
+      if (t > 0)
+         this.connected_towns.push( t );
+   }
+   this.connected_towns = this.connected_towns.slice(0, 6);
+}
+
+Place.prototype.sumFood = function() {
    var total = 0;
    for( var stock in this.stock ) {
       if ($.inArray( stock, animal_list ) !== -1 ||
           $.inArray( stock, food_list ) !== -1)
          total += (cargo_index[ stock ].foodvalue * this.stock[ stock ]);
    }
+   return total;
+}
 
-   if (total < food_target) return false; // Starvation
+Place.prototype.attemptEat = function( food_target ) {
+   // First check if we have enough
+   var total = this.sumFood();
+
+   if (total < food_target) return false; // Didn't work
 
    for( var stock in this.stock ) {
       if (food_target <= 0) break;
@@ -1254,7 +1332,7 @@ Place.prototype.upgrade = function() {
    // Strategy:
    // 1- Gather resources
    // 1.2- Resource loss
-   // 1.5- Eat food, if not enough food then NO UPGRADE FOR YOU
+   // 1.5- Eat food, if not enough food then drop pop otherwise grow it
    // 2- Craft resources
    // 3- Attempt to upgrade industries
    // 4- Attempt to grow the town
@@ -1277,16 +1355,30 @@ Place.prototype.upgrade = function() {
          var gain = Math.floor( Math.pow( this.stock[stock] * Math.random(), breed_power ) );
          // TODO: Calculate more e.g. Population bounds
          this.stock[stock] += gain;
+      } else if ($.inArray( stock, food_list ) !== -1) {
+         // This stuff gets eaten so whatever
+
+      } else {
+         // Random loss
+         var size_factor = 0.2 + (0.04 * this.size)
+         var loss = 0.8 - (Math.random() * size_factor);
+         this.stock[stock] = Math.ceil( this.stock[stock] * loss );
       }
-      // Random loss
-      var size_factor = 0.04 * this.size;
-      var loss = (Math.random() * size_factor) + 0.9 - size_factor;
-      this.stock[stock] = Math.ceil( this.stock[stock] * loss );
    }
 
    // 1.5- Eat
-   if (this.attemptEat( Math.round( Math.pow(this.size, 1.5) * 50 )) === false)
-      return;
+   var food_value = this.sumFood();
+   var pop_requirements = this.population * 9;
+   if (food_value >= pop_requirements) {
+      this.attemptEat( pop_requirements );
+      this.population += 3;
+   } else if (food_value >= pop_requirements * 2 / 3) {
+      this.attemptEat( pop_requirements * 2 / 3 );
+      this.population -= 2;
+   } else {
+      this.attemptEat( pop_requirements / 3 );
+      this.population = Math.round( this.population * 0.8 );
+   }
 
    // 2- Craft
    // TODO: More?
@@ -1339,7 +1431,7 @@ Place.prototype.upgrade = function() {
          this.stock.pavingstone += craft_count;
       }
       // Obsidian figurines
-      if (this.stock.obsidian && this.industries.stonecraft > 3) {
+      if (this.stock.obsidian && this.industries.stonecraft > 2) {
          craft_count = Math.floor( this.stock.obsidian / 4 );
          if (craft_count > this.industries.stonecraft)
             craft_count = this.industries.stonecraft;
@@ -1360,7 +1452,7 @@ Place.prototype.upgrade = function() {
          this.stock.bronze += 2 * craft_count;
       }
       // Smelt steel
-      if (this.stock.iron && this.stock.coal && this.industries.metalcraft > 4) {
+      if (this.stock.iron && this.stock.coal && this.industries.metalcraft > 3) {
          craft_count = Math.floor( Math.min( this.stock.iron / 2, this.stock.coal ) / 4 );
          if (craft_count > this.industries.metalcraft)
             craft_count = this.industries.metalcraft;
@@ -1414,7 +1506,7 @@ Place.prototype.upgrade = function() {
          }
       }
       // Pillows wool/cotton outside, down filling
-      if ((this.stock.wool || this.stock.cotton) && this.industries.weaving > 1) {
+      if ((this.stock.wool || this.stock.cotton) && this.industries.weaving > 2) {
          craft_count = Math.min( Math.floor( (this.stock.wool + this.stock.cotton) / 4 ),
             Math.floor( (this.stock.chickens + this.stock.ducks + this.stock.penguins) / 8 ) );
          if (craft_count > this.industries.weaving)
@@ -1441,7 +1533,7 @@ Place.prototype.upgrade = function() {
          }
       }
       // Fancy Clothing
-      if (this.stock.silk && this.industries.weaving > 2) {
+      if (this.stock.silk && this.industries.weaving > 3) {
          craft_count = Math.floor( this.stock.silk / 4 );
          if (craft_count > this.industries.weaving)
             craft_count = this.industries.weaving;
@@ -1463,181 +1555,193 @@ Place.prototype.upgrade = function() {
 
 Place.prototype.upgradeFarming = function()
 {
-   for (var res in resources) {
+   for (var res in this.resources) {
       if ($.inArray( res, food_list ) !== -1)
-         resources[res] += 2;
+         this.resources[res] += 2;
    }
+   this.industries.farming++;
 }
 
 Place.prototype.upgradeMining = function()
 {
-   for (var res in resources) {
+   for (var res in this.resources) {
       if ($.inArray( res, mining_list ) !== -1)
-         resources[res] += 2;
+         this.resources[res] += 2;
    }
+   this.industries.mining++;
 }
 
 Place.prototype.upgradeWoodcraft = function()
 {
-   for (var res in resources) {
+   for (var res in this.resources) {
       if (res === 'hardwood' || res === 'softwood')
-         resources[res] += 2;
+         this.resources[res] += 2;
    }
+   this.industries.woodcraft++;
 }
 
 Place.prototype.upgradeStonecraft = function()
 {
-   for (var res in resources) {
+   for (var res in this.resources) {
       if (res === 'stone' || res === 'granite' || res === 'obsidian' || res === 'coal')
-         resources[res]++;
+         this.resources[res]++;
    }
+   this.industries.stonecraft++;
 }
 
 Place.prototype.upgradeMetalcraft = function()
 {
-   for (var res in resources) {
+   for (var res in this.resources) {
       if (res === 'copper' || res === 'tin' || res === 'iron')
-         resources[res]++;
+         this.resources[res]++;
    }
+   this.industries.metalcraft++;
 }
 
 Place.prototype.upgradeWeaving = function()
 {
-   for (var res in resources) {
+   for (var res in this.resources) {
       if (res === 'burlap' || res === 'cotton' || res === 'silk' || res === 'sheep')
-         resources[res] += 2;
+         this.resources[res] += 2;
    }
+   this.industries.weaving++;
 }
 
 Place.prototype.attemptUpgrades = function() {
-   // TODO
-   /* Industies:
-         farming
-         mining
-         woodcraft
-         stonecraft
-         metalcraft
-         weaving
-         boatcraft
-         */
-
-   // Farming - mostly you need better tools I guess
-   if (this.farming === 0) {
-      var tools = (this.stock.stonetools || 0) + (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
-      if (tools > 1) {
-         tools = 2;
-         while( tools > 0 ) {
-            if (this.stock.stonetools && this.stock.stonetools > 0) this.stock.stonetools--;
-            else if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
-            else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
-            tools--;
-         }
-         this.upgradeFarming();
+   // Farming
+   var reqs = farming_upgrade_list[this.industries.farming];
+   if (reqs) {
+      var up = true;
+      for (var req in reqs) {
+         if ((!this.stock[req]) || this.stock[req] < reqs[req])
+            up = false;
       }
-   } else if (this.farming === 1) {
-      var tools = (this.stock.stonetools || 0) + (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
-      if (tools > 8) {
-         tools = 9;
-         while( tools > 0 ) {
-            if (this.stock.stonetools && this.stock.stonetools > 0) this.stock.stonetools--;
-            else if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
-            else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
-            tools--;
-         }
-         this.upgradeFarming();
-      }
-   } else if (this.farming === 2) {
-      var tools = (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
-      if (tools > 4) {
-         tools = 5;
-         while( tools > 0 ) {
-            if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
-            else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
-            tools--;
-         }
-         this.upgradeFarming();
-      }
-   } else if (this.farming === 3) {
-      var tools = (this.stock.irontools || 0);
-      if (tools > 4) {
-         this.stock.irontools -= 5;
-         this.upgradeFarming();
-      }
-   } else if (this.farming === 4) {
-      var tools = (this.stock.irontools || 0);
-      if (tools > 29) {
-         this.stock.irontools -= 30;
+      if (up) {
+         for (var req in reqs)
+            this.stock[req] -= reqs[req];
          this.upgradeFarming();
       }
    }
-
-   // TODO: Mining
-   // TODO: woodcraft
-   // TODO: stonecraft
-   if (this.stonecraft === 0) {
-      if (this.stock.stone && this.stock.stone > 11) {
-         this.stock.stone -= 12;
-         this.upgradeStonecraft();
+   // Mining
+   var reqs = mining_upgrade_list[this.industries.mining];
+   if (reqs) {
+      var up = true;
+      for (var req in reqs) {
+         if ((!this.stock[req]) || this.stock[req] < reqs[req])
+            up = false;
       }
-   } else if (this.stonecraft === 1) {
-      if (this.stock.stone && this.stock.stone > 19
-         && this.stock.stonetools && this.stock.stonetools > 3) {
-         this.stock.stone -= 20;
-         this.stock.stonetools -= 4;
+      if (up) {
+         for (var req in reqs)
+            this.stock[req] -= reqs[req];
+         this.upgradeMining();
+      }
+   }
+   // Woodcraft
+   var reqs = woodcraft_upgrade_list[this.industries.woodcraft];
+   if (reqs) {
+      var up = true;
+      for (var req in reqs) {
+         if ((!this.stock[req]) || this.stock[req] < reqs[req])
+            up = false;
+      }
+      if (up) {
+         for (var req in reqs)
+            this.stock[req] -= reqs[req];
+         this.upgradeWoodcraft();
+      }
+   }
+   // Stonecraft
+   var reqs = stonecraft_upgrade_list[this.industries.stonecraft];
+   if (reqs) {
+      var up = true;
+      for (var req in reqs) {
+         if ((!this.stock[req]) || this.stock[req] < reqs[req])
+            up = false;
+      }
+      if (up) {
+         for (var req in reqs)
+            this.stock[req] -= reqs[req];
          this.upgradeStonecraft();
       }
    }
-   // TODO: metalcraft
-   // TODO: weaving
-   // TODO: boatcraft
+   // Metalcraft
+   var reqs = metalcraft_upgrade_list[this.industries.metalcraft];
+   if (reqs) {
+      var up = true;
+      for (var req in reqs) {
+         if ((!this.stock[req]) || this.stock[req] < reqs[req])
+            up = false;
+      }
+      if (up) {
+         for (var req in reqs)
+            this.stock[req] -= reqs[req];
+         this.upgradeMetalcraft();
+      }
+   }
+   // Weaving
+   var reqs = weaving_upgrade_list[this.industries.weaving];
+   if (reqs) {
+      var up = true;
+      for (var req in reqs) {
+         if ((!this.stock[req]) || this.stock[req] < reqs[req])
+            up = false;
+      }
+      if (up) {
+         for (var req in reqs)
+            this.stock[req] -= reqs[req];
+         this.upgradeWeaving();
+      }
+   }
+   // Boatcraft
+   var reqs = boatcraft_upgrade_list[this.industries.boatcraft];
+   if (reqs) {
+      var up = true;
+      for (var req in reqs) {
+         if ((!this.stock[req]) || this.stock[req] < reqs[req])
+            up = false;
+      }
+      if (up) {
+         for (var req in reqs)
+            this.stock[req] -= reqs[req];
+         this.boatcraft++;
+      }
+   }
+
 }
 
 Place.prototype.attemptGrowth = function() {
    if (this.size < 4) {
-      // Only need sufficient food
-      var food_req = (this.size * 400) + 200;
+      // Only need sufficient population
+      var pop_req = this.size * 20;
 
-      if (this.attemptEat( food_req ) === true) {
+      if (this.population >= pop_req) {
          growTown( this, true );
          return true;
       }
    } else if (this.size < 7) {
-      // Need tools and decent clothing
-      var food_req = (this.size * 450) + 300;
+      // Need decent clothing
+      var pop_req = this.size * 20;
       var tool_req = (this.size * 4) + 8;
       var clothing_req = (this.size * 6) + 5;
-
-      var tools = (this.stock.stonetools || 0) + (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
-      if (tools >= tool_req &&
-          (this.stock.pants || 0) >= clothing_req && 
+      if ((this.stock.pants || 0) >= clothing_req && 
           (this.stock.shirts || 0) >= clothing_req && 
           (this.stock.dresses || 0) >= clothing_req) {
-         if (this.attemptEat( food_req ) === true) {
+         if (this.population >= pop_req) {
             this.stock.pants -= clothing_req;
             this.stock.shirts -= clothing_req;
             this.stock.dresses -= clothing_req;
-            tools = tool_req;
-            while( tools > 0 ) {
-               if (this.stock.stonetools && this.stock.stonetools > 0) this.stock.stonetools--;
-               else if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
-               else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
-               tools--;
-            }
             growTown( this, true );
             return true;
          }
       }
    } else if (this.size < 10) {
-      // Need paving stone, furniture, and better tools
-      var food_req = (this.size * 500) + 300;
-      var tool_req = (this.size * 4) + 3;
+      // Need paving stone, furniture
+      var pop_req = this.size * 20;
       var clothing_req = (this.size * 7) + 5;
       var paving_req = (this.size * 15) + 40;
       var furniture_req = (this.size * 2) + 2;
 
-      var tools = (this.stock.bronzetools || 0) + (this.stock.irontools || 0);
-      if (tools >= tool_req &&
-          (this.stock.pants || 0) >= clothing_req && 
+      if ((this.stock.pants || 0) >= clothing_req && 
           (this.stock.shirts || 0) >= clothing_req && 
           (this.stock.dresses || 0) >= clothing_req &&
           (this.stock.pavingstone || 0) >= paving_req &&
@@ -1646,7 +1750,7 @@ Place.prototype.attemptGrowth = function() {
           (this.stock.desks || 0) >= furniture_req && 
           (this.stock.pillows || 0) >= (furniture_req * 2) && 
           (this.stock.beds || 0) >= furniture_req) {
-         if (this.attemptEat( food_req ) === true) {
+         if (this.population >= pop_req) {
             this.stock.desks -= furniture_req;
             this.stock.beds -= furniture_req;
             this.stock.tables -= 2 * furniture_req;
@@ -1655,26 +1759,18 @@ Place.prototype.attemptGrowth = function() {
             this.stock.pants -= clothing_req;
             this.stock.shirts -= clothing_req;
             this.stock.dresses -= clothing_req;
-            tools = tool_req;
-            while( tools > 0 ) {
-               if (this.stock.bronzetools && this.stock.bronzetools > 0) this.stock.bronzetools--;
-               else if (this.stock.irontools && this.stock.irontools > 0) this.stock.irontools--;
-               tools--;
-            }
             growTown( this, true );
             return true;
          }
       }
    } else {
-      // Need the best tools and fancy clothing
-      var food_req = (this.size * 500) + 400;
-      var tool_req = (this.size * 5) + 2;
+      // Need the fanciest clothing
+      var pop_req = this.size * 20;
       var clothing_req = (this.size * 8) + 4;
       var paving_req = (this.size * 15) + 40;
       var furniture_req = (this.size * 2) + 2;
 
-      if ((this.stock.irontools || 0) >= tool_req &&
-          (this.stock.fancyshirts || 0) >= clothing_req && 
+      if ((this.stock.fancyshirts || 0) >= clothing_req && 
           (this.stock.fancydresses || 0) >= clothing_req &&
           (this.stock.pavingstone || 0) >= paving_req &&
           (this.stock.chairs || 0) >= (furniture_req * 4) && 
@@ -1682,7 +1778,7 @@ Place.prototype.attemptGrowth = function() {
           (this.stock.desks || 0) >= furniture_req && 
           (this.stock.pillows || 0) >= (furniture_req * 4) && 
           (this.stock.beds || 0) >= furniture_req) {
-         if (this.attemptEat( food_req ) === true) {
+         if (this.population >= pop_req) {
             this.stock.desks -= furniture_req;
             this.stock.beds -= furniture_req;
             this.stock.tables -= 2 * furniture_req;
@@ -1691,7 +1787,6 @@ Place.prototype.attemptGrowth = function() {
             this.stock.pants -= clothing_req;
             this.stock.shirts -= clothing_req;
             this.stock.dresses -= clothing_req;
-            this.stock.irontools -= tool_req;
             growTown( this, true );
             return true;
          }
@@ -1720,6 +1815,7 @@ function updatePlaces()
 
 function genBoatName()
 {
+   // TODO
    return "Mini boatster";
 }
 
@@ -1889,11 +1985,13 @@ Boat.prototype.calculateBlindJourney = function()
 
 Boat.prototype.decideNext = function ()
 {
+   // 0 = sail direction; 1 = explore island; 2 = journey; 3 = blind journey; 4 = sail error
    if (this.sail_style === -1)
       this.next_direction = -1;
    else if (this.sail_style === 0 || this.sail_style === 1 || this.sail_style === 3) { 
       if (this.sail_style === 3) {
          if (this.x === this.journey_path[0][0] && this.y === this.journey_path[0][1]) {
+            // Destination
             this.sail_style = -1;
             this.next_direction = -1;
             this.direction = -1;
@@ -1902,6 +2000,7 @@ Boat.prototype.decideNext = function ()
          }
 
          this.direction = getDirection( this.x, this.y, this.journey_path[0][0], this.journey_path[0][1]);
+         // TODO: This doesn't work, it gets stuck on islands
       }
 
       if (this.direction === -1) {
@@ -2127,6 +2226,7 @@ function selectBoat( selection )
    if (selection < 0) selection = 0;
    boat_selection = selection;
    initDestinations();
+   if (boat_menu > 5) boat_menu = 5;
 }
 
 function updateBoats()
@@ -2316,7 +2416,7 @@ function drawBoatContent()
          */
          var cargo_string = Math.ceil(b.cargoweight) + "\/" + b.maxcargo;
          var width = cargo_string.width("14pt serif");
-         boat_context.fillText("Cargo: ", grid_x + 280, grid_y + 50);
+         boat_context.fillText("Cargo: ", grid_x + 330, grid_y + 24);
          boat_context.fillText(cargo_string, BOAT_WIDTH - (82 + width), grid_y + 50);
 
          // Goto Button
@@ -2450,6 +2550,7 @@ function drawBoatContent()
 
             boat_context.fillStyle = 'black';
             if (boat_menu === 3) {
+               // TODO: Give coins/cargo(?) to other boats in the same place
                if (place !== undefined && place !== 0 && selection !== 'coins') {
                   var sell_price = Math.round( places[place].getPrice( selection ) );
                   var sell_str = 'Sell (' + sell_price + ')';
@@ -2856,13 +2957,99 @@ function drawBoatContent()
          else
             boat_context.drawImage( guild_closed_img, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
       } else if (boat_menu === 6) {
-         // TODO Maps (6): Reveal surrounding, or location of other towns
+         // Maps (6): Reveal surrounding, or location of other towns
+
+         // Back button
+         boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
+
+         // Draw map man
+         boat_context.drawImage( mapman_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 80 );
+
+         // Text
+         boat_context.fillStyle = "black";
+         var town_text = "You want maps? I have maps!";
+         var y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, BOAT_INNER_Y + 30, 18, '13pt arial', true);
+         town_text = "This is great nobody ever wants maps.";
+         y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 20, 18, '13pt arial', true);
+         town_text = "Okay, so I've got pretty good maps of these places:";
+         y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 20, 18, '13pt arial', true);
+         
+         // Reveal surrounding area
+         y = BOAT_INNER_Y + 170;
+         boat_context.fillStyle = "rgba(55,55,55,1)";
+         boat_context.fillRect( BOAT_INNER_X + 210, y, BOAT_INNER_WIDTH - 230, 27 );
+         boat_context.fillStyle = "white";
+         boat_context.fillRect( BOAT_INNER_X + 212, y + 2, BOAT_INNER_WIDTH - 234, 23 );
+         boat_context.fillStyle = "black";
+         town_text = places[place].name + " (" + LOCAL_MAP_PRICE + ")";
+         fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y, 20, '13pt arial', true);
+
+         // TODO: Reveal connected towns
+         for (var t = 0; t < places[place].connected_towns.length; ++t) {
+
+            var town = places[ places[place].connected_towns[t] ];
+
+            y += 30;
+            boat_context.fillStyle = "rgba(55,55,55,1)";
+            boat_context.fillRect( BOAT_INNER_X + 210, y, BOAT_INNER_WIDTH - 230, 27 );
+            boat_context.fillStyle = "white";
+            boat_context.fillRect( BOAT_INNER_X + 212, y + 2, BOAT_INNER_WIDTH - 234, 23 );
+            boat_context.fillStyle = "black";
+            town_text = town.name + " (" + FOREIGN_MAP_PRICE + ")";
+            fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y, 20, '13pt arial', true);
+         }
+
+         // Buttons
       } else if (boat_menu === 7) {
-         // - Boats (7): Buy new boat or rename your boat
+         // TODO Boats (7): Buy new boat or rename your boat
+
+         // Back button
+         boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
+
+         // Draw boat man
+         boat_context.drawImage( boatman_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 120 );
+
+         // Boats for sale
+         
+         // Rename boat
       } else if (boat_menu === 8) {
-         // - Town hall (8): information about the town- industries, population
+         // TODO Town hall (8): information about the town- industries, population
+
+         // Back button
+         boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
+
+         // Draw town man
+         boat_context.drawImage( townman_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 120 );
+
+         // Town info
+         boat_context.fillStyle = "black";
+         var town_text = "You want to know about " + places[place].name + "?";
+         var y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, BOAT_INNER_Y + 80, 18, '13pt arial', true);
+         if (places[place].industry_randomizer1 < 0.333)
+            town_text = "It's difficult to get across a true sense of our town using mere words, but we do have some cold hard stats:";
+         else if (places[place].industry_randomizer1 < 0.677)
+            town_text = "I'm pretty clueless about that stuff, but my secretary made this cheat sheet for me:"
+         else
+            town_text = "That's no problem. Please feel free to access the town files. Well, really just the one file:";
+         y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
+
+         // Info
+         boat_context.fillStyle = "rgba(55,55,55,1)";
+         boat_context.fillRect( BOAT_INNER_X + 210, y + 20, BOAT_INNER_WIDTH - 230, 140 );
+         boat_context.fillStyle = "white";
+         boat_context.fillRect( BOAT_INNER_X + 212, y + 22, BOAT_INNER_WIDTH - 234, 136 );
+         boat_context.fillStyle = "black";
+         town_text = "Population: " + places[place].population;
+         y = fitText( boat_context, town_text, BOAT_INNER_X + 210, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 20, 18, '13pt arial', true);
+
       } else if (boat_menu === 9) {
-         // - Guild hall (9): information about what's needed for upgrades
+         // TODO Guild hall (9): information about what's needed for upgrades
+
+         // Back button
+         boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
+
+         // Draw guild lady
+         boat_context.drawImage( guildlady_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 120 );
       }
    }
 }
@@ -3170,6 +3357,35 @@ function onClickBoats( e )
             y_pix > BOAT_INNER_Y + 110 && y_pix <= BOAT_INNER_Y + 300)
          changeBoatMenu( 8 );
    }
+   else if (boat_menu >= 6 
+         && x_pix >= BOAT_INNER_X + 20 && x_pix <= BOAT_INNER_X + 70
+         && y_pix >= BOAT_INNER_Y + 20 && y_pix <= BOAT_INNER_Y + 70) {
+      changeBoatMenu( 5 );
+   }
+   else if (boat_menu === 6) {
+      // Maps
+      if (x_pix > BOAT_INNER_X + 220 && x_pix <= BOAT_INNER_X + BOAT_INNER_WIDTH - 20) {
+         var boat = boats[ my_boats[boat_selection] ];
+         var place = map[boat.x][boat.y].place;
+         var y = BOAT_INNER_Y + 170;
+         if (y_pix > y && y_pix <= y + 27) {
+            if (boat.cargo.coins >= LOCAL_MAP_PRICE) {
+               boat.cargo.coins -= LOCAL_MAP_PRICE;
+               revealArea( places[place].x, places[place].y );
+            }
+         }
+         for (var t = 0; t < places[place].connected_towns.length; ++t) {
+            var town = places[ places[place].connected_towns[t] ];
+            y += 30;
+            if (y_pix > y && y_pix <= y + 27) {
+               if (boat.cargo.coins >= FOREIGN_MAP_PRICE) {
+                  boat.cargo.coins -= FOREIGN_MAP_PRICE;
+                  revealArea( town.x, town.y );
+               }
+            }
+         }
+      }
+   }
 }
 $('#boat_canvas').click( onClickBoats ); 
 
@@ -3259,7 +3475,7 @@ function moveMap( x_cent, y_cent, zoom )
    if (x_cent >= MAP_WIDTH) x_cent = MAP_WIDTH - 1;
    if (y_cent >= MAP_HEIGHT) y_cent = MAP_HEIGHT - 1;
    if (zoom < 0) zoom = 0;
-   if (zoom > 4) zoom = 4;
+   if (zoom > 3) zoom = 3;
 
    map_center_x = x_cent;
    map_center_y = y_cent;
@@ -3281,6 +3497,24 @@ function findSelectedBoat()
    var b = boats[ my_boats[boat_selection] ];
    if (b !== undefined)
       moveMap( b.x, b.y, map_zoom_level );
+}
+
+function revealArea( x_mid, y_mid, r )
+{
+   var radius = r || DEFAULT_MAP_RADIUS;
+
+   for (var x = Math.max(0,x_mid-radius); x <= Math.min(MAP_WIDTH,x_mid+radius); ++x) {
+      for (var y = Math.max(0,y_mid-radius); y <= Math.min(MAP_WIDTH,y_mid+radius); ++y) {
+         var dist_sq = ((x_mid - x) * (x_mid - x)) + ((y_mid - y) * (y_mid - y));
+         if (dist_sq < radius * radius) {
+            map[x][y].discovered = true;
+            if (map[x][y].place)
+               places[map[x][y].place].discovered = true;
+         }
+      }
+   }
+
+   moveMap( x_mid, y_mid, map_zoom_level );
 }
 
 function addBoatVision( x, y )
@@ -4039,6 +4273,14 @@ function generateMap()
          map[x][y].discovered = false;
       }
    }
+
+   for (var t = 1; t < places.length; ++t) {
+      places[t].linkTowns();
+   }
+   
+   for (var repeat = 0; repeat < 5000; ++repeat) {
+      updatePlaces();
+   }
 }
 
 // Draw --
@@ -4161,9 +4403,9 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
                drawPlace( loc.place, grid_x, grid_y, MAP_SQUARE_DIM );
          } else {
             drawTerrain( loc.terrain, grid_x, grid_y, MAP_SQUARE_DIM );
-            drawPlace( loc.place, grid_x, grid_y, MAP_SQUARE_DIM );
             if (!loc.visible)
                drawFog( grid_x, grid_y, MAP_SQUARE_DIM );
+            drawPlace( loc.place, grid_x, grid_y, MAP_SQUARE_DIM );
          }
       }
    }
@@ -4187,9 +4429,9 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
                   drawPlace( loc.place, g_x, g_y, draw_step );
             } else {
                drawTerrain( loc.terrain, g_x, g_y, draw_step );
-               drawPlace( loc.place, g_x, g_y, draw_step );
                if (!loc.visible)
                   drawFog( g_x, g_y, draw_step );
+               drawPlace( loc.place, g_x, g_y, draw_step );
             }
             g_y += draw_step;
          }
@@ -4220,9 +4462,9 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
                      drawPlace( place, g_x, g_y, draw_step );
                } else {
                   drawTerrain( map[x][y].terrain, g_x, g_y, draw_step );
-                  drawPlace( place, g_x, g_y, draw_step );
                   if (!map[x][y].visible)
                      drawFog( g_x, g_y, draw_step );
+                  drawPlace( place, g_x, g_y, draw_step );
                }
             } else {
                // Attempt 1: if sum in area is > half, draw green
@@ -4346,14 +4588,14 @@ function drawMapControls()
 
    map_context.fillStyle = "black";
    fitText( map_context, '+', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 20, 40, '36pt arial', true);
-   for (var i = 0; i <= 4; ++i) {
+   for (var i = 0; i <= 3; ++i) {
       if (map_zoom_level === i) {
          fitText( map_context, '=', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 65 + (i * 20), 20, '20pt arial', true);
       } else {
          fitText( map_context, '-', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 65 + (i * 20), 20, '20pt arial', true);
       }
    }
-   fitText( map_context, '-', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 165, 40, '60pt arial', true);
+   fitText( map_context, '-', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 145, 40, '60pt arial', true);
 
    var cur_place = map[map_center_x][map_center_y].place;
    if (cur_place !== undefined)
@@ -4381,10 +4623,10 @@ function onClickMap( e ) {
       if (y_pix > 20 && y_pix < 60) {
          plusZoom();
          refresh();
-      } else if (y_pix > 165 && y_pix < 205) {
+      } else if (y_pix > 145 && y_pix < 185) {
          minusZoom();
          refresh();
-      } else if (y_pix > 65 && y_pix < 165) {
+      } else if (y_pix > 65 && y_pix < 145) {
          var new_zoom = Math.floor((y_pix - 65) / 20);
          moveMap( map_center_x, map_center_y, new_zoom );
          refresh();
@@ -4392,8 +4634,9 @@ function onClickMap( e ) {
    } else if (y_pix > MAP_FULL_DIM) {
       if (x_pix < MAP_FULL_DIM / 2) {
          var center_place = map[map_center_x][map_center_y].place;
-         if (center_place !== undefined)
-            changeBoatMenu( 5 );
+         if (center_place !== undefined) {
+            changeBoatMenu( 2 );
+         }
       }
    }
 }
@@ -4446,11 +4689,6 @@ function onMouseMoveMap( e ) {
       map_dx -= map_dx % 3;
       map_dy -= map_dy % 3;
    }
-   if (map_zoom_level === 4) {
-      map_dx -= map_dx % 9;
-      map_dy -= map_dy % 9;
-   }
-
 
    if (map_dx != mapDragLast_dx || map_dy != mapDragLast_dy) {
       moveMap( mapDragBase_x + map_dx, mapDragBase_y + map_dy, map_zoom_level );
@@ -4555,6 +4793,8 @@ function refresh()
    drawBoats();
 }
 
+var catchup = 0;
+
 function update()
 {
    updateBoats();
@@ -4562,6 +4802,21 @@ function update()
    updateVision();
 
    refresh();
+   ++catchup;
+}
+
+// setInterval doesn't really work when tabbed away - 1000 ms is min that works
+function catchupUpdate()
+{
+   while (catchup < 40) {
+      updateBoats();
+      updatePlaces();
+      catchup++;
+   }
+   updateVision();
+   refresh();
+
+   catchup = 0;
 }
 
 function start() {
@@ -4571,7 +4826,8 @@ function start() {
    updateVision();
    refresh();
 
-   setInterval(update, 50); // .1 sec
+   setInterval(update, 25); // .025 sec
+   //setInterval(catchupUpdate, 1000); // 1 sec
 }
 
 // Load images
@@ -4590,7 +4846,13 @@ function loadImage( img, src ) {
    img.src = src;
 }
 
+loadImage( backarrow_img, 'BackArrow.png' );
+
 loadImage( oldman_img, 'OldMan.png' );
+loadImage( mapman_img, 'MapMan.png' );
+loadImage( boatman_img, 'BoatMan.png' );
+loadImage( townman_img, 'TownMan.png' );
+loadImage( guildlady_img, 'GuildLady.png' );
 
 loadImage( maps_closed_img, 'MapStoreClosed.png' );
 loadImage( maps_open_img, 'MapStoreOpen.png' );
