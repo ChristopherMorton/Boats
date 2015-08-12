@@ -1355,9 +1355,6 @@ Place.prototype.upgrade = function() {
          var gain = Math.floor( Math.pow( this.stock[stock] * Math.random(), breed_power ) );
          // TODO: Calculate more e.g. Population bounds
          this.stock[stock] += gain;
-      } else if ($.inArray( stock, food_list ) !== -1) {
-         // This stuff gets eaten so whatever
-
       } else {
          // Random loss
          var size_factor = 0.2 + (0.04 * this.size)
@@ -1813,7 +1810,7 @@ function updatePlaces()
 /////////////////////////////////////////////////////////////////////
 // Boats ---
 
-var boat_names = [ "African Queen", "SS Anne", "Argo", "Barracuda" "Batavia Queen", "Batboat", "Bebop", "Belafonte", "Bismarck", "Black Pearl", "Black Wind", "Borealis", "Borneo Prince", "Calypso", "HMS Cutlass", "Darkstar", "Dawn Treader", "HMS Defiant", "Eagle's Shadow", "Empress", "Enterprise", "Flying Dutchman", "Gankplank Galleon", "Ghost", "Going Merry", "Heart of Gold", "Henrietta", "Hispaniola", "Hyperion", "Interceptor", "Iron Wind", "The Jackdaw", "Jenny", "Jeroboam", "Jolly Roger", "Leviathan", "USS Liberty", "Libra", "Lusitania", "Maria Elena", "Moby Dick", "Nagifar", "Nautilus", "Nina", "Old Ironsides", "Oro Jackson", "Over the Rainbow", "Pequod", "HMS Pinafore", "Pinta", "Poseidon", "Queen's Gambit", "Ragnarok", "Red Dragon", "Red October", "Salty Hippo", "Santa Maria", "Silence", "SS Naked Sun", "Starfish", "Super 99", "Tempest Junior", "Thousand Sunny", "Thunderbird 4", "Titanic", "Ulysses", "USS Harry Truman", "HMS Victory", "The Walrus", "The Wanderer", "White Star", "White Widow", "X-2" ];
+var boat_names = [ "African Queen", "SS Anne", "Argo", "Barracuda", "Batavia Queen", "Batboat", "Bebop", "Belafonte", "Bismarck", "Black Pearl", "Black Wind", "Borealis", "Borneo Prince", "Calypso", "HMS Cutlass", "Darkstar", "Dawn Treader", "HMS Defiant", "Eagle's Shadow", "Empress", "Enterprise", "Flying Dutchman", "Gankplank Galleon", "Ghost", "Going Merry", "Heart of Gold", "Henrietta", "Hispaniola", "Hyperion", "Interceptor", "Iron Wind", "The Jackdaw", "Jenny", "Jeroboam", "Jolly Roger", "Leviathan", "USS Liberty", "Libra", "Lusitania", "Maria Elena", "Moby Dick", "Nagifar", "Nautilus", "Nina", "Old Ironsides", "Oro Jackson", "Over the Rainbow", "Pequod", "HMS Pinafore", "Pinta", "Poseidon", "Queen's Gambit", "Ragnarok", "Red Dragon", "Red October", "Salty Hippo", "Santa Maria", "Silence", "SS Naked Sun", "Starfish", "Super 99", "Tempest Junior", "Thousand Sunny", "Thunderbird 4", "Titanic", "Ulysses", "USS Harry Truman", "HMS Victory", "The Walrus", "The Wanderer", "White Star", "White Widow", "X-2" ];
 
 function boatNameGen()
 {
@@ -2983,12 +2980,27 @@ function drawBoatContent()
          // Reveal surrounding area
          y = BOAT_INNER_Y + 170;
          boat_context.fillStyle = "rgba(55,55,55,1)";
-         boat_context.fillRect( BOAT_INNER_X + 210, y, BOAT_INNER_WIDTH - 230, 27 );
+         boat_context.fillRect( BOAT_INNER_X + 210, y, BOAT_INNER_WIDTH - 270, 27 );
          boat_context.fillStyle = "white";
-         boat_context.fillRect( BOAT_INNER_X + 212, y + 2, BOAT_INNER_WIDTH - 234, 23 );
+         boat_context.fillRect( BOAT_INNER_X + 212, y + 2, BOAT_INNER_WIDTH - 274, 23 );
          boat_context.fillStyle = "black";
          town_text = places[place].name + " (" + LOCAL_MAP_PRICE + ")";
-         fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y, 20, '13pt arial', true);
+         fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 50, y, 20, '13pt arial', true);
+
+         // Goto Button
+         boat_context.fillStyle = "white";
+         boat_context.strokeStyle = "rgba(85,85,85,1)";
+         boat_context.lineWidth = '3';
+         boat_context.beginPath();
+         boat_context.moveTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 - 13, y - 5 + 13 );
+         boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 6, y - 5 + 13 );
+         boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 6, y - 5 + 9 );
+         boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 17, y - 5 + 20 );
+         boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 6, y - 5 + 31 );
+         boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 6, y - 5 + 27 );
+         boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 - 13, y - 5 + 27 );
+         boat_context.fill();
+         boat_context.stroke();
 
          // TODO: Reveal connected towns
          for (var t = 0; t < places[place].connected_towns.length; ++t) {
@@ -2997,12 +3009,27 @@ function drawBoatContent()
 
             y += 30;
             boat_context.fillStyle = "rgba(55,55,55,1)";
-            boat_context.fillRect( BOAT_INNER_X + 210, y, BOAT_INNER_WIDTH - 230, 27 );
+            boat_context.fillRect( BOAT_INNER_X + 210, y, BOAT_INNER_WIDTH - 270, 27 );
             boat_context.fillStyle = "white";
-            boat_context.fillRect( BOAT_INNER_X + 212, y + 2, BOAT_INNER_WIDTH - 234, 23 );
+            boat_context.fillRect( BOAT_INNER_X + 212, y + 2, BOAT_INNER_WIDTH - 274, 23 );
             boat_context.fillStyle = "black";
             town_text = town.name + " (" + FOREIGN_MAP_PRICE + ")";
-            fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y, 20, '13pt arial', true);
+            fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 50, y, 20, '13pt arial', true);
+
+            // Goto Button
+            boat_context.fillStyle = "white";
+            boat_context.strokeStyle = "rgba(85,85,85,1)";
+            boat_context.lineWidth = '3';
+            boat_context.beginPath();
+            boat_context.moveTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 - 13, y - 5 + 13 );
+            boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 6, y - 5 + 13 );
+            boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 6, y - 5 + 9 );
+            boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 17, y - 5 + 20 );
+            boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 6, y - 5 + 31 );
+            boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 + 6, y - 5 + 27 );
+            boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 - 13, y - 5 + 27 );
+            boat_context.fill();
+            boat_context.stroke();
          }
 
          // Buttons
@@ -3370,7 +3397,7 @@ function onClickBoats( e )
    }
    else if (boat_menu === 6) {
       // Maps
-      if (x_pix > BOAT_INNER_X + 220 && x_pix <= BOAT_INNER_X + BOAT_INNER_WIDTH - 20) {
+      if (x_pix > BOAT_INNER_X + 220 && x_pix <= BOAT_INNER_X + BOAT_INNER_WIDTH - 50) {
          var boat = boats[ my_boats[boat_selection] ];
          var place = map[boat.x][boat.y].place;
          var y = BOAT_INNER_Y + 170;
@@ -3388,6 +3415,21 @@ function onClickBoats( e )
                   boat.cargo.coins -= FOREIGN_MAP_PRICE;
                   revealArea( town.x, town.y );
                }
+            }
+         }
+      }
+      else if (x_pix > BOAT_INNER_X + BOAT_INNER_WIDTH - 48 && x_pix <= BOAT_INNER_X + BOAT_INNER_WIDTH - 18) {
+         var boat = boats[ my_boats[boat_selection] ];
+         var place = map[boat.x][boat.y].place;
+         var y = BOAT_INNER_Y + 170;
+         if (y_pix > y && y_pix <= y + 27) {
+            moveMap( places[place].x, places[place].y, map_zoom_level );
+         }
+         for (var t = 0; t < places[place].connected_towns.length; ++t) {
+            var town = places[ places[place].connected_towns[t] ];
+            y += 30;
+            if (y_pix > y && y_pix <= y + 27) {
+               moveMap( town.x, town.y, map_zoom_level );
             }
          }
       }
