@@ -1813,10 +1813,16 @@ function updatePlaces()
 /////////////////////////////////////////////////////////////////////
 // Boats ---
 
-function genBoatName()
+var boat_names = [ "African Queen", "SS Anne", "Argo", "Barracuda" "Batavia Queen", "Batboat", "Bebop", "Belafonte", "Bismarck", "Black Pearl", "Black Wind", "Borealis", "Borneo Prince", "Calypso", "HMS Cutlass", "Darkstar", "Dawn Treader", "HMS Defiant", "Eagle's Shadow", "Empress", "Enterprise", "Flying Dutchman", "Gankplank Galleon", "Ghost", "Going Merry", "Heart of Gold", "Henrietta", "Hispaniola", "Hyperion", "Interceptor", "Iron Wind", "The Jackdaw", "Jenny", "Jeroboam", "Jolly Roger", "Leviathan", "USS Liberty", "Libra", "Lusitania", "Maria Elena", "Moby Dick", "Nagifar", "Nautilus", "Nina", "Old Ironsides", "Oro Jackson", "Over the Rainbow", "Pequod", "HMS Pinafore", "Pinta", "Poseidon", "Queen's Gambit", "Ragnarok", "Red Dragon", "Red October", "Salty Hippo", "Santa Maria", "Silence", "SS Naked Sun", "Starfish", "Super 99", "Tempest Junior", "Thousand Sunny", "Thunderbird 4", "Titanic", "Ulysses", "USS Harry Truman", "HMS Victory", "The Walrus", "The Wanderer", "White Star", "White Widow", "X-2" ];
+
+function boatNameGen()
 {
-   // TODO
-   return "Mini boatster";
+   if (boat_names.length === 0)
+      return 'Boat ' + name_count++;
+
+   var index = Math.floor(Math.random() * boat_names.length);
+
+   return boat_names.splice( index, 1 )[0];
 }
 
 function Boat( type )
@@ -1833,35 +1839,35 @@ function Boat( type )
          break;
       case 1:
          this.maxcargo = 60;
-         this.name = genBoatName();
+         this.name = boatNameGen();
          this.typename = "Outrigger Canoe";
          this.maxhealth = 100;
          this.speed = 32;
          break;
       case 2:
          this.maxcargo = 180;
-         this.name = genBoatName();
+         this.name = boatNameGen();
          this.typename = "Sailboat";
          this.maxhealth = 225;
          this.speed = 22;
          break;
       case 3:
          this.maxcargo = 540;
-         this.name = genBoatName();
+         this.name = boatNameGen();
          this.typename = "Schooner";
          this.maxhealth = 340;
          this.speed = 16;
          break;
       case 4:
          this.maxcargo = 1200;
-         this.name = genBoatName();
+         this.name = boatNameGen();
          this.typename = "Yacht";
          this.maxhealth = 450;
          this.speed = 15;
          break;
       case 5:
          this.maxcargo = 4000;
-         this.name = genBoatName();
+         this.name = boatNameGen();
          this.typename = "Galleon";
          this.maxhealth = 660;
          this.speed = 15;
