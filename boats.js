@@ -11,7 +11,7 @@ var backarrow_img = new Image();
 var oldman_img = new Image();
 var mapman_img = new Image();
 var boatman_img = new Image();
-var townman_img = new Image();
+var bankman_img = new Image();
 var guildlady_img = new Image();
 
 var maps_closed_img = new Image();
@@ -376,6 +376,9 @@ var text_box_selection = '';
 
 var quest_status = 0;
 var quest_goals = [ 'q0', 'q1', 'q2', 'q3', 'q4' ];
+
+var guild_req = '';
+var guild_industry = '';
 
 var LOCAL_MAP_PRICE = 30;
 var FOREIGN_MAP_PRICE = 60;
@@ -811,6 +814,8 @@ function Place( type, name )
       };
       this.stock = {};
       this.stock_selected = '';
+      this.bank = {};
+      this.bank_selected = '';
       this.industry_randomizer1 = Math.random();
       this.industry_randomizer2 = Math.random();
       this.population = 5;
@@ -1368,10 +1373,11 @@ Place.prototype.upgrade = function() {
    var pop_requirements = this.population * 9;
    if (food_value >= pop_requirements) {
       this.attemptEat( pop_requirements );
-      this.population += 3;
+      this.population += 2 + Math.round( Math.random() * 2 );
+      if (this.population > this.size * 100) this.population = this.size * 120;
    } else if (food_value >= pop_requirements * 2 / 3) {
       this.attemptEat( pop_requirements * 2 / 3 );
-      this.population -= 2;
+      this.population -= 1 + Math.round( Math.random() * 2 );
    } else {
       this.attemptEat( pop_requirements / 3 );
       this.population = Math.round( this.population * 0.8 );
@@ -2305,6 +2311,39 @@ function changeBoatMenu( new_menu )
    if (new_menu >= 5)
       testQuest();
 
+   if (new_menu === 8) {
+      var boat = boats[ my_boats[boat_selection] ];
+      var place = map[boat.x][boat.y].place;
+      if (place) {
+         var town = places[ place ];
+
+         // Choose random upgrade to describe
+         var reqs = [ farming_upgrade_list[town.industries.farming],
+                      mining_upgrade_list[town.industries.mining],
+                      woodcraft_upgrade_list[town.industries.woodcraft],
+                      stonecraft_upgrade_list[town.industries.stonecraft],
+                      metalcraft_upgrade_list[town.industries.metalcraft],
+                      weaving_upgrade_list[town.industries.weaving],
+                      boatcraft_upgrade_list[town.industries.boatcraft] ];
+         var keys = [ 'farming', 'mining', 'woodworking', 'stoneworking', 'metalworking', 'weaving', 'boat building' ];
+         for (var i = 0; i < reqs.length; ++i) {
+            if (reqs[i] === undefined) {
+               reqs.splice( i, 1 );
+               keys.splice( i, 1 );
+               i--;
+            }
+         }
+         if (reqs.length === 0) {
+            guild_req = {};
+            guild_industry = '';
+         } else {
+            var rand = Math.floor( Math.random() * reqs.length );
+            guild_req = reqs[rand];
+            guild_industry = keys[rand];
+         }
+      }
+   }
+
    boat_menu = new_menu;
    refresh();
 }
@@ -2553,7 +2592,6 @@ function drawBoatContent()
 
             boat_context.fillStyle = 'black';
             if (boat_menu === 3) {
-               // TODO: Give coins/cargo(?) to other boats in the same place
                if (place !== undefined && place !== 0 && selection !== 'coins') {
                   var sell_price = Math.round( places[place].getPrice( selection ) );
                   var sell_str = 'Sell (' + sell_price + ')';
@@ -2924,6 +2962,7 @@ function drawBoatContent()
          // - Town name
          boat_context.fillStyle = 'Black';
          fitText( boat_context, "Welcome to " + places[place].name, BOAT_INNER_X, BOAT_INNER_X + BOAT_INNER_WIDTH, BOAT_INNER_Y + 25, 28, '22pt arial', true );
+         fitText( boat_context, "Population: " + places[place].population, BOAT_INNER_X, BOAT_INNER_X + BOAT_INNER_WIDTH, BOAT_INNER_Y + 56, 22, '15pt arial', true );
 
          // Path
          var town_size = places[place].size;
@@ -2938,8 +2977,8 @@ function drawBoatContent()
          // Buildings:
          // - Maps (6): Reveal surrounding, or location of other towns
          // - Boats (7): Buy new boat or rename your boat
-         // - Town hall (8): information about the town- industries, population
-         // - Guild hall (9): information about what's needed for upgrades
+         // - Guild hall (8): information about what's needed for upgrades
+         // - Bank (9): Store and retrieve stuff
          if (building_hover === 6)
             boat_context.drawImage( maps_open_img, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
          else
@@ -3002,7 +3041,6 @@ function drawBoatContent()
          boat_context.fill();
          boat_context.stroke();
 
-         // TODO: Reveal connected towns
          for (var t = 0; t < places[place].connected_towns.length; ++t) {
 
             var town = places[ places[place].connected_towns[t] ];
@@ -3046,16 +3084,65 @@ function drawBoatContent()
          
          // Rename boat
       } else if (boat_menu === 8) {
-         // TODO Town hall (8): information about the town- industries, population
+         // Guild hall (8): information about what's needed for upgrades
+
+         // Back button
+         boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
+
+         var town = places[place];
+
+         // Find which thing they need
+         var req = '';
+         for (var r in guild_req) {
+            if (town.stock[r] < guild_req[r]) {
+               req = r;
+               break;
+            }
+         }
+
+         // Draw guild lady
+         boat_context.drawImage( guildlady_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 120 );
+
+         if (guild_req === '') {
+            // No upgrades available
+            boat_context.fillStyle = "black";
+            var town_text = "Oh hey, nice to see you.";
+            var y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, BOAT_INNER_Y + 100, 18, '13pt arial', true);
+            town_text = "Guess what, it turns out our little town has actually reached the pinnacle of human industrial achievement, so I guess we don't really need your help anymore.";
+            y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
+            town_text = "Feel free to drop by whenever though.";
+            y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
+         } else {
+            boat_context.fillStyle = "black";
+            var town_text = town.name + " is a town on the rise. We've got plenty of growing industries, although some of them are a little stalled."
+            var y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, BOAT_INNER_Y + 80, 18, '13pt arial', true);
+            town_text = "Actually, we could use your help.";
+            y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
+            town_text = "If you could bring us some " + req + " then we could really improve our town's expertise in " + guild_industry + ".";
+            y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
+            town_text = "That would be great."
+            y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
+         }
+         
+      } else if (boat_menu === 9) {
+         // TODO: Bank (9): Store stuff, so as to retrieve it with other boats
 
          // Back button
          boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
 
          // Draw town man
-         boat_context.drawImage( townman_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 120 );
+         boat_context.drawImage( bankman_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 100 );
+         boat_context.fillStyle = "black";
+         var town_text = "Here's your account sir.";
+         var y = fitText( boat_context, town_text, BOAT_INNER_X + 10, BOAT_INNER_X + 140, BOAT_INNER_Y + 300, 18, '13pt arial', true);
+
+         // TODO: Copy this stuff from cargo/market
+         // Bank contents
+
+         // Info section
 
          // Town info
-         boat_context.fillStyle = "black";
+         /* 'Town' menu - GONE
          var town_text = "You want to know about " + places[place].name + "?";
          var y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, BOAT_INNER_Y + 80, 18, '13pt arial', true);
          if (places[place].industry_randomizer1 < 0.333)
@@ -3074,15 +3161,8 @@ function drawBoatContent()
          boat_context.fillStyle = "black";
          town_text = "Population: " + places[place].population;
          y = fitText( boat_context, town_text, BOAT_INNER_X + 210, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 20, 18, '13pt arial', true);
+         */
 
-      } else if (boat_menu === 9) {
-         // TODO Guild hall (9): information about what's needed for upgrades
-
-         // Back button
-         boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
-
-         // Draw guild lady
-         boat_context.drawImage( guildlady_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 120 );
       }
    }
 }
@@ -3434,6 +3514,15 @@ function onClickBoats( e )
          }
       }
    }
+   else if (boat_menu === 7) {
+      // Boats
+   }
+   else if (boat_menu === 8) {
+      // Guild Hall
+   }
+   else if (boat_menu === 9) {
+      // Bank
+   }
 }
 $('#boat_canvas').click( onClickBoats ); 
 
@@ -3472,6 +3561,8 @@ function onMouseWheelBoats( e ) {
        */
        delta = -e.detail/3;
    }
+
+   delta = Math.floor( delta );
 
    var x_pix = e.pageX - boat_canvas.offsetLeft;
    var y_pix = e.pageY - boat_canvas.offsetTop;
@@ -4760,6 +4851,8 @@ function onMouseWheelMap( e ) {
        delta = -e.detail/3;
    }
 
+   delta = Math.floor( delta );
+
    moveMap( map_center_x, map_center_y, map_zoom_level - delta );
    refresh();
 }
@@ -4899,7 +4992,7 @@ loadImage( backarrow_img, 'BackArrow.png' );
 loadImage( oldman_img, 'OldMan.png' );
 loadImage( mapman_img, 'MapMan.png' );
 loadImage( boatman_img, 'BoatMan.png' );
-loadImage( townman_img, 'TownMan.png' );
+loadImage( bankman_img, 'TownMan.png' );
 loadImage( guildlady_img, 'GuildLady.png' );
 
 loadImage( maps_closed_img, 'MapStoreClosed.png' );
