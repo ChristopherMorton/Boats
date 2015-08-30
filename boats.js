@@ -14,14 +14,22 @@ var boatman_img = new Image();
 var bankman_img = new Image();
 var guildlady_img = new Image();
 
-var maps_closed_img = new Image();
-var maps_open_img = new Image();
-var boats_closed_img = new Image();
-var boats_open_img = new Image();
-var town_closed_img = new Image();
-var town_open_img = new Image();
-var guild_closed_img = new Image();
-var guild_open_img = new Image();
+var maps_closed_img1 = new Image();
+var maps_closed_img2 = new Image();
+var maps_open_img1 = new Image();
+var maps_open_img2 = new Image();
+var boats_closed_img1 = new Image();
+var boats_closed_img2 = new Image();
+var boats_open_img1 = new Image();
+var boats_open_img2 = new Image();
+var bank_closed_img1 = new Image();
+var bank_closed_img2 = new Image();
+var bank_open_img1 = new Image();
+var bank_open_img2 = new Image();
+var guild_closed_img1 = new Image();
+var guild_closed_img2 = new Image();
+var guild_open_img1 = new Image();
+var guild_open_img2 = new Image();
 
 var dirt_road_img = new Image();
 var stone_road_img = new Image();
@@ -399,7 +407,7 @@ String.prototype.width = function(font) {
   return w;
 }
    
-function fitText( context, text, x_min, x_max, y_min, font_size, font, centered, first_line_offset )
+function fitText( context, text, x_min, x_max, y_min, font_size, font, centered, first_line_offset, stroke )
 {
    var text_split = text.split(' ');
    var text_bit = '', text_bit_temp = '';
@@ -412,8 +420,15 @@ function fitText( context, text, x_min, x_max, y_min, font_size, font, centered,
       text_bit_temp += text_split[i];
       text_width = text_bit_temp.width( font );
       if (text_width + x_min > x_max) { // Can't add that bit
-         if (centered) context.fillText( text_bit, (x_min + x_max - text_bit.width( font )) / 2 , y );
-         else context.fillText( text_bit, x_min, y );
+         if (centered) {
+            if (stroke)
+               context.strokeText( text_bit, (x_min + x_max - text_bit.width( font )) / 2 , y );
+            context.fillText( text_bit, (x_min + x_max - text_bit.width( font )) / 2 , y );
+         } else {
+            if (stroke)
+               context.strokeText( text_bit, x_min, y );
+            context.fillText( text_bit, x_min, y );
+         }
 
          text_bit = text_bit_temp = text_split[i] + ' ';
          y += font_size;
@@ -423,8 +438,15 @@ function fitText( context, text, x_min, x_max, y_min, font_size, font, centered,
       }
    }
    if (text_bit) {
-      if (centered) context.fillText( text_bit, (x_min + x_max - text_bit.width( font )) / 2 , y );
-      else context.fillText( text_bit, x_min, y );
+      if (centered) {
+         if (stroke)
+            context.strokeText( text_bit, (x_min + x_max - text_bit.width( font )) / 2 , y );
+         context.fillText( text_bit, (x_min + x_max - text_bit.width( font )) / 2 , y );
+      } else {
+         if (stroke)
+            context.strokeText( text_bit, x_min, y );
+         context.fillText( text_bit, x_min, y );
+      }
 
       return y;
    }
@@ -702,9 +724,9 @@ function testQuest()
  * 7 6 5
  */
 
-function constructTerrain( start_dir, end_dir, river_bits, ter_type ) { // Goes Clockwise
+function constructTerrain( start_dir, end_dir, ter_type ) { // Goes Clockwise
    var ter = ter_type || 1;
-   return ter + (start_dir << 3) + (end_dir << 6) + (river_bits << 9);
+   return ter + (start_dir << 3) + (end_dir << 6);
 }
 
 function terGetType( terrain ) {
@@ -815,7 +837,6 @@ function Place( type, name )
       this.stock = {};
       this.stock_selected = '';
       this.bank = {};
-      this.bank_selected = '';
       this.industry_randomizer1 = Math.random();
       this.industry_randomizer2 = Math.random();
       this.population = 5;
@@ -1949,10 +1970,10 @@ Boat.prototype.getImage = function( size )
 
 function calculateDistanceMetric( dx, dy )
 {
-   if (dx > dy)
-      return (dy * 0.4) + dx; // === (dx - dy) + (dy * 1.4)
+   if (Math.abs(dx) > Math.abs(dy))
+      return Math.abs(dy * 0.4) + Math.abs(dx); // === (dx - dy) + (dy * 1.4)
    else
-      return (dx * 0.4) + dy; // === (dx - dy) + (dy * 1.4)
+      return Math.abs(dx * 0.4) + Math.abs(dy); // === (dx - dy) + (dy * 1.4)
 }
 
 Boat.prototype.calculateJourney = function()
@@ -1962,7 +1983,7 @@ Boat.prototype.calculateJourney = function()
    } else if (!map[this.journey_x][this.journey_y].discovered) {
       this.calculateBlindJourney();
    } else {
-      var path = astar( this.x, this.y, this.journey_x, this.journey_y );
+      var path = astar( this.x, this.y, this.journey_x, this.journey_y, true );
 
       if (path.length === 0) {
          // Couldn't find a way there
@@ -2141,6 +2162,9 @@ Boat.prototype.changeDirection = function ( dir )
 
    this.blocked = false;
 
+   if (this.sail_style === -1)
+      this.sail_style = 0;
+
    this.sailing_progress = 0;
    this.decideNext();
 }
@@ -2216,6 +2240,17 @@ Boat.prototype.sellCargo = function ( cargo_id, count )
    }
 }
 
+Boat.prototype.bankCargo = function ( cargo_id, count )
+{
+   var place = map[this.x][this.y].place;
+   if (place !== undefined) {
+      if (this.addCargo( cargo_id, -count )) {
+         if (places[place].bank[ cargo_id ]) places[place].bank[ cargo_id ] += count;
+         else places[place].bank[ cargo_id ] = count;
+      }
+   }
+}
+
 Boat.prototype.buyCargo = function ( cargo_id, count )
 {
    var place = map[this.x][this.y].place;
@@ -2255,12 +2290,13 @@ function initBoats()
    my_boats.push( b.id );
    var b2 = new Boat( 1 );
    b2.mine = true;
-   b2.x = 151;
-   b2.y = 163;
+   b2.x = places[1].x;
+   b2.y = places[1].y;
    b2.name = "Secret Test Boat";
    b2.maxhealth = 9999;
    b2.health = 9999;
    b2.maxcargo = 9999;
+   b2.addCargo( 'coins', 2000 );
    b2.addCargo( 'softwood', 2 );
    b2.addCargo( 'apples', 1 );
    b2.addCargo( 'coconuts', 1 );
@@ -2579,23 +2615,28 @@ function drawBoatContent()
             if (boat_menu === 3)
                boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 39, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
             boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 75, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
-            if (boat_menu === 3 && place !== undefined && place !== 0 && selection !== 'coins')
+            if (boat_menu === 3 && place !== undefined && place !== 0 && selection !== 'coins') {
                boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 111, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
+               boat_context.fillRect( x_divider + 15, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 147, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 30, 28 );
+            }
 
 
             boat_context.fillStyle = 'white';
             if (boat_menu === 3)
                boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 37, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
             boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 73, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
-            if (boat_menu === 3 && place !== undefined && place !== 0 && selection !== 'coins')
+            if (boat_menu === 3 && place !== undefined && place !== 0 && selection !== 'coins') {
                boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 109, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
+               boat_context.fillRect( x_divider + 17, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 145, BOAT_INNER_X + BOAT_INNER_WIDTH - x_divider - 34, 24 );
+            }
 
             boat_context.fillStyle = 'black';
             if (boat_menu === 3) {
                if (place !== undefined && place !== 0 && selection !== 'coins') {
                   var sell_price = Math.round( places[place].getPrice( selection ) );
                   var sell_str = 'Sell (' + sell_price + ')';
-                  fitText( boat_context, sell_str, x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110, 20, '20px arial', true);
+                  fitText( boat_context, sell_str, x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110, 20, '20px arial', true); 
+                  fitText( boat_context, 'Bank', x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 146, 20, '20px arial', true);
                }
 
                fitText( boat_context, 'Discard 1', x_divider + 18, BOAT_INNER_X + BOAT_INNER_WIDTH - 18, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 74, 20, '20px arial', true);
@@ -2969,7 +3010,7 @@ function drawBoatContent()
 
          if (town_size <= 3)
             boat_context.drawImage( dirt_road_img, BOAT_INNER_X + Math.floor(BOAT_INNER_WIDTH / 2) - 150, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 305 );
-         else if (town_size <= 6)
+         else //if (town_size <= 6)
             boat_context.drawImage( stone_road_img, BOAT_INNER_X + Math.floor(BOAT_INNER_WIDTH / 2) - 150, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 305 );
 
 
@@ -2979,27 +3020,58 @@ function drawBoatContent()
          // - Boats (7): Buy new boat or rename your boat
          // - Guild hall (8): information about what's needed for upgrades
          // - Bank (9): Store and retrieve stuff
-         if (building_hover === 6)
-            boat_context.drawImage( maps_open_img, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
-         else
-            boat_context.drawImage( maps_closed_img, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
+         if (building_hover === 6) {
+            if (town_size <= 4)
+               boat_context.drawImage( maps_open_img1, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
+            else
+               boat_context.drawImage( maps_open_img2, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
+         } else {
+            if (town_size <= 4)
+               boat_context.drawImage( maps_closed_img1, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
+            else
+               boat_context.drawImage( maps_closed_img2, BOAT_INNER_X + 77, BOAT_INNER_Y + 110 );
+         }
 
-         if (building_hover === 7)
-            boat_context.drawImage( boats_open_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 200 );
-         else
-            boat_context.drawImage( boats_closed_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 200 );
+         if (building_hover === 7) {
+            if (town_size <= 4)
+               boat_context.drawImage( boats_open_img1, BOAT_INNER_X + 20, BOAT_INNER_Y + 200 );
+            else
+               boat_context.drawImage( boats_open_img2, BOAT_INNER_X + 20, BOAT_INNER_Y + 200 );
+         } else {
+            if (town_size <= 4)
+               boat_context.drawImage( boats_closed_img1, BOAT_INNER_X + 20, BOAT_INNER_Y + 200 );
+            else
+               boat_context.drawImage( boats_closed_img2, BOAT_INNER_X + 20, BOAT_INNER_Y + 200 );
+         }
 
-         if (building_hover === 8)
-            boat_context.drawImage( town_open_img, BOAT_INNER_X + 267, BOAT_INNER_Y + 110 );
-         else
-            boat_context.drawImage( town_closed_img, BOAT_INNER_X + 267, BOAT_INNER_Y + 110 );
+         if (building_hover === 8) {
+            if (town_size <= 4)
+               boat_context.drawImage( guild_open_img1, BOAT_INNER_X + 267, BOAT_INNER_Y + 110 );
+            else
+               boat_context.drawImage( guild_open_img2, BOAT_INNER_X + 267, BOAT_INNER_Y + 110 );
+         } else {
+            if (town_size <= 4)
+               boat_context.drawImage( guild_closed_img1, BOAT_INNER_X + 267, BOAT_INNER_Y + 110 );
+            else
+               boat_context.drawImage( guild_closed_img2, BOAT_INNER_X + 267, BOAT_INNER_Y + 110 );
+         }
 
-         if (building_hover === 9)
-            boat_context.drawImage( guild_open_img, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
-         else
-            boat_context.drawImage( guild_closed_img, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
+         if (building_hover === 9) {
+            if (town_size <= 4)
+               boat_context.drawImage( bank_open_img1, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
+            else
+               boat_context.drawImage( bank_open_img2, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
+         } else {
+            if (town_size <= 4)
+               boat_context.drawImage( bank_closed_img1, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
+            else
+               boat_context.drawImage( bank_closed_img2, BOAT_INNER_X + 324, BOAT_INNER_Y + 200 );
+         }
+
       } else if (boat_menu === 6) {
          // Maps (6): Reveal surrounding, or location of other towns
+
+         // TODO: Cross out boxes that you can't afford
 
          // Back button
          boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
@@ -3009,6 +3081,10 @@ function drawBoatContent()
 
          // Text
          boat_context.fillStyle = "black";
+         var coins = boat.cargo['coins'] || 0;
+         var coin_text = "Coins: " + coins;
+         fitText( boat_context, coin_text, BOAT_INNER_X + 10, BOAT_INNER_X + 190, BOAT_INNER_Y + BOAT_INNER_HEIGHT - 50, 18, '16pt arial', true);
+
          var town_text = "You want maps? I have maps!";
          var y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, BOAT_INNER_Y + 30, 18, '13pt arial', true);
          town_text = "This is great nobody ever wants maps.";
@@ -3040,6 +3116,12 @@ function drawBoatContent()
          boat_context.lineTo( BOAT_INNER_X + BOAT_INNER_WIDTH - 35 - 13, y - 5 + 27 );
          boat_context.fill();
          boat_context.stroke();
+
+         if ( coins < 30 ) {
+            // TODO: Cross out box
+            //boat_context.strokeStyle = 
+
+         }
 
          for (var t = 0; t < places[place].connected_towns.length; ++t) {
 
@@ -3093,17 +3175,25 @@ function drawBoatContent()
 
          // Find which thing they need
          var req = '';
+         var more = false;
          for (var r in guild_req) {
-            if (town.stock[r] < guild_req[r]) {
+            if ((!town.stock[r]) || town.stock[r] === 0) {
                req = r;
+               more = false;
+               break;
+            } else if (town.stock[r] < guild_req[r]) {
+               req = r;
+               more = true;
                break;
             }
          }
 
+         req = (cargo_index[req].name).toUpperCase();
+
          // Draw guild lady
          boat_context.drawImage( guildlady_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 120 );
 
-         if (guild_req === '') {
+         if (req === '') {
             // No upgrades available
             boat_context.fillStyle = "black";
             var town_text = "Oh hey, nice to see you.";
@@ -3114,30 +3204,89 @@ function drawBoatContent()
             y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
          } else {
             boat_context.fillStyle = "black";
-            var town_text = town.name + " is a town on the rise. We've got plenty of growing industries, although some of them are a little stalled."
+            var town_text = town.name + " is a town on the rise. We've got plenty of growing industries."
             var y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, BOAT_INNER_Y + 80, 18, '13pt arial', true);
-            town_text = "Actually, we could use your help.";
+            town_text = "Actually, we could use a little help with that.";
             y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
-            town_text = "If you could bring us some " + req + " then we could really improve our town's expertise in " + guild_industry + ".";
+            town_text = "If you could bring us some " + (more?"more ":'') + req + " then we could really improve our town's expertise in " + guild_industry + ".";
             y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
             town_text = "That would be great."
             y = fitText( boat_context, town_text, BOAT_INNER_X + 200, BOAT_INNER_X + BOAT_INNER_WIDTH - 10, y + 10, 18, '13pt arial', true);
          }
          
       } else if (boat_menu === 9) {
-         // TODO: Bank (9): Store stuff, so as to retrieve it with other boats
+         // Bank (9): Store stuff, so as to retrieve it with other boats
 
          // Back button
          boat_context.drawImage( backarrow_img, BOAT_INNER_X + 20, BOAT_INNER_Y + 20 );
 
          // Draw town man
-         boat_context.drawImage( bankman_img, BOAT_INNER_X + 15, BOAT_INNER_Y + 100 );
+         boat_context.drawImage( bankman_img, BOAT_INNER_X + 10, BOAT_INNER_Y + 100 );
          boat_context.fillStyle = "black";
-         var town_text = "Here's your account sir.";
-         var y = fitText( boat_context, town_text, BOAT_INNER_X + 10, BOAT_INNER_X + 140, BOAT_INNER_Y + 300, 18, '13pt arial', true);
+         var town_text = "Bring me some stuff and I'll hold onto it for you.";
+         for (var cargo_id in places[place].bank) {
+            if (places[place].bank[ cargo_id ] && places[place].bank[ cargo_id ] > 0)
+               town_text = "Here's your stuff. I've been taking great care of it.";
+         }
+         var y = fitText( boat_context, town_text, BOAT_INNER_X + 15, BOAT_INNER_X + BOAT_INNER_WIDTH - (70 * 4) - 25, BOAT_INNER_Y + 300, 18, '13pt arial', true);
 
-         // TODO: Copy this stuff from cargo/market
-         // Bank contents
+         var divider = BOAT_INNER_X + BOAT_INNER_WIDTH - (70 * 4) - 10;
+
+         // Bank divider
+         boat_context.fillStyle = "rgba(185,185,185,1)";
+         boat_context.fillRect(divider, BOAT_INNER_Y, 5, BOAT_INNER_HEIGHT);
+
+         // Bank title
+         boat_context.fillStyle = "black";
+         town_text = "'Bank' of " + places[place].name;
+         fitText( boat_context, town_text, divider, BOAT_INNER_X + BOAT_INNER_WIDTH, BOAT_INNER_Y + 5, 24, '20px arial', true);
+
+         // Bank contents 
+         var x = divider + 10, y = BOAT_INNER_Y + 36;
+         var x_edge = BOAT_INNER_X + BOAT_INNER_WIDTH;
+         var relevant_cargo = places[place].bank;
+
+         for (var cargo_id in relevant_cargo) {
+            var count = places[place].bank[cargo_id];
+
+            if (count === 0 || !count) continue;
+
+            var name = cargo_index[cargo_id].name;
+
+
+            if (cargo_id === selection) {
+               boat_context.fillStyle = "rgba(185,185,185,1)";
+               boat_context.fillRect( x, y, 60, 60 );
+            }
+            boat_context.strokeStyle = "rgba(85,85,85,1)";
+            boat_context.lineWidth = '2';
+            boat_context.strokeRect( x, y, 60, 60 );
+
+            // Draw image
+            var img = cargo_index[cargo_id].image;
+            if (img)
+               boat_context.drawImage( img, x, y );
+
+            // Draw count
+            if (!(place === 0 && boat_menu === 4)) {
+               var count_str = String(count);
+               var count_width = count_str.width("14pt arial");
+                  
+               boat_context.fillStyle = 'white';
+               boat_context.fillRect( x + 58 - count_width, y + 62 - 18, count_width + 4, 18 )
+               boat_context.strokeRect( x + 58 - count_width, y + 62 - 18, count_width + 4, 18 )
+
+               boat_context.fillStyle = 'black';
+               boat_context.font = '14pt arial';
+               boat_context.fillText( count_str, x + 60 - count_width, y + 60 );
+            }
+
+            x += 70;
+            if (x + 60 > x_edge) {
+               x = BOAT_INNER_X + BOAT_INNER_WIDTH - (70 * 4);
+               y += 70;
+            }
+         }
 
          // Info section
 
@@ -3274,6 +3423,13 @@ function onClickBoats( e )
                 && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 110 + 28 
                 && place !== undefined) {
                   boat.sellCargo( boat.cargo_selected, 1 );
+                  if (boat.cargo[ boat.cargo_selected ] === 0)
+                     boat.cargo_selected = '';
+                  refresh();
+               } else if (y_pix > BOAT_INNER_Y + BOAT_INNER_HEIGHT - 146 
+                && y_pix < BOAT_INNER_Y + BOAT_INNER_HEIGHT - 146 + 28 
+                && place !== undefined) {
+                  boat.bankCargo( boat.cargo_selected, 1 );
                   if (boat.cargo[ boat.cargo_selected ] === 0)
                      boat.cargo_selected = '';
                   refresh();
@@ -3493,7 +3649,8 @@ function onClickBoats( e )
             if (y_pix > y && y_pix <= y + 27) {
                if (boat.cargo.coins >= FOREIGN_MAP_PRICE) {
                   boat.cargo.coins -= FOREIGN_MAP_PRICE;
-                  revealArea( town.x, town.y );
+                  revealPath( places[place].x, places[place].y, town.x, town.y );
+                  // TODO: Reveal path from a to b
                }
             }
          }
@@ -3518,10 +3675,35 @@ function onClickBoats( e )
       // Boats
    }
    else if (boat_menu === 8) {
-      // Guild Hall
+      // Guild Hall === nada
    }
    else if (boat_menu === 9) {
       // Bank
+      if (x_pix > BOAT_INNER_X + BOAT_INNER_WIDTH - (70 * 4)) {
+         var x_box = Math.floor((x_pix - (BOAT_INNER_X + BOAT_INNER_WIDTH - (70 * 4))) / 70);
+         var y_box = Math.floor((y_pix - (BOAT_INNER_Y + 36)) / 70);
+         if (x_box >= 0 && x_box < 4 && y_box >= 0 && y_box < 5) {
+            var index = x_box + (4 * y_box);
+            var i = 0;
+            var bank = places[place].bank;
+            for (var cargo_id in bank) {
+               if (!bank[cargo_id] || bank[cargo_id] === 0)
+                  continue;
+
+               if (i === index) {
+                  boat.addCargo( cargo_id, 1 );
+                  bank[ cargo_id ]--;
+                  refresh();
+                  break;
+               }
+               else
+               {
+                  ++i;
+               }
+            }
+         }
+
+      }
    }
 }
 $('#boat_canvas').click( onClickBoats ); 
@@ -3656,6 +3838,35 @@ function revealArea( x_mid, y_mid, r )
    moveMap( x_mid, y_mid, map_zoom_level );
 }
 
+function revealPath( a_x, a_y, b_x, b_y )
+{
+   var path = astar( a_x, a_y, b_x, b_y, false );
+
+   for (var i = 0; i < path.length - 1; ++i) {
+      var x1 = path[i][0];
+      var y1 = path[i][1];
+      var x2 = path[i+1][0];
+      var y2 = path[i+1][1];
+
+      var dir = path[i][2];
+
+      while ( x1 !== x2 || y1 !== y2 ) {
+         // Custom small revealArea
+         for (var x = Math.max(0,x1-1); x <= Math.min(MAP_WIDTH,x1+1); ++x) {
+            for (var y = Math.max(0,y1-1); y <= Math.min(MAP_WIDTH,y1+1); ++y) {
+               map[x][y].discovered = true;
+               if (map[x][y].place)
+                  places[map[x][y].place].discovered = true;
+            }
+         }
+         var next = addDirection( x1, y1, dir );
+         x1 = next[0];
+         y1 = next[1];
+      }
+   }
+   revealArea( b_x, b_y, 2 );
+}
+
 function addBoatVision( x, y )
 {
    for (var i = x - 4; i <= x + 4; ++i) {
@@ -3686,7 +3897,7 @@ function updateVision()
 }
 
 var astar_map = [];
-function astar( x1, y1, x2, y2 )
+function astar( x1, y1, x2, y2, fog )
 {
    astar_map = new Array( MAP_WIDTH );
    for (var x = 0; x < MAP_WIDTH ; ++x) {
@@ -3736,11 +3947,18 @@ function astar( x1, y1, x2, y2 )
          if ( dir % 2 === 1) {
             var neighbor_ter = map[neighbor[0]][neighbor[1]].terrain;
             if (neighbor_ter !== 0 && terGetStart( neighbor_ter ) === terGetEnd( neighbor_ter ))
-               continue; // Diagonal movement into full land - hard to detect
+               continue; // Diagonal movement into full land
+
+            var neighbor_dir = (dir + 4) % 8; // Reverse direction check
+            var neighbor_ter_start = terGetStart( neighbor_ter ), neighbor_ter_end = terGetEnd( neighbor_ter );
+            if ( (neighbor_dir > neighbor_ter_start && neighbor_dir < neighbor_ter_end) ||
+                 (neighbor_dir > neighbor_ter_start && neighbor_ter_end < neighbor_ter_start) ||
+                 (neighbor_dir < neighbor_ter_end && neighbor_ter_end < neighbor_ter_start) )
+               continue;
          }
 
-         if ( !map[neighbor[0]][neighbor[1]].discovered )
-            continue; // Can't plan movement through undiscovered areas
+         if ( !map[neighbor[0]][neighbor[1]].discovered && fog )
+            continue; // Can't plan movement through undiscovered areas (if fog on)
 
          var neighbor_data = astar_map[neighbor[0]][neighbor[1]];
          if (neighbor_data.vis)
@@ -3954,7 +4172,7 @@ function smoothIsland( x_min, y_min, x_max, y_max, ter_type )
                }
                cur2++;
             }
-            map[x][y].terrain = constructTerrain( start, end, 0, terGetType(map[x][y].terrain) );
+            map[x][y].terrain = constructTerrain( start, end, terGetType(map[x][y].terrain) );
          }
       }
    }
@@ -4273,6 +4491,23 @@ function generateMap()
    map_center_x = 150;
    map_center_y = 160;
 
+   // Oh wait first we build the ring of land encircling this inland sea
+   // TODO Make this rounder
+   for (var x = 1; x < MAP_WIDTH - 1; ++x) {
+      map[x][0].terrain = constructTerrain( 0, 4, 4 );
+      map[x][0].discovered = true;
+      map[x][MAP_HEIGHT-1].terrain = constructTerrain( 4, 0, 4 );
+      map[x][MAP_HEIGHT-1].discovered = true;
+   }
+   for (var y = 0; y < MAP_HEIGHT; ++y) {
+      map[0][y].terrain = constructTerrain( 6, 2, 4 );
+      map[0][y].discovered = true;
+      map[MAP_WIDTH-1][y].terrain = constructTerrain( 2, 6, 4 );
+      map[MAP_WIDTH-1][y].discovered = true;
+   }
+   //map[0][0].terrain = constructTerrain( 
+
+
    // Start by custom building the home island
    for (var x = 146; x <= 154; ++x) {
       for (var y = 161; y <= 166; ++y) {
@@ -4546,7 +4781,7 @@ function drawMapSquare( grid_x, grid_y, map_x, map_y, step )
                drawFog( grid_x, grid_y, MAP_SQUARE_DIM );
             drawPlace( loc.place, grid_x, grid_y, MAP_SQUARE_DIM );
          }
-      }
+      } 
    }
    else if (step === MAP_ZOOM_RATIO) {
       var g_x = grid_x;
@@ -4973,7 +5208,7 @@ function start() {
 
 // Load images
 var images_ready = 0;
-var total_images = 45;
+var total_images = 104;
 
 function addReadyImage() {
    images_ready++;
@@ -4995,14 +5230,22 @@ loadImage( boatman_img, 'BoatMan.png' );
 loadImage( bankman_img, 'TownMan.png' );
 loadImage( guildlady_img, 'GuildLady.png' );
 
-loadImage( maps_closed_img, 'MapStoreClosed.png' );
-loadImage( maps_open_img, 'MapStoreOpen.png' );
-loadImage( boats_closed_img, 'BoatStoreClosed.png' );
-loadImage( boats_open_img, 'BoatStoreOpen.png' );
-loadImage( town_closed_img, 'TownStoreClosed.png' );
-loadImage( town_open_img, 'TownStoreOpen.png' );
-loadImage( guild_closed_img, 'GuildStoreClosed.png' );
-loadImage( guild_open_img, 'GuildStoreOpen.png' );
+loadImage( maps_closed_img1, 'MapStoreClosed1.png' );
+loadImage( maps_closed_img2, 'MapStoreClosed2.png' );
+loadImage( maps_open_img1, 'MapStoreOpen1.png' );
+loadImage( maps_open_img2, 'MapStoreOpen2.png' );
+loadImage( boats_closed_img1, 'BoatStoreClosed1.png' );
+loadImage( boats_closed_img2, 'BoatStoreClosed2.png' );
+loadImage( boats_open_img1, 'BoatStoreOpen1.png' );
+loadImage( boats_open_img2, 'BoatStoreOpen2.png' );
+loadImage( bank_closed_img1, 'BankClosed1.png' );
+loadImage( bank_closed_img2, 'BankClosed2.png' );
+loadImage( bank_open_img1, 'BankOpen1.png' );
+loadImage( bank_open_img2, 'BankOpen2.png' );
+loadImage( guild_closed_img1, 'GuildClosed1.png' );
+loadImage( guild_closed_img2, 'GuildClosed2.png' );
+loadImage( guild_open_img1, 'GuildOpen1.png' );
+loadImage( guild_open_img2, 'GuildOpen2.png' );
 
 loadImage( dirt_road_img, 'DirtPath.png' );
 loadImage( stone_road_img, 'StonePath.png' );
