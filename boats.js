@@ -654,14 +654,6 @@ function testQuest()
          payForQuest( 'stonetools', 3 );
          quest_status = 3;
          map[151][163].place = 0;
-      } else if (cargo_at_home.bronzetools >= 1) {
-         payForQuest( 'bronzetools', 1 );
-         quest_status = 3;
-         map[151][163].place = 0;
-      } else if (cargo_at_home.irontools >= 1) {
-         payForQuest( 'irontools', 1 );
-         quest_status = 3;
-         map[151][163].place = 0;
       }
    } else if (quest_status === 3) {
       var animals = [];
@@ -3173,12 +3165,12 @@ function drawBoatContent()
          var x_mid = (BOAT_INNER_X + 180 + BOAT_INNER_X + BOAT_INNER_WIDTH - 20) / 2;
          if (quest_status === 0) {
 
-            var quest_text = "Ah my child, just who I was looking for! I'm getting a bit old now, so it's up to you to take our bananas to market.";
+            var quest_text = "Kid, I'm getting a bit old now, so it's up to you to take our bananas to market.";
             var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 45, 18, '13pt arial', true );
 
-            quest_text = "Use the Sail menu to navigate to Market Town, just north of here. You can sell bananas from your Cargo. Then buy two SOFTWOOD at the Market so I can fix that hole in our roof.";
+            quest_text = "Use the 'Sail' menu to navigate to Market Town, just north of here. You can sell bananas from your 'Cargo'. Then buy two SOFTWOOD at the 'Market' so I can fix that hole in our roof.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
-            y = fitText( boat_context, "Hurry back!", BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
+            y = fitText( boat_context, "That's enough tutorializing for now. Hurry back!", BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
             var x = x_mid - 30;
             y += 10;
@@ -3188,7 +3180,7 @@ function drawBoatContent()
          } else if (quest_status === 1) {
             var quest_text = "Hoho! Well done kiddo!";
             var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 60, 18, '13pt arial', true );
-            quest_text = "You're a pretty savvy trader. You know you can make good money by buying goods where they're abundant and then selling them where they're lacking. You can buy maps in Town or just explore to find other settlements.";
+            quest_text = "You're a pretty savvy trader. You know you can make good money by trading between towns. You can buy maps in Town or just explore to find other settlements.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
             quest_text = "Here, take some more bananas from our Market and bring back four DIFFERENT KINDS OF FOOD. We'll have a proper meal for a change!";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
@@ -3198,7 +3190,7 @@ function drawBoatContent()
             var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 50, 18, '13pt arial', true );
             quest_text = "There's a lot of work to be done to fix this place up. I think there are some towns that produce tools, if not you'll have to stimulate their economy until they learn how.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
-            quest_text = "I think three STONE TOOLS will do it, or a single METAL TOOL if you can find one.";
+            quest_text = "I think three STONE TOOLS will do it.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
             var x = x_mid - 30;
@@ -3241,9 +3233,9 @@ function drawBoatContent()
          } else if (quest_status === 6) {
             var quest_text = "Ah that hit the spot.";
             var y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, BOAT_INNER_Y + 30, 18, '13pt arial', true );
-            quest_text = "I'm getting to know my way around these foreign foods pretty well, but to tell the truth the kitchen here is pretty lousy. Hey, why don't you bring some stuff to spruce it up?";
+            quest_text = "I'm getting to know my way around these foreign foods pretty well, but honestly the kitchen here is pretty lousy. Why don't you bring some stuff to spruce it up?";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
-            quest_text = "A nice new TABLE with four CHAIRS to start. Oh, and you know what would be perfect - a GRANITE countertop. Bring me four slabs of GRANITE and a two sets of IRON TOOLS and I'll handle the rest.";
+            quest_text = "A nice new TABLE with four CHAIRS to start. Oh, and how about a GRANITE countertop - bring me four slabs of GRANITE and a two sets of IRON TOOLS and I'll handle the rest.";
             y = fitText( boat_context, quest_text, BOAT_INNER_X + 180, BOAT_INNER_X + BOAT_INNER_WIDTH - 20, y + 10, 18, '13pt arial', true );
 
             var x = x_mid - 135;
