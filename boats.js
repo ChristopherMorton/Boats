@@ -979,7 +979,9 @@ function Place( name )
 
    this.discovered = false;
 
-   this.color = "rgba(255,55,55,1)";
+   this.color = "rgba(" + Math.round(195 + (Math.random() * 60)) + "," 
+                        + Math.round(35 + (Math.random() * 40)) + "," 
+                        + Math.round(35 + (Math.random() * 40)) + ",1)";
 
    this.update_tick = 0;
    this.upgrade_frequency = 475 + Math.round( Math.random() * 50 ); // # of ticks
@@ -4292,7 +4294,7 @@ function onClickBoats( e )
             for (var bt = 1; bt <= places[place].industries.boatcraft; bt++) {
                if (y_pix >= y && y_pix < y + 24) {
                   // initiate boat building
-                  var coins = boat.cargo.coins;
+                  var coins = (boat.cargo.coins || 0);
                   if (bt === 1 && coins >= 400) {
                      boat.addCargo( 'coins', -400 );
                   } else if (bt === 2 && coins >= 2700) {
@@ -4303,6 +4305,9 @@ function onClickBoats( e )
                      boat.addCargo( 'coins', -22000 );
                   } else if (bt === 5 && coins >= 48000) {
                      boat.addCargo( 'coins', -48000 );
+                  } else {
+                     y+= 30;
+                     continue;
                   }
                   places[place].building_boat_time = bt;
                   places[place].building_boat_type = bt;
@@ -5297,7 +5302,7 @@ function generateMap()
    createIsland( 140, 140, 160, 160, 2, 1, [1, 6] );
    places[1].discovered = true;
    places[1].resources = {};
-   places[1].stock = {};
+   places[1].stock = new Cargo();
    places[1].resources.softwood = 5;
    places[1].resources.apples = 5;
    places[1].resources.corn = 5;
@@ -5765,7 +5770,7 @@ function drawMapControls()
    fitText( map_context, '-', MAP_FULL_DIM, MAP_FULL_DIM + MAP_CONTROLS_WIDTH, 145, 40, '60pt arial', true);
 
    var cur_place = map[map_center_x][map_center_y].place;
-   if (cur_place !== undefined)
+   if (cur_place !== undefined && places[cur_place].discovered)
       fitText( map_context, places[cur_place].name, 24, MAP_FULL_DIM / 2, MAP_FULL_DIM + 1, 16, '14pt arial', false);
 
    fitText( map_context, map_center_x + "E - " + map_center_y + "S", MAP_FULL_DIM - 130, MAP_FULL_DIM, MAP_FULL_DIM + 1, 16, '14pt arial', true);
