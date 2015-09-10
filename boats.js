@@ -1576,28 +1576,15 @@ Place.prototype.attemptEat = function( food_target ) {
 
 Place.prototype.upgrade = function() {
    // Strategy:
-   // 1- Gather resources
-   // 1.1- Plant resources
    // 1.2- Resource loss
+   // 1.3- Gather resources
    // 1.5- Eat food, if not enough food then drop pop otherwise grow it
    // 2- Craft resources
    // 2.5- Build boats
    // 3- Attempt to upgrade industries
    // 4- Attempt to grow the town
 
-   // 1- Gather
-   for(var res in this.resources) {
-      var cur = this.stock[res];
-      if (!cur) cur = 0;
-      var income = this.resources[res] + Math.floor( Math.random() * 3 ) - 1;
-
-      cur = Math.round(cur + income);
-      this.stock[res] = cur;
-   }
-
-   // 1.1
-
-   // 1.2
+   // 1.2 - Breeding/loss
    for (var stock in this.stock) {
       if (stock === 'toJSON') continue;
       // Animal breeding
@@ -1619,9 +1606,19 @@ Place.prototype.upgrade = function() {
       } else {
          // Random loss
          var size_factor = 0.2 + (0.01 * this.size)
-         var loss = 0.8 - (Math.random() * size_factor);
-         this.stock[stock] = Math.ceil( this.stock[stock] * loss );
+         var loss = 0.7 - (Math.random() * size_factor);
+         this.stock[stock] = Math.round( this.stock[stock] * loss );
       }
+   }
+
+   // 1.3 - Gather
+   for(var res in this.resources) {
+      var cur = this.stock[res];
+      if (!cur) cur = 0;
+      var income = this.resources[res] + Math.floor( Math.random() * 3 ) - 1;
+
+      cur = Math.round(cur + income);
+      this.stock[res] = cur;
    }
 
    // 1.5- Eat
