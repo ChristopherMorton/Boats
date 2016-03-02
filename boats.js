@@ -2053,7 +2053,7 @@ Place.prototype.update = function() {
 
 function updatePlaces()
 {
-   for( var i = 0; i < places.length; ++i)
+   for( var i = 1; i < places.length; ++i)
       places[i].update();
 }
 
